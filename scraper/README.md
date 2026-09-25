@@ -12,5 +12,10 @@ uv run scraper
 
 ## Stages
 
-1. **Setup database**: creates the `mushrooms` table (the flattened structure of
-   `data/8.json`). If the table already exists, you can clean it, recreate it or leave it.
+1. **Setup database**: creates the tables defined in `src/scraper/schema.py`:
+   `funghi_italiani` (raw API data) and `mushrooms` (the flattened structure of
+   `data/8.json`). Missing tables are created. If some already exist, you can clean
+   them, recreate them or leave them.
+2. **Download data from funghiitaliani.it**: reads every record from the grid API
+   (100 per page, with retries) and saves it into `funghi_italiani`. If the table
+   already has rows, you can replace them or update them (upsert).

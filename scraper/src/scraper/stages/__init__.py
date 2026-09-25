@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Callable
 
-from scraper.stages import setup_db
+from scraper.stages import funghi_italiani, setup_db
 
 
 @dataclass(frozen=True)
@@ -13,4 +13,5 @@ class Stage:
 
 STAGES: list[Stage] = [
     Stage(1, "Setup database", setup_db.run),
+    Stage(2, "Download data from funghiitaliani.it", funghi_italiani.run),
 ]

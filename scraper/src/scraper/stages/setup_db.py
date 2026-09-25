@@ -1,61 +1,21 @@
-"""Stage 1: create the `mushrooms` table matching the structure of data/8.json.
+"""Stage 1: create the tables defined in scraper.schema.
 
-Each JSON record has three nested objects (source, taxonomy, properties); they are
-flattened into a single row. Wikipedia page ids are either ints or "" in the source
-data, so they are nullable. `class` and `order` are SQL keywords, hence taxon_*.
+If some tables already exist, ask whether to clean them, recreate them or leave
+them as they are. Missing tables are always created.
 """
 
 import psycopg
 import questionary
+from psycopg import sql
 from rich.console import Console
 
 from scraper.config import ConfigError, load_db_config
 from scraper.db import connect, row_count, table_exists
+from scraper.schema import TABLES
 
-TABLE = "mushrooms"
-
-CREATE_TABLE_SQL = f"""
-CREATE TABLE {TABLE} (
-    id                        integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-
-    -- source
-    funghi_italiani_id        integer NOT NULL UNIQUE,
-    funghi_italiani_topic_id  integer,
-    wikipedia_it_page_id      bigint,
-    wikipedia_en_page_id      bigint,
-
-    -- taxonomy
-    kingdom                   text NOT NULL DEFAULT '',
-    division                  text NOT NULL DEFAULT '',
-    taxon_class               text NOT NULL DEFAULT '',
-    taxon_order               text NOT NULL DEFAULT '',
-    family                    text NOT NULL DEFAULT '',
-    genus                     text NOT NULL,
-    species                   text NOT NULL,
-
-    -- properties
-    edible                    boolean NOT NULL DEFAULT false,
-    microscopic               boolean NOT NULL DEFAULT false,
-    cap                       text NOT NULL DEFAULT '',
-    hymenium                  text NOT NULL DEFAULT '',
-    lamella                   text NOT NULL DEFAULT '',
-    stipe                     text NOT NULL DEFAULT '',
-    gleba                     text NOT NULL DEFAULT '',
-    spore_print               text NOT NULL DEFAULT '',
-    ecology                   text NOT NULL DEFAULT '',
-    conservation_status       text NOT NULL DEFAULT '',
-    cover_image               text NOT NULL DEFAULT '',
-
-    created_at                timestamptz NOT NULL DEFAULT now(),
-    updated_at                timestamptz NOT NULL DEFAULT now()
-);
-
-CREATE INDEX {TABLE}_genus_species_idx ON {TABLE} (genus, species);
-"""
-
-CLEAN = "Clean it (delete all rows, keep the table)"
-RECREATE = "Recreate it (drop and create the table again)"
-KEEP = "Leave it as it is"
+CLEAN = "Clean them (delete all rows, keep the tables)"
+RECREATE = "Recreate them (drop and create the tables again)"
+KEEP = "Leave them as they are"
 
 console = Console()
 
@@ -76,31 +36,45 @@ def run() -> None:
 
 
 def _setup(conn: psycopg.Connection) -> None:
-    if not table_exists(conn, TABLE):
-        conn.execute(CREATE_TABLE_SQL)
-        conn.commit()
-        console.print(f"[green]Table '{TABLE}' created.[/green]")
+    existing = [table for table in TABLES if table_exists(conn, table)]
+    missing = [table for table in TABLES if table not in existing]
+
+    for table in missing:
+        conn.execute(TABLES[table])
+        console.print(f"[green]Table '{table}' created.[/green]")
+    conn.commit()
+
+    if not existing:
         return
 
-    count = row_count(conn, TABLE)
-    console.print(f"[yellow]Table '{TABLE}' already exists ({count} rows).[/yellow]")
+    for table in existing:
+        count = row_count(conn, table)
+        console.print(f"[yellow]Table '{table}' already exists ({count} rows).[/yellow]")
     choice = questionary.select(
-        "What do you want to do?", choices=[CLEAN, RECREATE, KEEP], default=CLEAN
+        "What do you want to do with the existing tables?",
+        choices=[CLEAN, RECREATE, KEEP],
+        default=CLEAN,
     ).ask()
 
     if choice == CLEAN:
-        conn.execute(f"TRUNCATE {TABLE} RESTART IDENTITY")
+        conn.execute(
+            sql.SQL("TRUNCATE {} RESTART IDENTITY").format(
+                sql.SQL(", ").join(map(sql.Identifier, existing))
+            )
+        )
         conn.commit()
-        console.print(f"[green]Table '{TABLE}' cleaned.[/green]")
+        console.print(f"[green]Cleaned: {', '.join(existing)}.[/green]")
     elif choice == RECREATE:
         if not questionary.confirm(
-            f"This drops '{TABLE}' and its {count} rows. Continue?", default=False
+            f"This drops {', '.join(existing)} and all their rows. Continue?",
+            default=False,
         ).ask():
             console.print("Aborted.")
             return
-        conn.execute(f"DROP TABLE {TABLE}")
-        conn.execute(CREATE_TABLE_SQL)
+        for table in existing:
+            conn.execute(sql.SQL("DROP TABLE {}").format(sql.Identifier(table)))
+            conn.execute(TABLES[table])
         conn.commit()
-        console.print(f"[green]Table '{TABLE}' recreated.[/green]")
+        console.print(f"[green]Recreated: {', '.join(existing)}.[/green]")
     else:
-        console.print("Table left untouched.")
+        console.print("Existing tables left untouched.")
