@@ -39,3 +39,7 @@ uv run scraper
    `src/scraper/stages/normalize.py`; compound values like "convex or flat" are
    translated part by part. Values not in the dictionaries are left unchanged and
    listed on screen. Running it again changes nothing.
+6. **Export to JSON**: writes the `mushrooms` table to a JSON file (by default
+   `data/mushrooms.json`) with the structure of `data/8.json`: `id`, a `taxonomy`
+   and a `properties` object with camelCase keys. The funghiitaliani.it and Wikipedia
+   ids and the timestamps are not exported.
