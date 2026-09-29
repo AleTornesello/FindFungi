@@ -71,7 +71,22 @@ CREATE TABLE funghi_italiani (
 CREATE INDEX funghi_italiani_genus_species_idx ON funghi_italiani (genus, species);
 """
 
+# Wikipedia lookup results (stage 3): one row per funghi_italiani record and
+# language. page_id is NULL when no page exists, so a row always means "searched".
+WIKIPEDIA_PAGES = """
+CREATE TABLE wikipedia_pages (
+    funghi_italiani_id  integer NOT NULL,
+    lang                text NOT NULL,                 -- 'it' or 'en'
+    searched_title      text NOT NULL,                 -- "<genus> <species>"
+    page_id             bigint,
+    page_title          text,                          -- differs if redirected
+    searched_at         timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (funghi_italiani_id, lang)
+);
+"""
+
 TABLES: dict[str, str] = {
     "funghi_italiani": FUNGHI_ITALIANI,
+    "wikipedia_pages": WIKIPEDIA_PAGES,
     "mushrooms": MUSHROOMS,
 }
