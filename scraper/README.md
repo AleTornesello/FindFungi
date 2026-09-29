@@ -5,7 +5,7 @@ Multi-stage interactive CLI that builds the FindFungi mushroom database.
 ## Setup
 
 ```sh
-cp .env.example .env   # then edit the connection values
+cp .env.example .env   # then edit the connection values and the Firecrawl key
 docker compose -f ../docker-compose.yaml up -d db
 uv run scraper
 ```
@@ -24,3 +24,12 @@ uv run scraper
    request, following redirects) and saves the result into `wikipedia_pages`, with a
    NULL `page_id` when there is no page. On later runs you can search only the
    mushrooms not searched yet, or all of them again.
+4. **Scrape Wikipedia data**: for every `funghi_italiani` record with a Wikipedia
+   page, scrapes the infoboxes of the Italian page (or the English one when there is
+   no Italian page) through the [Firecrawl](https://www.firecrawl.dev) API and saves
+   a row into `mushrooms`: taxonomy and edibility from funghiitaliani.it, morphology
+   (cap, hymenium, lamella, stipe, gleba, spore print, ecology), conservation status
+   and cover image from Wikipedia. Needs `FIRECRAWL_API_KEY` in `.env` (without it
+   the keyless rate limits apply); `FIRECRAWL_CONCURRENCY` sets the parallel requests.
+   Rows are committed in batches: on later runs you can scrape only the mushrooms not
+   saved yet (e.g. after an interruption or failed pages) or all of them again.
