@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react"
 import {
+  Badge,
   Box,
   Button,
   Container,
@@ -13,9 +14,11 @@ import {
   Spinner,
   Text,
 } from "@chakra-ui/react"
-import { RefreshCw, Search, WifiOff } from "lucide-react"
+import { RefreshCw, Search, SlidersHorizontal, WifiOff, X } from "lucide-react"
 import { scientificName } from "../data/mushrooms"
 import { MushroomCard } from "../components/MushroomCard"
+import { AdvancedFilterDialog } from "../components/AdvancedFilterDialog"
+import { activeFilterCount, FILTER_FIELDS, matchesFilters, type AdvancedFilters } from "../data/advancedFilters"
 import { useMushrooms } from "../hooks/useMushrooms"
 
 type Filter = "all" | "edible" | "inedible"
@@ -32,18 +35,37 @@ export function ExplorePage() {
   const { mushrooms, status } = useMushrooms()
   const [query, setQuery] = useState("")
   const [filter, setFilter] = useState<Filter>("all")
+  const [advanced, setAdvanced] = useState<AdvancedFilters>({})
+  const [dialogOpen, setDialogOpen] = useState(false)
   const [shown, setShown] = useState(PAGE_SIZE)
 
-  const results = useMemo(() => {
+  const searched = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return mushrooms
-      .filter(
-        (m) =>
-          (filter === "all" || m.properties.edible === (filter === "edible")) &&
-          (!q || scientificName(m).toLowerCase().includes(q) || m.taxonomy.family.toLowerCase().includes(q)),
-      )
-      .sort((a, b) => scientificName(a).localeCompare(scientificName(b)))
+    return mushrooms.filter(
+      (m) =>
+        (filter === "all" || m.properties.edible === (filter === "edible")) &&
+        (!q || scientificName(m).toLowerCase().includes(q) || m.taxonomy.family.toLowerCase().includes(q)),
+    )
   }, [mushrooms, query, filter])
+
+  const results = useMemo(
+    () =>
+      searched
+        .filter((m) => matchesFilters(m, advanced))
+        .sort((a, b) => scientificName(a).localeCompare(scientificName(b))),
+    [searched, advanced],
+  )
+
+  const advancedCount = activeFilterCount(advanced)
+  const applyAdvanced = (next: AdvancedFilters) => {
+    setAdvanced(next)
+    setShown(PAGE_SIZE)
+  }
+  const removeAdvanced = (key: string, value: string) => {
+    const { [key]: values = [], ...rest } = advanced
+    const remaining = values.filter((v) => v !== value)
+    applyAdvanced(remaining.length ? { ...rest, [key]: remaining } : rest)
+  }
 
   return (
     <Container maxW="6xl" px={{ base: "4", md: "6" }} pt={{ base: "8", md: "12" }}>
@@ -70,31 +92,84 @@ export function ExplorePage() {
         />
       </InputGroup>
 
-      <HStack role="group" aria-label="Filter by edibility" mt="4" gap="2">
-        {FILTERS.map((f) => {
-          const active = filter === f.value
-          return (
-            <Button
-              key={f.value}
-              size="sm"
-              borderRadius="full"
-              flexShrink={0}
-              aria-pressed={active}
-              onClick={() => {
-                setFilter(f.value)
-                setShown(PAGE_SIZE)
-              }}
-              bg={active ? "soil.900" : "bg.panel"}
-              color={active ? "lichen.300" : "fg"}
-              borderWidth="1px"
-              borderColor={active ? "soil.900" : "border"}
-              _hover={{ borderColor: "soil.500" }}
-            >
-              {f.label}
-            </Button>
-          )
-        })}
+      <HStack mt="4" gap="2" justify="space-between" flexWrap="wrap">
+        <HStack role="group" aria-label="Filter by edibility" gap="2">
+          {FILTERS.map((f) => {
+            const active = filter === f.value
+            return (
+              <Button
+                key={f.value}
+                size="sm"
+                borderRadius="full"
+                flexShrink={0}
+                aria-pressed={active}
+                onClick={() => {
+                  setFilter(f.value)
+                  setShown(PAGE_SIZE)
+                }}
+                bg={active ? "soil.900" : "bg.panel"}
+                color={active ? "lichen.300" : "fg"}
+                borderWidth="1px"
+                borderColor={active ? "soil.900" : "border"}
+                _hover={{ borderColor: "soil.500" }}
+              >
+                {f.label}
+              </Button>
+            )
+          })}
+        </HStack>
+        <Button
+          size="sm"
+          borderRadius="full"
+          variant="outline"
+          bg="bg.panel"
+          borderColor={advancedCount ? "soil.900" : "border"}
+          _hover={{ borderColor: "soil.500" }}
+          onClick={() => setDialogOpen(true)}
+        >
+          <SlidersHorizontal />
+          Filters
+          {advancedCount > 0 && (
+            <Badge bg="soil.900" color="lichen.300" borderRadius="full" px="2">
+              {advancedCount}
+            </Badge>
+          )}
+        </Button>
       </HStack>
+
+      {advancedCount > 0 && (
+        <Flex mt="3" gap="2" wrap="wrap" align="center" aria-label="Active filters">
+          {FILTER_FIELDS.flatMap((f) =>
+            (advanced[f.key] ?? []).map((value) => (
+              <Button
+                key={`${f.key}:${value}`}
+                size="xs"
+                borderRadius="full"
+                variant="subtle"
+                aria-label={`Remove filter ${f.label}: ${value}`}
+                onClick={() => removeAdvanced(f.key, value)}
+              >
+                <Text as="span" color="fg.muted">
+                  {f.label}:
+                </Text>
+                {value}
+                <X />
+              </Button>
+            )),
+          )}
+          <Button size="xs" variant="plain" color="fg.muted" textDecoration="underline" onClick={() => applyAdvanced({})}>
+            Clear filters
+          </Button>
+        </Flex>
+      )}
+
+      <AdvancedFilterDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        mushrooms={searched}
+        filters={advanced}
+        onApply={applyAdvanced}
+      />
 
       {mushrooms.length === 0 ? (
         <EmptyGuide loading={status === "loading" || status === "syncing"} />
@@ -119,9 +194,9 @@ export function ExplorePage() {
       ) : (
         <Box mt="10" textAlign="center" color="fg.muted">
           <Text fontWeight="600" color="fg">
-            No species match “{query}”.
+            {query.trim() ? `No species match “${query.trim()}”.` : "No species match these filters."}
           </Text>
-          <Text mt="1">Try a shorter name or clear the filter.</Text>
+          <Text mt="1">Try a shorter name or clear some filters.</Text>
         </Box>
       )}
     </Container>
