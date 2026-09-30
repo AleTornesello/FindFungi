@@ -1,4 +1,4 @@
-import type { Mushroom } from "./mushrooms"
+import type { Mushroom, ValueTranslations } from "./mushrooms"
 
 /**
  * The species dataset (~1 MB) lives in IndexedDB rather than localStorage, which is too small
@@ -6,6 +6,8 @@ import type { Mushroom } from "./mushrooms"
  */
 export interface MushroomSnapshot {
   mushrooms: Mushroom[]
+  /** Missing in snapshots saved before the dataset carried translations. */
+  translations?: ValueTranslations
   /** Epoch milliseconds of the last successful download. */
   syncedAt: number
 }

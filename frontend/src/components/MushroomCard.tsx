@@ -2,17 +2,22 @@ import { useState } from "react"
 import { Badge, Box, Flex, HStack, Image, Text } from "@chakra-ui/react"
 import { scientificName, type Mushroom } from "../data/mushrooms"
 import { MushroomIllustration } from "./MushroomIllustration"
+import { useI18n } from "../i18n/I18nProvider"
+import type { MessageKey } from "../i18n/locales/en"
+import { useValueLabel } from "../hooks/useMushrooms"
 
-const FEATURES: { key: keyof Mushroom["properties"]; label: string }[] = [
-  { key: "cap", label: "Cap" },
-  { key: "hymenium", label: "Hymenium" },
-  { key: "stipe", label: "Stipe" },
-  { key: "sporePrint", label: "Spore print" },
-  { key: "ecology", label: "Ecology" },
+const FEATURES: { key: keyof Mushroom["properties"]; label: MessageKey }[] = [
+  { key: "cap", label: "field.cap" },
+  { key: "hymenium", label: "field.hymenium" },
+  { key: "stipe", label: "field.stipe" },
+  { key: "sporePrint", label: "field.sporePrint" },
+  { key: "ecology", label: "field.ecology" },
 ]
 
 export function MushroomCard({ mushroom }: { mushroom: Mushroom }) {
   const { taxonomy, properties } = mushroom
+  const { t } = useI18n()
+  const valueLabel = useValueLabel()
   // Photos are remote and won't load offline; fall back to the illustration.
   const [imageFailed, setImageFailed] = useState(false)
   const features = FEATURES.filter((f) => {
@@ -56,7 +61,7 @@ export function MushroomCard({ mushroom }: { mushroom: Mushroom }) {
             px="2.5"
             flexShrink={0}
           >
-            {properties.edible ? "Edible" : "Not edible"}
+            {properties.edible ? t("edibility.edible") : t("edibility.inedible")}
           </Badge>
         </HStack>
         {features.length > 0 && (
@@ -64,9 +69,9 @@ export function MushroomCard({ mushroom }: { mushroom: Mushroom }) {
             {features.map((f) => (
               <Box key={f.key} display="contents">
                 <Text as="dt" color="fg.muted">
-                  {f.label}
+                  {t(f.label)}
                 </Text>
-                <Text as="dd">{properties[f.key] as string}</Text>
+                <Text as="dd">{valueLabel(f.key, properties[f.key] as string)}</Text>
               </Box>
             ))}
           </Box>

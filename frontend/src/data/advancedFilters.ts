@@ -1,4 +1,5 @@
 import type { Mushroom } from "./mushrooms"
+import type { MessageKey } from "../i18n/locales/en"
 
 /**
  * Fields the explore page doesn't already cover (name/family search and the edibility toggle).
@@ -7,9 +8,11 @@ import type { Mushroom } from "./mushrooms"
  */
 export interface FilterField {
   key: string
-  label: string
-  group: "Taxonomy" | "Characteristics"
+  label: MessageKey
+  group: "taxonomy" | "characteristics"
   values: (m: Mushroom) => string[]
+  /** Values the app itself produces (rather than the dataset), shown translated. */
+  valueLabels?: Record<string, MessageKey>
 }
 
 /** Selected option values per field key. Options within a field are ORed, fields are ANDed. */
@@ -27,40 +30,56 @@ const split = (v: string) =>
 // "Vulnerable (IUCN 3.1)" and "Vulnerable (NatureServe)" are the same status from different sources.
 const withoutSource = (v: string) => single(v.replace(/\s*\(.*\)$/, ""))
 
-const taxon = (key: keyof Mushroom["taxonomy"], label: string): FilterField => ({
+const taxon = (key: keyof Mushroom["taxonomy"], label: MessageKey): FilterField => ({
   key,
   label,
-  group: "Taxonomy",
+  group: "taxonomy",
   values: (m) => single(m.taxonomy[key]),
 })
 
-const trait = (key: keyof Mushroom["properties"], label: string, map = split): FilterField => ({
+const trait = (key: keyof Mushroom["properties"], label: MessageKey, map = split): FilterField => ({
   key,
   label,
-  group: "Characteristics",
+  group: "characteristics",
   values: (m) => map(String(m.properties[key])),
 })
 
 export const FILTER_FIELDS: FilterField[] = [
-  taxon("kingdom", "Kingdom"),
-  taxon("division", "Division"),
-  taxon("class", "Class"),
-  taxon("order", "Order"),
-  trait("hymenium", "Hymenium"),
-  trait("cap", "Cap shape"),
-  trait("lamella", "Gill attachment"),
-  trait("stipe", "Stipe"),
-  trait("gleba", "Flesh", single),
-  trait("sporePrint", "Spore print"),
-  trait("ecology", "Ecology"),
-  trait("conservationStatus", "Conservation status", withoutSource),
+  taxon("kingdom", "field.kingdom"),
+  taxon("division", "field.division"),
+  taxon("class", "field.class"),
+  taxon("order", "field.order"),
+  trait("hymenium", "field.hymenium"),
+  trait("cap", "field.capShape"),
+  trait("lamella", "field.lamella"),
+  trait("stipe", "field.stipe"),
+  trait("gleba", "field.gleba", single),
+  trait("sporePrint", "field.sporePrint"),
+  trait("ecology", "field.ecology"),
+  trait("conservationStatus", "field.conservationStatus", withoutSource),
   {
     key: "microscopic",
-    label: "Microscopy",
-    group: "Characteristics",
-    values: (m) => [m.properties.microscopic ? "Documented" : "Not documented"],
+    label: "field.microscopic",
+    group: "characteristics",
+    values: (m) => [m.properties.microscopic ? "documented" : "undocumented"],
+    valueLabels: {
+      documented: "filters.microscopy.documented",
+      undocumented: "filters.microscopy.undocumented",
+    },
   },
 ]
+
+/** Option label: app-made values go through `t`, characteristics through the dataset's translations. */
+export function filterValueLabel(
+  field: FilterField,
+  value: string,
+  t: (key: MessageKey) => string,
+  valueLabel: (property: keyof Mushroom["properties"], value: string) => string,
+) {
+  const key = field.valueLabels?.[value]
+  if (key) return t(key)
+  return field.group === "characteristics" ? valueLabel(field.key as keyof Mushroom["properties"], value) : value
+}
 
 export function matchesFilters(m: Mushroom, filters: AdvancedFilters, skipKey?: string) {
   return FILTER_FIELDS.every((f) => {

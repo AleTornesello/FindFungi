@@ -18,21 +18,31 @@ import { RefreshCw, Search, SlidersHorizontal, WifiOff, X } from "lucide-react"
 import { scientificName } from "../data/mushrooms"
 import { MushroomCard } from "../components/MushroomCard"
 import { AdvancedFilterDialog } from "../components/AdvancedFilterDialog"
-import { activeFilterCount, FILTER_FIELDS, matchesFilters, type AdvancedFilters } from "../data/advancedFilters"
-import { useMushrooms } from "../hooks/useMushrooms"
+import {
+  activeFilterCount,
+  FILTER_FIELDS,
+  filterValueLabel,
+  matchesFilters,
+  type AdvancedFilters,
+} from "../data/advancedFilters"
+import { OFFLINE_ERROR, useMushrooms, useValueLabel } from "../hooks/useMushrooms"
+import { useI18n } from "../i18n/I18nProvider"
+import type { MessageKey } from "../i18n/locales/en"
 
 type Filter = "all" | "edible" | "inedible"
 
-const FILTERS: { value: Filter; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "edible", label: "Edible" },
-  { value: "inedible", label: "Not edible" },
+const FILTERS: { value: Filter; label: MessageKey }[] = [
+  { value: "all", label: "explore.filter.all" },
+  { value: "edible", label: "explore.filter.edible" },
+  { value: "inedible", label: "explore.filter.inedible" },
 ]
 
 const PAGE_SIZE = 48
 
 export function ExplorePage() {
   const { mushrooms, status } = useMushrooms()
+  const { t } = useI18n()
+  const valueLabel = useValueLabel()
   const [query, setQuery] = useState("")
   const [filter, setFilter] = useState<Filter>("all")
   const [advanced, setAdvanced] = useState<AdvancedFilters>({})
@@ -70,10 +80,10 @@ export function ExplorePage() {
   return (
     <Container maxW="6xl" px={{ base: "4", md: "6" }} pt={{ base: "8", md: "12" }}>
       <Heading as="h1" fontSize={{ base: "4xl", md: "5xl" }} fontWeight="800" letterSpacing="-0.03em">
-        Species
+        {t("explore.title")}
       </Heading>
       <Text color="fg.muted" mt="2" maxW="xl">
-        Look up a species by its Latin name or family. The guide is saved on this device and works without signal.
+        {t("explore.intro")}
       </Text>
       <SyncStatusBar />
 
@@ -84,16 +94,16 @@ export function ExplorePage() {
             setQuery(e.target.value)
             setShown(PAGE_SIZE)
           }}
-          placeholder="Search by Latin name or family"
+          placeholder={t("explore.searchPlaceholder")}
           size="lg"
           bg="bg.panel"
           borderRadius="full"
-          aria-label="Search species"
+          aria-label={t("explore.searchLabel")}
         />
       </InputGroup>
 
       <HStack mt="4" gap="2" justify="space-between" flexWrap="wrap">
-        <HStack role="group" aria-label="Filter by edibility" gap="2">
+        <HStack role="group" aria-label={t("explore.edibilityGroup")} gap="2">
           {FILTERS.map((f) => {
             const active = filter === f.value
             return (
@@ -113,7 +123,7 @@ export function ExplorePage() {
                 borderColor={active ? "soil.900" : "border"}
                 _hover={{ borderColor: "soil.500" }}
               >
-                {f.label}
+                {t(f.label)}
               </Button>
             )
           })}
@@ -128,7 +138,7 @@ export function ExplorePage() {
           onClick={() => setDialogOpen(true)}
         >
           <SlidersHorizontal />
-          Filters
+          {t("explore.filters")}
           {advancedCount > 0 && (
             <Badge bg="soil.900" color="lichen.300" borderRadius="full" px="2">
               {advancedCount}
@@ -138,7 +148,7 @@ export function ExplorePage() {
       </HStack>
 
       {advancedCount > 0 && (
-        <Flex mt="3" gap="2" wrap="wrap" align="center" aria-label="Active filters">
+        <Flex mt="3" gap="2" wrap="wrap" align="center" aria-label={t("explore.activeFilters")}>
           {FILTER_FIELDS.flatMap((f) =>
             (advanced[f.key] ?? []).map((value) => (
               <Button
@@ -146,19 +156,19 @@ export function ExplorePage() {
                 size="xs"
                 borderRadius="full"
                 variant="subtle"
-                aria-label={`Remove filter ${f.label}: ${value}`}
+                aria-label={t("explore.removeFilter", { field: t(f.label), value: filterValueLabel(f, value, t, valueLabel) })}
                 onClick={() => removeAdvanced(f.key, value)}
               >
                 <Text as="span" color="fg.muted">
-                  {f.label}:
+                  {t(f.label)}:
                 </Text>
-                {value}
+                {filterValueLabel(f, value, t, valueLabel)}
                 <X />
               </Button>
             )),
           )}
           <Button size="xs" variant="plain" color="fg.muted" textDecoration="underline" onClick={() => applyAdvanced({})}>
-            Clear filters
+            {t("explore.clearFilters")}
           </Button>
         </Flex>
       )}
@@ -182,11 +192,11 @@ export function ExplorePage() {
           </SimpleGrid>
           <Flex direction="column" align="center" mt="6" gap="3">
             <Text fontSize="sm" color="fg.muted">
-              Showing {Math.min(shown, results.length)} of {results.length}
+              {t("explore.showing", { shown: Math.min(shown, results.length), total: results.length })}
             </Text>
             {shown < results.length && (
               <Button variant="outline" borderRadius="full" onClick={() => setShown((n) => n + PAGE_SIZE)}>
-                Show more
+                {t("explore.showMore")}
               </Button>
             )}
           </Flex>
@@ -194,26 +204,26 @@ export function ExplorePage() {
       ) : (
         <Box mt="10" textAlign="center" color="fg.muted">
           <Text fontWeight="600" color="fg">
-            {query.trim() ? `No species match “${query.trim()}”.` : "No species match these filters."}
+            {query.trim() ? t("explore.noMatchQuery", { query: query.trim() }) : t("explore.noMatchFilters")}
           </Text>
-          <Text mt="1">Try a shorter name or clear some filters.</Text>
+          <Text mt="1">{t("explore.noMatchHint")}</Text>
         </Box>
       )}
     </Container>
   )
 }
 
-const relative = new Intl.RelativeTimeFormat("en", { numeric: "auto" })
-
-function ago(ms: number) {
+function ago(ms: number, locale: string, justNow: string) {
+  const relative = new Intl.RelativeTimeFormat(locale, { numeric: "auto" })
   const days = Math.round((ms - Date.now()) / 86_400_000)
   if (days !== 0) return relative.format(days, "day")
   const hours = Math.round((ms - Date.now()) / 3_600_000)
-  return hours !== 0 ? relative.format(hours, "hour") : "just now"
+  return hours !== 0 ? relative.format(hours, "hour") : justNow
 }
 
 function SyncStatusBar() {
   const { mushrooms, syncedAt, status, error, sync } = useMushrooms()
+  const { locale, t } = useI18n()
   const syncing = status === "syncing"
 
   return (
@@ -225,14 +235,15 @@ function SyncStatusBar() {
       ) : null}
       <Text>
         {syncing
-          ? "Updating species guide…"
+          ? t("sync.updating")
           : syncedAt
-            ? `${mushrooms.length.toLocaleString()} species · updated ${ago(syncedAt)}`
-            : "Species guide not downloaded yet"}
-        {status === "error" && ` · couldn't update (${error})`}
+            ? t("sync.summary", { count: mushrooms.length, when: ago(syncedAt, locale, t("sync.justNow")) })
+            : t("sync.notDownloaded")}
+        {status === "error" &&
+          ` · ${t("sync.failed", { error: error === OFFLINE_ERROR ? t("sync.offline") : (error ?? "") })}`}
       </Text>
       <IconButton
-        aria-label="Update species guide now"
+        aria-label={t("sync.updateNow")}
         size="2xs"
         variant="ghost"
         color="fg.muted"
@@ -246,16 +257,15 @@ function SyncStatusBar() {
 }
 
 function EmptyGuide({ loading }: { loading: boolean }) {
+  const { t } = useI18n()
   return (
     <Flex direction="column" align="center" textAlign="center" mt="8" py="10" px="6" borderRadius="3xl" bg="bg.subtle">
       {loading ? <Spinner size="lg" color="moss.500" /> : <WifiOff size={32} aria-hidden />}
       <Text mt="4" fontWeight="700" fontSize="lg">
-        {loading ? "Downloading the species guide" : "The species guide isn't on this device yet"}
+        {loading ? t("sync.loadingTitle") : t("sync.missingTitle")}
       </Text>
       <Text color="fg.muted" mt="1" maxW="sm">
-        {loading
-          ? "This happens once. After that it works offline and refreshes itself every week."
-          : "Connect to the internet once to download it. After that it works offline."}
+        {loading ? t("sync.loadingBody") : t("sync.missingBody")}
       </Text>
     </Flex>
   )

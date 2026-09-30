@@ -1,14 +1,26 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react"
-import { MUSHROOMS_URL, parseMushrooms, RESYNC_AFTER_MS, type Mushroom } from "../data/mushrooms"
+import {
+  MUSHROOMS_URL,
+  parseMushrooms,
+  RESYNC_AFTER_MS,
+  type Mushroom,
+  type ValueTranslations,
+} from "../data/mushrooms"
 import { loadSnapshot, saveSnapshot } from "../data/mushroomStore"
+import { useI18n } from "../i18n/I18nProvider"
 
 export type SyncStatus = "loading" | "syncing" | "idle" | "error"
 
+/** `error` value when the download failed because the device has no connection. */
+export const OFFLINE_ERROR = "offline"
+
 interface MushroomsState {
   mushrooms: Mushroom[]
+  translations: ValueTranslations
   /** Epoch ms of the last successful sync, undefined if the dataset was never downloaded. */
   syncedAt?: number
   status: SyncStatus
+  /** Technical detail of the last failed download, or OFFLINE_ERROR. */
   error?: string
   /** Download the dataset now, regardless of its age. */
   sync: () => Promise<void>
@@ -23,6 +35,7 @@ const MushroomsContext = createContext<MushroomsState | null>(null)
  */
 export function MushroomsProvider({ children }: { children: ReactNode }) {
   const [mushrooms, setMushrooms] = useState<Mushroom[]>([])
+  const [translations, setTranslations] = useState<ValueTranslations>({})
   const [syncedAt, setSyncedAt] = useState<number>()
   const [status, setStatus] = useState<SyncStatus>("loading")
   const [error, setError] = useState<string>()
@@ -38,8 +51,9 @@ export function MushroomsProvider({ children }: { children: ReactNode }) {
         const res = await fetch(MUSHROOMS_URL, { cache: "no-cache" })
         if (!res.ok) throw new Error(`Download failed (HTTP ${res.status})`)
         const data = parseMushrooms(await res.json())
-        const snapshot = { mushrooms: data, syncedAt: Date.now() }
-        setMushrooms(data)
+        const snapshot = { ...data, syncedAt: Date.now() }
+        setMushrooms(data.mushrooms)
+        setTranslations(data.translations)
         setSyncedAt(snapshot.syncedAt)
         syncedAtRef.current = snapshot.syncedAt
         setError(undefined)
@@ -50,7 +64,7 @@ export function MushroomsProvider({ children }: { children: ReactNode }) {
           // Storage full or unavailable: the data still works for this session.
         }
       } catch (e) {
-        setError(navigator.onLine ? (e instanceof Error ? e.message : String(e)) : "You're offline")
+        setError(navigator.onLine ? (e instanceof Error ? e.message : String(e)) : OFFLINE_ERROR)
         setStatus("error")
       } finally {
         inFlight.current = null
@@ -67,11 +81,13 @@ export function MushroomsProvider({ children }: { children: ReactNode }) {
       if (cancelled) return
       if (snapshot) {
         setMushrooms(snapshot.mushrooms)
+        setTranslations(snapshot.translations ?? {})
         setSyncedAt(snapshot.syncedAt)
         syncedAtRef.current = snapshot.syncedAt
         setStatus("idle")
       }
-      if (isStale()) void sync()
+      // Copies saved before the dataset carried translations are replaced right away.
+      if (isStale() || !snapshot?.translations) void sync()
     })
 
     // Ask the browser not to evict the offline copy under storage pressure.
@@ -88,7 +104,7 @@ export function MushroomsProvider({ children }: { children: ReactNode }) {
   }, [sync])
 
   return (
-    <MushroomsContext.Provider value={{ mushrooms, syncedAt, status, error, sync }}>
+    <MushroomsContext.Provider value={{ mushrooms, translations, syncedAt, status, error, sync }}>
       {children}
     </MushroomsContext.Provider>
   )
@@ -98,4 +114,14 @@ export function useMushrooms() {
   const ctx = useContext(MushroomsContext)
   if (!ctx) throw new Error("useMushrooms must be used inside <MushroomsProvider>")
   return ctx
+}
+
+/** Shows a characteristic value in the current language, or in English when it has no translation. */
+export function useValueLabel() {
+  const { translations } = useMushrooms()
+  const { locale } = useI18n()
+  return useCallback(
+    (property: keyof Mushroom["properties"], value: string) => translations[locale]?.[property]?.[value] ?? value,
+    [translations, locale],
+  )
 }

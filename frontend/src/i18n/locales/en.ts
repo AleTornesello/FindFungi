@@ -1,0 +1,103 @@
+/**
+ * English is the source language and the fallback: every key must exist here, and any key
+ * another locale leaves out is shown in English. Placeholders like {count} are filled by t().
+ */
+export const en = {
+  "app.home": "FindFungi home",
+  "app.disclaimer": "Never eat a wild mushroom on the strength of an app. Check every find with a local expert.",
+
+  "nav.main": "Main",
+  "nav.species": "Species",
+  "nav.finds": "My finds",
+
+  "language.label": "Language",
+
+  "explore.title": "Species",
+  "explore.intro": "Look up a species by its Latin name or family. The guide is saved on this device and works without signal.",
+  "explore.searchPlaceholder": "Search by Latin name or family",
+  "explore.searchLabel": "Search species",
+  "explore.edibilityGroup": "Filter by edibility",
+  "explore.filter.all": "All",
+  "explore.filter.edible": "Edible",
+  "explore.filter.inedible": "Not edible",
+  "explore.filters": "Filters",
+  "explore.activeFilters": "Active filters",
+  "explore.removeFilter": "Remove filter {field}: {value}",
+  "explore.clearFilters": "Clear filters",
+  "explore.showing": "Showing {shown} of {total}",
+  "explore.showMore": "Show more",
+  "explore.noMatchQuery": "No species match “{query}”.",
+  "explore.noMatchFilters": "No species match these filters.",
+  "explore.noMatchHint": "Try a shorter name or clear some filters.",
+
+  "sync.updating": "Updating species guide…",
+  "sync.summary": "{count} species · updated {when}",
+  "sync.justNow": "just now",
+  "sync.notDownloaded": "Species guide not downloaded yet",
+  "sync.failed": "couldn't update ({error})",
+  "sync.offline": "You're offline",
+  "sync.updateNow": "Update species guide now",
+  "sync.loadingTitle": "Downloading the species guide",
+  "sync.loadingBody": "This happens once. After that it works offline and refreshes itself every week.",
+  "sync.missingTitle": "The species guide isn't on this device yet",
+  "sync.missingBody": "Connect to the internet once to download it. After that it works offline.",
+
+  "filters.title": "Filters",
+  "filters.clearAll": "Clear all",
+  "filters.show": "Show {count} species",
+  "filters.group.taxonomy": "Taxonomy",
+  "filters.group.characteristics": "Characteristics",
+  "filters.microscopy.documented": "Documented",
+  "filters.microscopy.undocumented": "Not documented",
+
+  "field.kingdom": "Kingdom",
+  "field.division": "Division",
+  "field.class": "Class",
+  "field.order": "Order",
+  "field.hymenium": "Hymenium",
+  "field.cap": "Cap",
+  "field.capShape": "Cap shape",
+  "field.lamella": "Gill attachment",
+  "field.stipe": "Stipe",
+  "field.gleba": "Flesh",
+  "field.sporePrint": "Spore print",
+  "field.ecology": "Ecology",
+  "field.conservationStatus": "Conservation status",
+  "field.microscopic": "Microscopy",
+
+  "edibility.edible": "Edible",
+  "edibility.inedible": "Not edible",
+
+  "finds.title": "My finds",
+  "finds.intro": "Your finds are saved in this browser.",
+  "finds.formTitle": "Log a find",
+  "finds.species": "Species",
+  "finds.place": "Place",
+  "finds.placePlaceholder": "Old beech wood, north path",
+  "finds.date": "Date",
+  "finds.notes": "Notes",
+  "finds.notesPlaceholder": "How many, what they grew on, smell…",
+  "finds.save": "Save find",
+  "finds.emptyTitle": "No finds yet",
+  "finds.emptyBody": "Fill in the form after your next walk. The place and date help you return next season.",
+  "finds.unknownSpecies": "Unknown species",
+  "finds.delete": "Delete {species} at {place}",
+
+  "species.chanterelle": "Chanterelle",
+  "species.porcini": "Porcini",
+  "species.fly-agaric": "Fly agaric",
+  "species.death-cap": "Death cap",
+  "species.chicken-of-the-woods": "Chicken of the woods",
+  "species.parasol": "Parasol",
+  "species.morel": "Morel",
+  "species.turkey-tail": "Turkey tail",
+
+  "notFound.title": "This page isn't here",
+  "notFound.body": "The link may be old or mistyped.",
+  "notFound.cta": "Browse species",
+}
+
+export type MessageKey = keyof typeof en
+
+/** Other locales may be incomplete while they're being translated; gaps fall back to English. */
+export type Messages = Partial<Record<MessageKey, string>>

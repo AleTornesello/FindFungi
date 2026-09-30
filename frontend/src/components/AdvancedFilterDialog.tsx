@@ -1,7 +1,15 @@
 import { useMemo, useState } from "react"
 import { Box, Button, CloseButton, Dialog, Flex, Heading, Portal, Stack, Text } from "@chakra-ui/react"
 import type { Mushroom } from "../data/mushrooms"
-import { activeFilterCount, FILTER_FIELDS, matchesFilters, type AdvancedFilters } from "../data/advancedFilters"
+import {
+  activeFilterCount,
+  FILTER_FIELDS,
+  filterValueLabel,
+  matchesFilters,
+  type AdvancedFilters,
+} from "../data/advancedFilters"
+import { useI18n } from "../i18n/I18nProvider"
+import { useValueLabel } from "../hooks/useMushrooms"
 
 interface Props {
   open: boolean
@@ -12,9 +20,11 @@ interface Props {
   onApply: (filters: AdvancedFilters) => void
 }
 
-const GROUPS = ["Taxonomy", "Characteristics"] as const
+const GROUPS = ["taxonomy", "characteristics"] as const
 
 export function AdvancedFilterDialog({ open, onOpenChange, mushrooms, filters, onApply }: Props) {
+  const { t } = useI18n()
+  const valueLabel = useValueLabel()
   // Edits stay local until applied, so closing the dialog discards them.
   const [draft, setDraft] = useState(filters)
   const [prevOpen, setPrevOpen] = useState(open)
@@ -66,7 +76,7 @@ export function AdvancedFilterDialog({ open, onOpenChange, mushrooms, filters, o
           <Dialog.Content borderRadius={{ base: "0", md: "3xl" }}>
             <Dialog.Header>
               <Dialog.Title fontFamily="heading" fontSize="2xl" fontWeight="800" letterSpacing="-0.02em">
-                Filters
+                {t("filters.title")}
               </Dialog.Title>
             </Dialog.Header>
             <Dialog.CloseTrigger asChild>
@@ -78,7 +88,7 @@ export function AdvancedFilterDialog({ open, onOpenChange, mushrooms, filters, o
                 {GROUPS.map((group) => (
                   <Box key={group} as="section">
                     <Heading as="h3" fontSize="xs" textTransform="uppercase" letterSpacing="0.08em" color="fg.muted">
-                      {group}
+                      {t(`filters.group.${group}`)}
                     </Heading>
                     <Stack gap="5" mt="3">
                       {FILTER_FIELDS.filter((f) => f.group === group).map((f) => {
@@ -86,15 +96,15 @@ export function AdvancedFilterDialog({ open, onOpenChange, mushrooms, filters, o
                         if (fieldOptions.length === 0) return null
                         const selected = draft[f.key] ?? []
                         return (
-                          <Box key={f.key} role="group" aria-label={f.label}>
+                          <Box key={f.key} role="group" aria-label={t(f.label)}>
                             <Text fontWeight="700" fontSize="sm" mb="2">
-                              {f.label}
+                              {t(f.label)}
                             </Text>
                             <Flex gap="2" wrap="wrap">
                               {fieldOptions.map(([value, count]) => (
                                 <OptionChip
                                   key={value}
-                                  label={value}
+                                  label={filterValueLabel(f, value, t, valueLabel)}
                                   count={count}
                                   active={selected.includes(value)}
                                   onClick={() => toggle(f.key, value)}
@@ -112,7 +122,7 @@ export function AdvancedFilterDialog({ open, onOpenChange, mushrooms, filters, o
 
             <Dialog.Footer justifyContent="space-between" borderTopWidth="1px" borderColor="border">
               <Button variant="ghost" disabled={activeFilterCount(draft) === 0} onClick={() => setDraft({})}>
-                Clear all
+                {t("filters.clearAll")}
               </Button>
               <Button
                 borderRadius="full"
@@ -124,7 +134,7 @@ export function AdvancedFilterDialog({ open, onOpenChange, mushrooms, filters, o
                   onOpenChange(false)
                 }}
               >
-                Show {matching.toLocaleString()} species
+                {t("filters.show", { count: matching })}
               </Button>
             </Dialog.Footer>
           </Dialog.Content>
