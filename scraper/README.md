@@ -40,6 +40,12 @@ uv run scraper
    translated part by part. Values not in the dictionaries are left unchanged and
    listed on screen. Running it again changes nothing.
 6. **Export to JSON**: writes the `mushrooms` table to a JSON file (by default
-   `data/mushrooms.json`) with the structure of `data/8.json`: `id`, a `taxonomy`
-   and a `properties` object with camelCase keys. The funghiitaliani.it and Wikipedia
-   ids and the timestamps are not exported.
+   `data/mushrooms.json`). Its `mushrooms` list has the structure of `data/8.json`:
+   `id`, a `taxonomy` and a `properties` object with camelCase keys. The
+   funghiitaliani.it and Wikipedia ids and the timestamps are not exported. Its
+   `translations` object holds, per language and property, the translation of every
+   characteristic value (e.g. `translations.it.cap["convex or flat"]` is
+   `"convesso o piatto"`), built from the dictionaries in `src/scraper/translations.py`;
+   compound values are translated part by part. Values missing from a dictionary are
+   listed on screen and shown in English by the app. To add a language, add its
+   dictionaries to that file and export again.

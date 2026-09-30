@@ -1,8 +1,13 @@
 """Stage 6: export the `mushrooms` table to a JSON file.
 
-The output follows the structure of data/8.json: a list of objects with the
-row id, a `taxonomy` and a `properties` object, keys in camelCase. The source
-ids (funghi_italiani and Wikipedia) and the timestamps are not exported.
+The output is an object with two keys:
+
+- `mushrooms`: the rows with the structure of data/8.json, i.e. the row id, a
+  `taxonomy` and a `properties` object, keys in camelCase. The source ids
+  (funghi_italiani and Wikipedia) and the timestamps are not exported.
+- `translations`: per language and property, the translation of every English
+  characteristic value in the export, from the dictionaries in
+  `scraper.translations`.
 """
 
 import json
@@ -12,9 +17,11 @@ import psycopg
 import questionary
 from psycopg.rows import dict_row
 from rich.console import Console
+from rich.table import Table
 
 from scraper.config import PROJECT_ROOT, ConfigError, load_db_config
 from scraper.db import connect, row_count, table_exists
+from scraper.translations import build_translations
 
 TABLE = "mushrooms"
 DEFAULT_PATH = "data/mushrooms.json"
@@ -63,8 +70,22 @@ def run() -> None:
         console.print("Cancelled.")
         return
 
-    write_json(path, [to_json(row) for row in rows])
+    mushrooms = [to_json(row) for row in rows]
+    translations, missing = build_translations(mushrooms)
+    write_json(path, {"mushrooms": mushrooms, "translations": translations})
     console.print(f"[green]Exported {len(rows)} mushrooms to {path}.[/green]")
+    if missing:
+        console.print(
+            f"[yellow]{len(missing)} values have no translation and will be shown in English "
+            "(add them to src/scraper/translations.py):[/yellow]"
+        )
+        table = Table()
+        table.add_column("Language")
+        table.add_column("Property")
+        table.add_column("Value")
+        for language, field, value in sorted(missing):
+            table.add_row(language, field, value)
+        console.print(table)
 
 
 def to_json(row: dict) -> dict:
@@ -95,7 +116,7 @@ def to_json(row: dict) -> dict:
     }
 
 
-def write_json(path: Path, data: list[dict]) -> None:
+def write_json(path: Path, data: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     # Write to a temporary file first, so a failure never leaves a truncated export.
     tmp = path.with_suffix(path.suffix + ".tmp")
