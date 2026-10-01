@@ -1,5 +1,5 @@
 import type { ReactNode } from "react"
-import { DETAIL, DrawingSvg, FILL, Ground, OUTLINE, Stipe, type DrawingProps } from "./mushroomDrawing"
+import { DETAIL, DrawingSvg, FILL, Ground, mirror, OUTLINE, Stipe, type DrawingProps } from "./mushroomDrawing"
 
 /**
  * Hymenium types drawn as a section through the fruiting body, like the cap shapes. Gills,
@@ -35,8 +35,6 @@ const capped = (underside: ReactNode) => (
     <path d={CAP} fill={FILL.cap} {...OUTLINE} />
   </>
 )
-
-const mirror = (d: string) => d.replace(/(-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)/g, (_, x, y) => `${64 - Number(x)} ${y}`)
 
 // Forking ridges of a chanterelle, running from the rim down onto the stipe.
 const RIDGES = ["M11 23.5 C16 26 22 30 26.5 39", "M17 23.5 C21 26 24 29 27 35", "M14 25 L15.5 23.5", "M21 27 L23 23.5"]

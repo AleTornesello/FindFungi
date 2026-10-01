@@ -2,7 +2,7 @@ import { chakra, type HTMLChakraProps } from "@chakra-ui/react"
 import type { ReactNode } from "react"
 
 /**
- * Shared look of the trait drawings (cap shapes, hymenium types): a 64×64 section through the
+ * Shared look of the trait drawings (cap shapes, hymenium types, gill attachments): a 64×64 section through the
  * fruiting body, ground at y=58, filled shapes outlined in the text colour, so each set reads
  * as one family next to the others.
  */
@@ -32,6 +32,9 @@ export const Stipe = ({ top }: { top: number }) => (
     {...OUTLINE}
   />
 )
+
+/** The same path reflected across the vertical centre line, for the other half of a section. */
+export const mirror = (d: string) => d.replace(/(-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)/g, (_, x, y) => `${64 - Number(x)} ${y}`)
 
 export type DrawingProps = { title?: string } & Omit<HTMLChakraProps<"svg">, "children">
 
