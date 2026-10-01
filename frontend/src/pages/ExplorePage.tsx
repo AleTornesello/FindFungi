@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import {
   Badge,
   Box,
@@ -39,15 +39,44 @@ const FILTERS: { value: Filter; label: MessageKey }[] = [
 
 const PAGE_SIZE = 48
 
+interface SavedState {
+  query: string
+  filter: Filter
+  advanced: AdvancedFilters
+  shown: number
+}
+
+const STATE_KEY = "findfungi:explore"
+
+function loadState(): SavedState {
+  const fallback: SavedState = { query: "", filter: "all", advanced: {}, shown: PAGE_SIZE }
+  try {
+    const raw = sessionStorage.getItem(STATE_KEY)
+    return raw ? { ...fallback, ...(JSON.parse(raw) as Partial<SavedState>) } : fallback
+  } catch {
+    return fallback
+  }
+}
+
 export function ExplorePage() {
   const { mushrooms, status } = useMushrooms()
   const { t } = useI18n()
   const valueLabel = useValueLabel()
-  const [query, setQuery] = useState("")
-  const [filter, setFilter] = useState<Filter>("all")
-  const [advanced, setAdvanced] = useState<AdvancedFilters>({})
+  const [saved] = useState(loadState)
+  const [query, setQuery] = useState(saved.query)
+  const [filter, setFilter] = useState<Filter>(saved.filter)
+  const [advanced, setAdvanced] = useState<AdvancedFilters>(saved.advanced)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [shown, setShown] = useState(PAGE_SIZE)
+  const [shown, setShown] = useState(saved.shown)
+
+  // Kept for the tab's lifetime so returning from a detail page restores the same results.
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(STATE_KEY, JSON.stringify({ query, filter, advanced, shown } satisfies SavedState))
+    } catch {
+      // Storage can be unavailable (private mode); filters then just reset on return.
+    }
+  }, [query, filter, advanced, shown])
 
   const searched = useMemo(() => {
     const q = query.trim().toLowerCase()
