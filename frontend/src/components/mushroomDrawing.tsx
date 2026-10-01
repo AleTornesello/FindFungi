@@ -2,9 +2,9 @@ import { chakra, type HTMLChakraProps } from "@chakra-ui/react"
 import type { ReactNode } from "react"
 
 /**
- * Shared look of the trait drawings (cap shapes, hymenium types, gill attachments, stipes): a 64×64 section through the
- * fruiting body, ground at y=58, filled shapes outlined in the text colour, so each set reads
- * as one family next to the others.
+ * Shared look of the trait drawings (cap shapes, hymenium types, gill attachments, stipes,
+ * flesh): a 64×64 section through the fruiting body, ground at y=58, filled shapes outlined in
+ * the text colour, so each set reads as one family next to the others.
  */
 export const FILL = {
   cap: "var(--chakra-colors-soil-400)",
@@ -18,6 +18,11 @@ export const FILL = {
   substrate: "var(--chakra-colors-soil-500)",
   /** Remains of the veil: ring, volva. */
   veil: "var(--chakra-colors-soil-50)",
+  /** Inside of a fruiting body cut in half. */
+  flesh: "var(--chakra-colors-soil-50)",
+  /** Flesh turning colour where it's cut or bruised, as in many boletes. */
+  stain: "var(--chakra-colors-blue-400)",
+  stainDeep: "var(--chakra-colors-blue-600)",
 }
 
 export const OUTLINE = { stroke: "currentColor", strokeWidth: 1.5 } as const
