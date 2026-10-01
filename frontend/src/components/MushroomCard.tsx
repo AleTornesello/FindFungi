@@ -1,7 +1,7 @@
-import { useState } from "react"
-import { Badge, Box, Flex, HStack, Image, Text } from "@chakra-ui/react"
-import { scientificName, type Mushroom } from "../data/mushrooms"
-import { MushroomIllustration } from "./MushroomIllustration"
+import { Badge, Box, HStack, LinkBox, LinkOverlay, Text } from "@chakra-ui/react"
+import { Link } from "react-router"
+import { scientificName, speciesPath, type Mushroom } from "../data/mushrooms"
+import { MushroomPhoto } from "./MushroomPhoto"
 import { useI18n } from "../i18n/I18nProvider"
 import type { MessageKey } from "../i18n/locales/en"
 import { useValueLabel } from "../hooks/useMushrooms"
@@ -18,35 +18,31 @@ export function MushroomCard({ mushroom }: { mushroom: Mushroom }) {
   const { taxonomy, properties } = mushroom
   const { t } = useI18n()
   const valueLabel = useValueLabel()
-  // Photos are remote and won't load offline; fall back to the illustration.
-  const [imageFailed, setImageFailed] = useState(false)
   const features = FEATURES.filter((f) => {
     const v = properties[f.key]
     return typeof v === "string" && v && v !== "not applicable"
   })
 
   return (
-    <Box as="article" bg="bg.panel" borderRadius="2xl" borderWidth="1px" borderColor="border" overflow="hidden" h="full">
-      <Flex h="36" align="center" justify="center" bg="soil.50" overflow="hidden">
-        {properties.coverImage && !imageFailed ? (
-          <Image
-            src={properties.coverImage}
-            alt=""
-            loading="lazy"
-            w="full"
-            h="full"
-            objectFit="cover"
-            onError={() => setImageFailed(true)}
-          />
-        ) : (
-          <MushroomIllustration capColor="#B58962" stemColor="#E9D9C8" w="24" />
-        )}
-      </Flex>
+    <LinkBox
+      as="article"
+      bg="bg.panel"
+      borderRadius="2xl"
+      borderWidth="1px"
+      borderColor="border"
+      overflow="hidden"
+      h="full"
+      transition="border-color 0.15s, transform 0.15s, box-shadow 0.15s"
+      _hover={{ borderColor: "soil.300", transform: "translateY(-2px)", boxShadow: "0 6px 18px rgba(46,31,20,.08)" }}
+    >
+      <MushroomPhoto src={properties.coverImage} h="36" />
       <Box p="4">
         <HStack justify="space-between" align="flex-start" gap="2">
           <Box minW="0">
             <Text fontFamily="heading" fontWeight="700" fontSize="lg" lineHeight="1.2" fontStyle="italic">
-              {scientificName(mushroom)}
+              <LinkOverlay asChild>
+                <Link to={speciesPath(mushroom)}>{scientificName(mushroom)}</Link>
+              </LinkOverlay>
             </Text>
             {taxonomy.family && (
               <Text color="fg.muted" fontSize="sm">
@@ -77,6 +73,6 @@ export function MushroomCard({ mushroom }: { mushroom: Mushroom }) {
           </Box>
         )}
       </Box>
-    </Box>
+    </LinkBox>
   )
 }

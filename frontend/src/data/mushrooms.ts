@@ -45,6 +45,8 @@ export interface MushroomData {
 
 export const scientificName = (m: Mushroom) => `${m.taxonomy.genus} ${m.taxonomy.species}`.trim()
 
+export const speciesPath = (m: Mushroom) => `/species/${m.id}`
+
 /** Rejects payloads that would break the UI, so a bad download never replaces a good local copy. */
 export function parseMushrooms(data: unknown): MushroomData {
   // Older exports were a bare list, without translations.
