@@ -6,6 +6,7 @@ import { scientificName, type Mushroom } from "../data/mushrooms"
 import { hasTraitDrawing, TraitIcon } from "../components/TraitIcon"
 import { MushroomCard } from "../components/MushroomCard"
 import { MushroomPhoto } from "../components/MushroomPhoto"
+import { SporePrintSwatch } from "../components/SporePrintSwatch"
 import { useMushrooms, useValueLabel } from "../hooks/useMushrooms"
 import { useI18n } from "../i18n/I18nProvider"
 import type { MessageKey } from "../i18n/locales/en"
@@ -222,9 +223,12 @@ function Hero({ mushroom }: { mushroom: Mushroom }) {
                   <Text as="dt" fontSize="xs" color="fg.muted">
                     {t(`field.${k}` as MessageKey)}
                   </Text>
-                  <Text as="dd" fontWeight="700" _firstLetter={{ textTransform: "uppercase" }}>
-                    {valueLabel(k, properties[k])}
-                  </Text>
+                  <HStack as="dd" gap="1.5">
+                    {k === "sporePrint" && <SporePrintSwatch value={properties[k]} />}
+                    <Text fontWeight="700" _firstLetter={{ textTransform: "uppercase" }}>
+                      {valueLabel(k, properties[k])}
+                    </Text>
+                  </HStack>
                 </Box>
               ))}
             </SimpleGrid>
@@ -308,9 +312,12 @@ function Characteristics({ mushroom }: { mushroom: Mushroom }) {
                       {t(f.label)}
                     </Text>
                     <Box as="dd">
-                      <Text fontWeight="600" _firstLetter={{ textTransform: "uppercase" }}>
-                        {valueLabel(f.key, properties[f.key] as string)}
-                      </Text>
+                      <HStack gap="2">
+                        {f.key === "sporePrint" && <SporePrintSwatch value={properties.sporePrint} w="3.5" h="3.5" />}
+                        <Text fontWeight="600" _firstLetter={{ textTransform: "uppercase" }}>
+                          {valueLabel(f.key, properties[f.key] as string)}
+                        </Text>
+                      </HStack>
                       <TraitDrawings property={f.key} value={properties[f.key] as string} />
                     </Box>
                   </Grid>

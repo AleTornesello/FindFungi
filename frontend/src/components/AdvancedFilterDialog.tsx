@@ -10,6 +10,7 @@ import {
 } from "../data/advancedFilters"
 import { useI18n } from "../i18n/I18nProvider"
 import { useValueLabel } from "../hooks/useMushrooms"
+import { SporePrintSwatch } from "./SporePrintSwatch"
 import { TraitIcon } from "./TraitIcon"
 
 interface Props {
@@ -106,7 +107,13 @@ export function AdvancedFilterDialog({ open, onOpenChange, mushrooms, filters, o
                                 <OptionChip
                                   key={value}
                                   label={filterValueLabel(f, value, t, valueLabel)}
-                                  icon={<TraitIcon property={f.key} value={value} w="5" h="5" />}
+                                  icon={
+                                    f.key === "sporePrint" ? (
+                                      <SporePrintSwatch value={value} />
+                                    ) : (
+                                      <TraitIcon property={f.key} value={value} w="5" h="5" />
+                                    )
+                                  }
                                   count={count}
                                   active={selected.includes(value)}
                                   onClick={() => toggle(f.key, value)}
