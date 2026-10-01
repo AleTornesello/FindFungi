@@ -311,7 +311,7 @@ function Characteristics({ mushroom }: { mushroom: Mushroom }) {
                     <Text as="dt" color="fg.muted" fontSize="sm">
                       {t(f.label)}
                     </Text>
-                    <Box as="dd">
+                    <Flex as="dd" justify="space-between" align="flex-start" gap="4">
                       <HStack gap="2">
                         {f.key === "sporePrint" && <SporePrintSwatch value={properties.sporePrint} w="3.5" h="3.5" />}
                         <Text fontWeight="600" _firstLetter={{ textTransform: "uppercase" }}>
@@ -319,7 +319,7 @@ function Characteristics({ mushroom }: { mushroom: Mushroom }) {
                         </Text>
                       </HStack>
                       <TraitDrawings property={f.key} value={properties[f.key] as string} />
-                    </Box>
+                    </Flex>
                   </Grid>
                 ))}
               </Box>
@@ -332,7 +332,7 @@ function Characteristics({ mushroom }: { mushroom: Mushroom }) {
 }
 
 /**
- * Section drawings of a characteristic; a value like "convex or flat" gets one per alternative,
+ * Section drawings of a characteristic, beside its value; a value like "convex or flat" gets one per alternative,
  * each captioned, while "ring and volva" is a single feature with its own drawing.
  */
 function TraitDrawings({ property, value }: { property: Property; value: string }) {
@@ -340,7 +340,7 @@ function TraitDrawings({ property, value }: { property: Property; value: string 
   const shapes = value.split(" or ").filter((v) => hasTraitDrawing(property, v))
   if (shapes.length === 0) return null
   return (
-    <Flex gap="3" mt="2" wrap="wrap">
+    <Flex gap="3" wrap="wrap" justify="flex-end" flexShrink={0}>
       {shapes.map((shape) => (
         <Stack key={shape} as="figure" align="center" gap="1" color="fg">
           <Box bg="bg.subtle" borderRadius="xl" p="1.5">
