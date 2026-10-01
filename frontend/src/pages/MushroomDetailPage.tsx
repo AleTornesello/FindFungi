@@ -4,7 +4,7 @@ import { Link as RouterLink, useLocation, useNavigate, useParams } from "react-r
 import { ArrowLeft, ChevronRight, ExternalLink, Microscope, TriangleAlert, Utensils, type LucideIcon } from "lucide-react"
 import { scientificName, type Mushroom } from "../data/mushrooms"
 import { splitValues } from "../data/advancedFilters"
-import { CapShapeIcon, hasCapDrawing } from "../components/CapShapeIcon"
+import { hasTraitDrawing, TraitIcon } from "../components/TraitIcon"
 import { MushroomCard } from "../components/MushroomCard"
 import { MushroomPhoto } from "../components/MushroomPhoto"
 import { useMushrooms, useValueLabel } from "../hooks/useMushrooms"
@@ -312,7 +312,7 @@ function Characteristics({ mushroom }: { mushroom: Mushroom }) {
                       <Text fontWeight="600" _firstLetter={{ textTransform: "uppercase" }}>
                         {valueLabel(f.key, properties[f.key] as string)}
                       </Text>
-                      {f.key === "cap" && <CapShapes value={properties.cap} />}
+                      <TraitDrawings property={f.key} value={properties[f.key] as string} />
                     </Box>
                   </Grid>
                 ))}
@@ -325,21 +325,21 @@ function Characteristics({ mushroom }: { mushroom: Mushroom }) {
   )
 }
 
-/** Section drawings of the cap; a value like "convex or flat" gets one per shape, each captioned. */
-function CapShapes({ value }: { value: string }) {
+/** Section drawings of a characteristic; a value like "convex or flat" gets one per shape, each captioned. */
+function TraitDrawings({ property, value }: { property: Property; value: string }) {
   const valueLabel = useValueLabel()
-  const shapes = splitValues(value).filter(hasCapDrawing)
+  const shapes = splitValues(value).filter((v) => hasTraitDrawing(property, v))
   if (shapes.length === 0) return null
   return (
     <Flex gap="3" mt="2" wrap="wrap">
       {shapes.map((shape) => (
         <Stack key={shape} as="figure" align="center" gap="1" color="fg">
           <Box bg="bg.subtle" borderRadius="xl" p="1.5">
-            <CapShapeIcon shape={shape} w="16" h="16" />
+            <TraitIcon property={property} value={shape} w="16" h="16" />
           </Box>
           {shapes.length > 1 && (
             <Text as="figcaption" fontSize="xs" color="fg.muted" _firstLetter={{ textTransform: "uppercase" }}>
-              {valueLabel("cap", shape)}
+              {valueLabel(property, shape)}
             </Text>
           )}
         </Stack>

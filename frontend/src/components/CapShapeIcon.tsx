@@ -1,9 +1,8 @@
-import { chakra, type HTMLChakraProps } from "@chakra-ui/react"
+import { DrawingSvg, FILL, Ground, OUTLINE, Stipe, type DrawingProps } from "./mushroomDrawing"
 
 /**
  * Cap shapes drawn as a vertical section through the fruiting body, in the manner of the
- * icons in it.wikipedia's Template:Fungo. Each is a 64×64 drawing with the ground at y=58;
- * `stipeTop` is where the stipe meets the underside of the cap, or undefined when the
+ * icons in it.wikipedia's Template:Fungo. `stipeTop` is where the stipe meets the underside of the cap, or undefined when the
  * drawing has no separate stipe.
  */
 interface CapDrawing {
@@ -95,48 +94,18 @@ const DRAWINGS: Record<string, CapDrawing> = {
 /** True when there's a drawing for this single cap shape (not a compound like "convex or flat"). */
 export const hasCapDrawing = (shape: string) => shape in DRAWINGS
 
-type Props = { shape: string; title?: string } & Omit<HTMLChakraProps<"svg">, "children">
+type Props = { shape: string } & DrawingProps
 
 /** The section drawing for one cap shape; renders nothing for shapes without one. */
-export function CapShapeIcon({ shape, title, ...rest }: Props) {
+export function CapShapeIcon({ shape, ...rest }: Props) {
   const d = DRAWINGS[shape]
   if (!d) return null
   return (
-    <chakra.svg
-      viewBox="0 0 64 64"
-      w="10"
-      h="10"
-      flexShrink={0}
-      role={title ? "img" : undefined}
-      aria-label={title}
-      aria-hidden={title ? undefined : true}
-      strokeLinejoin="round"
-      strokeLinecap="round"
-      {...rest}
-    >
-      {title && <title>{title}</title>}
-      {d.substrate && <path d={d.substrate} fill="var(--chakra-colors-soil-500)" stroke="currentColor" strokeWidth="1.5" />}
-      {d.stipeTop === undefined && !d.substrate && (
-        <path d="M10 58 H54" stroke="currentColor" strokeWidth="1.5" opacity={0.35} />
-      )}
-      {d.stipeTop !== undefined && (
-        <>
-          <path d="M10 58 H54" stroke="currentColor" strokeWidth="1.5" opacity={0.35} />
-          <path
-            d={`M27.5 ${d.stipeTop - 1} L36.5 ${d.stipeTop - 1} L38 55 C38 57.5 36.5 58 35 58 L29 58 C27.5 58 26 57.5 26 55Z`}
-            fill="var(--chakra-colors-soil-100)"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          />
-        </>
-      )}
-      {d.ghost && <path d={d.ghost} fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 3" opacity={0.55} />}
-      <path
-        d={d.cap}
-        fill={d.stipeTop === undefined && !d.substrate ? "var(--chakra-colors-chanterelle-300)" : "var(--chakra-colors-soil-400)"}
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-    </chakra.svg>
+    <DrawingSvg {...rest}>
+      {d.substrate ? <path d={d.substrate} fill={FILL.substrate} {...OUTLINE} /> : <Ground />}
+      {d.stipeTop !== undefined && <Stipe top={d.stipeTop} />}
+      {d.ghost && <path d={d.ghost} fill="none" {...OUTLINE} strokeDasharray="3 3" opacity={0.55} />}
+      <path d={d.cap} fill={d.stipeTop === undefined && !d.substrate ? FILL.body : FILL.cap} {...OUTLINE} />
+    </DrawingSvg>
   )
 }
