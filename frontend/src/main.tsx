@@ -12,7 +12,7 @@ createRoot(document.getElementById("root")!).render(
     <ChakraProvider value={system}>
       <I18nProvider>
         <MushroomsProvider>
-          <BrowserRouter>
+          <BrowserRouter basename={import.meta.env.BASE_URL}>
             <App />
           </BrowserRouter>
         </MushroomsProvider>

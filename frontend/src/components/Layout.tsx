@@ -68,7 +68,7 @@ function Logo() {
   return (
     <Link to="/" aria-label={t("app.home")}>
       <HStack gap="2">
-        <Image src="/favicon.svg" alt="" w="7" h="7" />
+        <Image src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" w="7" h="7" />
         <Text fontFamily="heading" fontWeight="800" fontSize="xl" letterSpacing="-0.02em">
           find<Box as="span" color="chanterelle.400">fungi</Box>
         </Text>
