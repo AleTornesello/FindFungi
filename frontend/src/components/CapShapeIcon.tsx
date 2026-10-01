@@ -91,6 +91,9 @@ const DRAWINGS: Record<string, CapDrawing> = {
   },
 }
 
+/** The plain convex mushroom, reused by drawings of other traits so they share one silhouette. */
+export const CONVEX = DRAWINGS.convex as Required<Pick<CapDrawing, "cap" | "stipeTop">>
+
 /** True when there's a drawing for this single cap shape (not a compound like "convex or flat"). */
 export const hasCapDrawing = (shape: string) => shape in DRAWINGS
 

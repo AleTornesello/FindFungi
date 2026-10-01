@@ -3,7 +3,6 @@ import { Badge, Box, Button, Container, Flex, Grid, Heading, HStack, Link, Simpl
 import { Link as RouterLink, useLocation, useNavigate, useParams } from "react-router"
 import { ArrowLeft, ChevronRight, ExternalLink, Microscope, TriangleAlert, Utensils, type LucideIcon } from "lucide-react"
 import { scientificName, type Mushroom } from "../data/mushrooms"
-import { splitValues } from "../data/advancedFilters"
 import { hasTraitDrawing, TraitIcon } from "../components/TraitIcon"
 import { MushroomCard } from "../components/MushroomCard"
 import { MushroomPhoto } from "../components/MushroomPhoto"
@@ -325,10 +324,13 @@ function Characteristics({ mushroom }: { mushroom: Mushroom }) {
   )
 }
 
-/** Section drawings of a characteristic; a value like "convex or flat" gets one per shape, each captioned. */
+/**
+ * Section drawings of a characteristic; a value like "convex or flat" gets one per alternative,
+ * each captioned, while "ring and volva" is a single feature with its own drawing.
+ */
 function TraitDrawings({ property, value }: { property: Property; value: string }) {
   const valueLabel = useValueLabel()
-  const shapes = splitValues(value).filter((v) => hasTraitDrawing(property, v))
+  const shapes = value.split(" or ").filter((v) => hasTraitDrawing(property, v))
   if (shapes.length === 0) return null
   return (
     <Flex gap="3" mt="2" wrap="wrap">

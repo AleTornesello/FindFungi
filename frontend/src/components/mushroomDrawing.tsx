@@ -2,7 +2,7 @@ import { chakra, type HTMLChakraProps } from "@chakra-ui/react"
 import type { ReactNode } from "react"
 
 /**
- * Shared look of the trait drawings (cap shapes, hymenium types, gill attachments): a 64×64 section through the
+ * Shared look of the trait drawings (cap shapes, hymenium types, gill attachments, stipes): a 64×64 section through the
  * fruiting body, ground at y=58, filled shapes outlined in the text colour, so each set reads
  * as one family next to the others.
  */
@@ -16,6 +16,8 @@ export const FILL = {
   /** Spore mass inside a puffball or truffle. */
   gleba: "var(--chakra-colors-soil-600)",
   substrate: "var(--chakra-colors-soil-500)",
+  /** Remains of the veil: ring, volva. */
+  veil: "var(--chakra-colors-soil-50)",
 }
 
 export const OUTLINE = { stroke: "currentColor", strokeWidth: 1.5 } as const
