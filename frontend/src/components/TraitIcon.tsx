@@ -1,5 +1,6 @@
 import type { Mushroom } from "../data/mushrooms"
 import { CapShapeIcon, hasCapDrawing } from "./CapShapeIcon"
+import { EcologyIcon, hasEcologyDrawing } from "./EcologyIcon"
 import { FleshIcon, hasFleshDrawing } from "./FleshIcon"
 import { GillAttachmentIcon, hasGillAttachmentDrawing } from "./GillAttachmentIcon"
 import { HymeniumIcon, hasHymeniumDrawing } from "./HymeniumIcon"
@@ -13,6 +14,7 @@ const DRAWN: Partial<Record<keyof Mushroom["properties"], (value: string) => boo
   lamella: hasGillAttachmentDrawing,
   stipe: hasStipeDrawing,
   gleba: hasFleshDrawing,
+  ecology: hasEcologyDrawing,
 }
 
 export const hasTraitDrawing = (property: string, value: string) =>
@@ -25,5 +27,6 @@ export function TraitIcon({ property, value, ...rest }: { property: string; valu
   if (property === "lamella") return <GillAttachmentIcon type={value} {...rest} />
   if (property === "stipe") return <StipeIcon type={value} {...rest} />
   if (property === "gleba") return <FleshIcon type={value} {...rest} />
+  if (property === "ecology") return <EcologyIcon type={value} {...rest} />
   return null
 }
