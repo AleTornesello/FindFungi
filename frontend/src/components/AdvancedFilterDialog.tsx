@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useMemo, useState, type ReactNode } from "react"
 import { Box, Button, CloseButton, Dialog, Flex, Heading, Portal, Stack, Text } from "@chakra-ui/react"
 import type { Mushroom } from "../data/mushrooms"
 import {
@@ -10,6 +10,7 @@ import {
 } from "../data/advancedFilters"
 import { useI18n } from "../i18n/I18nProvider"
 import { useValueLabel } from "../hooks/useMushrooms"
+import { CapShapeIcon } from "./CapShapeIcon"
 
 interface Props {
   open: boolean
@@ -105,6 +106,7 @@ export function AdvancedFilterDialog({ open, onOpenChange, mushrooms, filters, o
                                 <OptionChip
                                   key={value}
                                   label={filterValueLabel(f, value, t, valueLabel)}
+                                  icon={f.key === "cap" ? <CapShapeIcon shape={value} w="5" h="5" /> : undefined}
                                   count={count}
                                   active={selected.includes(value)}
                                   onClick={() => toggle(f.key, value)}
@@ -146,11 +148,13 @@ export function AdvancedFilterDialog({ open, onOpenChange, mushrooms, filters, o
 
 function OptionChip({
   label,
+  icon,
   count,
   active,
   onClick,
 }: {
   label: string
+  icon?: ReactNode
   count: number
   active: boolean
   onClick: () => void
@@ -167,6 +171,7 @@ function OptionChip({
       borderColor={active ? "soil.900" : "border"}
       _hover={{ borderColor: "soil.500" }}
     >
+      {icon}
       {label}
       <Text as="span" opacity={0.6} fontWeight="500">
         {count}

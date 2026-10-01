@@ -21,7 +21,7 @@ export type AdvancedFilters = Record<string, string[]>
 const single = (v: string) => (v ? [v] : [])
 
 // "white to cream", "ring and volva" and "adnate or decurrent" all describe several traits.
-const split = (v: string) =>
+export const splitValues = (v: string) =>
   v
     .split(/ or | and | to /)
     .map((s) => s.trim())
@@ -37,7 +37,7 @@ const taxon = (key: keyof Mushroom["taxonomy"], label: MessageKey): FilterField 
   values: (m) => single(m.taxonomy[key]),
 })
 
-const trait = (key: keyof Mushroom["properties"], label: MessageKey, map = split): FilterField => ({
+const trait = (key: keyof Mushroom["properties"], label: MessageKey, map = splitValues): FilterField => ({
   key,
   label,
   group: "characteristics",
