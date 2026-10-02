@@ -5,12 +5,12 @@ export const it: Messages = {
   "app.disclaimer": "Non mangiare mai un fungo selvatico basandoti su un'app. Fai controllare ogni ritrovamento da un esperto locale.",
 
   "nav.main": "Principale",
-  "nav.species": "Specie",
+  "nav.species": "Esplora",
   "nav.finds": "I miei ritrovamenti",
 
   "language.label": "Lingua",
 
-  "explore.title": "Specie",
+  "explore.title": "Esplora",
   "explore.intro": "Cerca una specie per nome latino o famiglia. La guida è salvata su questo dispositivo e funziona anche senza campo.",
   "explore.searchPlaceholder": "Cerca per nome latino o famiglia",
   "explore.searchLabel": "Cerca specie",

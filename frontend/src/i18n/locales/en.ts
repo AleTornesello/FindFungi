@@ -7,12 +7,12 @@ export const en = {
   "app.disclaimer": "Never eat a wild mushroom on the strength of an app. Check every find with a local expert.",
 
   "nav.main": "Main",
-  "nav.species": "Species",
+  "nav.species": "Explore",
   "nav.finds": "My finds",
 
   "language.label": "Language",
 
-  "explore.title": "Species",
+  "explore.title": "Explore",
   "explore.intro": "Look up a species by its Latin name or family. The guide is saved on this device and works without signal.",
   "explore.searchPlaceholder": "Search by Latin name or family",
   "explore.searchLabel": "Search species",
