@@ -1,10 +1,11 @@
 import { useEffect, useMemo, type ReactNode } from "react"
 import { Badge, Box, Button, Container, Flex, Grid, Heading, HStack, Link, SimpleGrid, Spinner, Stack, Text } from "@chakra-ui/react"
 import { Link as RouterLink, useLocation, useNavigate, useParams } from "react-router"
-import { ArrowLeft, ChevronRight, ExternalLink, Microscope, TriangleAlert, Utensils, type LucideIcon } from "lucide-react"
+import { ArrowLeft, ChevronRight, ExternalLink, Microscope, Skull, TriangleAlert, Utensils, type LucideIcon } from "lucide-react"
 import { scientificName, type Mushroom } from "../data/mushrooms"
 import { hasTraitDrawing, TraitIcon } from "../components/TraitIcon"
 import { MushroomCard } from "../components/MushroomCard"
+import { EdibilityBadge } from "../components/EdibilityBadge"
 import { MushroomPhoto } from "../components/MushroomPhoto"
 import { SporePrintSwatch } from "../components/SporePrintSwatch"
 import { useMushrooms, useValueLabel } from "../hooks/useMushrooms"
@@ -99,6 +100,7 @@ export function MushroomDetailPage() {
   return (
     <Container maxW="6xl" px={{ base: "4", md: "6" }} pt={{ base: "4", md: "6" }}>
       <BackLink />
+      {mushroom.properties.poisonous && <PoisonWarning mushroom={mushroom} />}
       <Hero mushroom={mushroom} />
 
       <Grid templateColumns={{ base: "1fr", lg: "1fr 340px" }} gap={{ base: "6", lg: "8" }} mt={{ base: "8", md: "10" }} alignItems="start">
@@ -186,9 +188,7 @@ function Hero({ mushroom }: { mushroom: Mushroom }) {
         </Heading>
 
         <Flex mt="4" gap="2" wrap="wrap">
-          <Badge colorPalette={properties.edible ? "moss" : "soil"} variant="subtle" borderRadius="full" px="3" py="1" fontSize="sm">
-            {properties.edible ? t("edibility.edible") : t("edibility.inedible")}
-          </Badge>
+          <EdibilityBadge properties={properties} px="3" py="1" fontSize="sm" />
           {properties.microscopic && (
             <Badge colorPalette="lichen" variant="subtle" borderRadius="full" px="3" py="1" fontSize="sm">
               <Microscope size={14} aria-hidden />
@@ -232,14 +232,65 @@ function Hero({ mushroom }: { mushroom: Mushroom }) {
           </Box>
         )}
 
-        <EdibilityNote edible={properties.edible} />
+        {!properties.poisonous && <EdibilityNote properties={properties} />}
       </Box>
     </Grid>
   )
 }
 
-function EdibilityNote({ edible }: { edible: boolean }) {
+/**
+ * Stays pinned under the header while the page scrolls, so the warning is on screen whatever part
+ * of the page is being read, on every screen size.
+ */
+function PoisonWarning({ mushroom }: { mushroom: Mushroom }) {
   const { t } = useI18n()
+  return (
+    <Flex
+      position="sticky"
+      top="14"
+      zIndex="docked"
+      mt="2"
+      align="flex-start"
+      gap="3"
+      px="4"
+      py="3"
+      borderRadius="xl"
+      bg="amanita.solid"
+      color="amanita.contrast"
+      boxShadow="0 6px 18px rgba(46,31,20,.25)"
+      role="alert"
+    >
+      <Box flexShrink={0} mt="0.5">
+        <Skull size={22} aria-hidden />
+      </Box>
+      <Box minW="0">
+        <Text fontWeight="800" fontSize="md" textTransform="uppercase" letterSpacing="0.04em">
+          {t("edibility.poisonous")}
+        </Text>
+        <Text fontSize="sm">{t("detail.poisonousNote")}</Text>
+        <ToxicityEffect value={mushroom.properties.toxicityEffectIt} />
+      </Box>
+    </Flex>
+  )
+}
+
+/** The syndrome is recorded in Italian only, so it's shown only when the app is in Italian. */
+function ToxicityEffect({ value }: { value: string }) {
+  const { locale, t } = useI18n()
+  if (locale !== "it" || !value) return null
+  return (
+    <Text fontSize="sm" mt="1">
+      {t("detail.toxicityEffect")}:{" "}
+      <Text as="span" fontWeight="700">
+        {value}
+      </Text>
+    </Text>
+  )
+}
+
+function EdibilityNote({ properties }: { properties: Mushroom["properties"] }) {
+  const { t } = useI18n()
+  const { edible } = properties
   const Icon: LucideIcon = edible ? Utensils : TriangleAlert
   return (
     <HStack
@@ -256,7 +307,10 @@ function EdibilityNote({ edible }: { edible: boolean }) {
       <Box flexShrink={0} mt="0.5">
         <Icon size={16} aria-hidden />
       </Box>
-      <Text>{edible ? t("detail.edibleNote") : t("detail.inedibleNote")}</Text>
+      <Box>
+        <Text>{edible ? t("detail.edibleNote") : t("detail.inedibleNote")}</Text>
+        <ToxicityEffect value={properties.toxicityEffectIt} />
+      </Box>
     </HStack>
   )
 }

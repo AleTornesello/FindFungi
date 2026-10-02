@@ -21,6 +21,9 @@ export interface Mushroom {
   };
   properties: {
     edible: boolean;
+    poisonous: boolean;
+    /** Ingestion syndrome in Italian, e.g. "Sindrome muscarinica"; '' when none is recorded. */
+    toxicityEffectIt: string;
     microscopic: boolean;
     cap: string;
     hymenium: string;

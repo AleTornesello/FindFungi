@@ -18,6 +18,7 @@ export const it: Messages = {
   "explore.filter.all": "Tutte",
   "explore.filter.edible": "Commestibili",
   "explore.filter.inedible": "Non commestibili",
+  "explore.filter.poisonous": "Velenosi",
   "explore.filters": "Filtri",
   "explore.activeFilters": "Filtri attivi",
   "explore.removeFilter": "Rimuovi filtro {field}: {value}",
@@ -68,6 +69,7 @@ export const it: Messages = {
 
   "edibility.edible": "Commestibile",
   "edibility.inedible": "Non commestibile",
+  "edibility.poisonous": "Velenoso",
 
   "detail.back": "Tutte le specie",
   "detail.loading": "Caricamento della specie…",
@@ -75,6 +77,8 @@ export const it: Messages = {
   "detail.notFoundBody": "Potrebbe essere stata rimossa dalla guida con l'ultimo aggiornamento.",
   "detail.edibleNote": "Indicata come commestibile. Molte specie commestibili hanno sosia tossici: fai controllare ogni ritrovamento da un esperto prima di mangiarlo.",
   "detail.inedibleNote": "Non indicata come commestibile. Questo comprende le specie velenose: non mangiarla e non assaggiarla.",
+  "detail.poisonousNote": "Specie velenosa: non mangiarla e non assaggiarla, nemmeno in piccola quantità.",
+  "detail.toxicityEffect": "Effetti dell'ingestione",
   "detail.microscopyBadge": "Microscopia documentata",
   "detail.atGlance": "In breve",
   "detail.characteristics": "Caratteristiche",

@@ -79,10 +79,19 @@ const config = defineConfig({
           900: { value: "#5E3517" },
           950: { value: "#361B09" },
         },
+        // Fly agaric red, kept for poisonous species.
         amanita: {
+          50: { value: "#FDEEEB" },
+          100: { value: "#FAD6CF" },
+          200: { value: "#F3AA9C" },
+          300: { value: "#EA7D68" },
           400: { value: "#E0533A" },
           500: { value: "#C73E27" },
           600: { value: "#A2311F" },
+          700: { value: "#80271A" },
+          800: { value: "#621F16" },
+          900: { value: "#4A1912" },
+          950: { value: "#2C0D09" },
         },
       },
       radii: {
@@ -129,6 +138,15 @@ const config = defineConfig({
           subtle: { value: { _light: "{colors.chanterelle.50}", _dark: "{colors.chanterelle.950}" } },
           emphasized: { value: { _light: "{colors.chanterelle.200}", _dark: "{colors.chanterelle.800}" } },
           focusRing: { value: "{colors.chanterelle.400}" },
+        },
+        amanita: {
+          solid: { value: "{colors.amanita.600}" },
+          contrast: { value: "white" },
+          fg: { value: { _light: "{colors.amanita.700}", _dark: "{colors.amanita.300}" } },
+          muted: { value: { _light: "{colors.amanita.100}", _dark: "{colors.amanita.900}" } },
+          subtle: { value: { _light: "{colors.amanita.50}", _dark: "{colors.amanita.950}" } },
+          emphasized: { value: { _light: "{colors.amanita.200}", _dark: "{colors.amanita.800}" } },
+          focusRing: { value: "{colors.amanita.400}" },
         },
         lichen: {
           solid: { value: "{colors.lichen.400}" },

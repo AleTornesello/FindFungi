@@ -20,6 +20,7 @@ export const en = {
   "explore.filter.all": "All",
   "explore.filter.edible": "Edible",
   "explore.filter.inedible": "Not edible",
+  "explore.filter.poisonous": "Poisonous",
   "explore.filters": "Filters",
   "explore.activeFilters": "Active filters",
   "explore.removeFilter": "Remove filter {field}: {value}",
@@ -70,6 +71,7 @@ export const en = {
 
   "edibility.edible": "Edible",
   "edibility.inedible": "Not edible",
+  "edibility.poisonous": "Poisonous",
 
   "detail.back": "All species",
   "detail.loading": "Loading species…",
@@ -77,6 +79,8 @@ export const en = {
   "detail.notFoundBody": "It may have been removed from the guide in the last update.",
   "detail.edibleNote": "Listed as edible. Many edible species have toxic lookalikes: have every find checked by an expert before eating it.",
   "detail.inedibleNote": "Not listed as edible. This includes poisonous species: don't eat or taste it.",
+  "detail.poisonousNote": "Poisonous species: don't eat or taste it, not even a small amount.",
+  "detail.toxicityEffect": "Effects of ingestion",
   "detail.microscopyBadge": "Microscopy documented",
   "detail.atGlance": "At a glance",
   "detail.characteristics": "Characteristics",

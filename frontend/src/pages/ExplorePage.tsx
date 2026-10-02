@@ -31,12 +31,13 @@ import { usePageMeta } from "../hooks/usePageMeta"
 import { homeMeta } from "../seo"
 import type { MessageKey } from "../i18n/locales/en"
 
-type Filter = "all" | "edible" | "inedible"
+type Filter = "all" | "edible" | "inedible" | "poisonous"
 
 const FILTERS: { value: Filter; label: MessageKey }[] = [
   { value: "all", label: "explore.filter.all" },
   { value: "edible", label: "explore.filter.edible" },
   { value: "inedible", label: "explore.filter.inedible" },
+  { value: "poisonous", label: "explore.filter.poisonous" },
 ]
 
 const PAGE_SIZE = 48
@@ -85,7 +86,8 @@ export function ExplorePage() {
     const q = query.trim().toLowerCase()
     return mushrooms.filter(
       (m) =>
-        (filter === "all" || m.properties.edible === (filter === "edible")) &&
+        (filter === "all" ||
+          (filter === "poisonous" ? m.properties.poisonous : m.properties.edible === (filter === "edible"))) &&
         (!q || scientificName(m).toLowerCase().includes(q) || m.taxonomy.family.toLowerCase().includes(q)),
     )
   }, [mushrooms, query, filter])
@@ -135,7 +137,7 @@ export function ExplorePage() {
       </InputGroup>
 
       <HStack mt="4" gap="2" justify="space-between" flexWrap="wrap">
-        <HStack role="group" aria-label={t("explore.edibilityGroup")} gap="2">
+        <HStack role="group" aria-label={t("explore.edibilityGroup")} gap="2" flexWrap="wrap">
           {FILTERS.map((f) => {
             const active = filter === f.value
             return (

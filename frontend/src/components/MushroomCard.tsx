@@ -1,7 +1,8 @@
-import { Badge, Box, HStack, LinkBox, LinkOverlay, Text } from "@chakra-ui/react"
+import { Box, HStack, LinkBox, LinkOverlay, Text } from "@chakra-ui/react"
 import { Link } from "react-router"
 import { scientificName, speciesPath, type Mushroom } from "../data/mushrooms"
 import { MushroomPhoto } from "./MushroomPhoto"
+import { EdibilityBadge } from "./EdibilityBadge"
 import { useI18n } from "../i18n/I18nProvider"
 import type { MessageKey } from "../i18n/locales/en"
 import { useValueLabel } from "../hooks/useMushrooms"
@@ -28,12 +29,16 @@ export function MushroomCard({ mushroom }: { mushroom: Mushroom }) {
       as="article"
       bg="bg.panel"
       borderRadius="2xl"
-      borderWidth="1px"
-      borderColor="border"
+      borderWidth={properties.poisonous ? "2px" : "1px"}
+      borderColor={properties.poisonous ? "amanita.solid" : "border"}
       overflow="hidden"
       h="full"
       transition="border-color 0.15s, transform 0.15s, box-shadow 0.15s"
-      _hover={{ borderColor: "soil.300", transform: "translateY(-2px)", boxShadow: "0 6px 18px rgba(46,31,20,.08)" }}
+      _hover={{
+        borderColor: properties.poisonous ? "amanita.solid" : "soil.300",
+        transform: "translateY(-2px)",
+        boxShadow: "0 6px 18px rgba(46,31,20,.08)",
+      }}
     >
       <MushroomPhoto src={properties.coverImage} h="36" />
       <Box p="4">
@@ -50,15 +55,7 @@ export function MushroomCard({ mushroom }: { mushroom: Mushroom }) {
               </Text>
             )}
           </Box>
-          <Badge
-            colorPalette={properties.edible ? "moss" : "soil"}
-            variant="subtle"
-            borderRadius="full"
-            px="2.5"
-            flexShrink={0}
-          >
-            {properties.edible ? t("edibility.edible") : t("edibility.inedible")}
-          </Badge>
+          <EdibilityBadge properties={properties} px="2.5" flexShrink={0} />
         </HStack>
         {features.length > 0 && (
           <Box as="dl" mt="3" fontSize="sm" display="grid" gridTemplateColumns="auto 1fr" columnGap="3" rowGap="0.5">
