@@ -4,6 +4,7 @@ from typing import Callable
 from scraper.stages import (
     export_json,
     funghi_italiani,
+    funghi_italiani_photos,
     normalize,
     setup_db,
     wikipedia,
@@ -24,5 +25,6 @@ STAGES: list[Stage] = [
     Stage(3, "Search Wikipedia pages (it, en)", wikipedia.run),
     Stage(4, "Scrape Wikipedia data into mushrooms", wikipedia_data.run),
     Stage(5, "Normalize mushrooms characteristics to English", normalize.run),
-    Stage(6, "Export mushrooms to JSON", export_json.run),
+    Stage(6, "Download photos from funghiitaliani.it topics", funghi_italiani_photos.run),
+    Stage(7, "Export mushrooms to JSON", export_json.run),
 ]

@@ -13,8 +13,8 @@ uv run scraper
 ## Stages
 
 1. **Setup database**: creates the tables defined in `src/scraper/schema.py`:
-   `funghi_italiani` (raw API data), `wikipedia_pages` and `mushrooms` (the flattened structure of
-   `data/8.json`). Missing tables are created. If some already exist, you can clean
+   `funghi_italiani` (raw API data), `wikipedia_pages`, `mushrooms` (the flattened structure of
+   `data/8.json`), `funghi_italiani_topics` and `funghi_italiani_photos`. Missing tables are created. If some already exist, you can clean
    them, recreate them or leave them.
 2. **Download data from funghiitaliani.it**: reads every record from the grid API
    (100 per page, with retries) and saves it into `funghi_italiani`, setting
@@ -41,10 +41,23 @@ uv run scraper
    `src/scraper/stages/normalize.py`; compound values like "convex or flat" are
    translated part by part. Values not in the dictionaries are left unchanged and
    listed on screen. Running it again changes nothing.
-6. **Export to JSON**: writes the `mushrooms` table to a JSON file (by default
+6. **Download photos from funghiitaliani.it topics**: for every `topic_id` in
+   `funghi_italiani` (the detail page linked from the grid, a forum topic shared by
+   synonyms), reads all the pages of the topic and saves the photos posted in it into
+   `funghi_italiani_photos`, in page order: the forum post id, the full size image URL
+   and, when the post shows a smaller one, the thumbnail URL. Avatars, badges,
+   emoticons, quoted posts and images hosted elsewhere are skipped; a photo posted
+   twice is kept once. Every fetched topic gets a row in `funghi_italiani_topics`, with
+   a NULL `url` when it is deleted or restricted. Only the URLs are stored, not the
+   files. Join on `mushrooms.funghi_italiani_topic_id` to get the photos of a mushroom.
+   Topics are committed in batches: on later runs you can download only the topics
+   not fetched yet, or all of them again (e.g. to pick up new posts).
+7. **Export to JSON**: writes the `mushrooms` table to a JSON file (by default
    `data/mushrooms.json`). Its `mushrooms` list has the structure of `data/8.json`:
-   `id`, a `taxonomy` and a `properties` object with camelCase keys. The
-   funghiitaliani.it and Wikipedia ids and the timestamps are not exported. Its
+   `id`, a `taxonomy` and a `properties` object with camelCase keys. Its `images`
+   property lists the Wikipedia cover image first, then the funghiitaliani.it photos
+   of stage 6 in page order. The funghiitaliani.it and Wikipedia ids and the
+   timestamps are not exported. Its
    `translations` object holds, per language and property, the translation of every
    characteristic value (e.g. `translations.it.cap["convex or flat"]` is
    `"convesso o piatto"`), built from the dictionaries in `src/scraper/translations.py`;

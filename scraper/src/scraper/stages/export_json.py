@@ -1,10 +1,12 @@
-"""Stage 6: export the `mushrooms` table to a JSON file.
+"""Stage 7: export the `mushrooms` table to a JSON file.
 
 The output is an object with two keys:
 
 - `mushrooms`: the rows with the structure of data/8.json, i.e. the row id, a
   `taxonomy` and a `properties` object, keys in camelCase. The source ids
   (funghi_italiani and Wikipedia) and the timestamps are not exported.
+  `properties.images` lists the Wikipedia cover image first, then the photos of
+  the funghiitaliani.it topic (stage 6) in page order.
 - `translations`: per language and property, the translation of every English
   characteristic value in the export, from the dictionaries in
   `scraper.translations`.
@@ -24,14 +26,20 @@ from scraper.db import connect, row_count, table_exists
 from scraper.translations import build_translations
 
 TABLE = "mushrooms"
+PHOTOS_TABLE = "funghi_italiani_photos"
 DEFAULT_PATH = "data/mushrooms.json"
 
 QUERY = f"""
 SELECT
     id, kingdom, division, taxon_class, taxon_order, family, genus, species,
     edible, poisonous, toxicity_effect_it, microscopic, cap, hymenium, lamella, stipe, gleba, spore_print,
-    ecology, conservation_status, cover_image
-FROM {TABLE}
+    ecology, conservation_status, cover_image,
+    ARRAY(
+        SELECT p.url FROM {PHOTOS_TABLE} p
+        WHERE p.topic_id = m.funghi_italiani_topic_id
+        ORDER BY p.position
+    ) AS photos
+FROM {TABLE} m
 ORDER BY genus, species, id
 """
 
@@ -50,6 +58,11 @@ def run() -> None:
         with connect(config) as conn:
             if not table_exists(conn, TABLE) or not row_count(conn, TABLE):
                 console.print(f"[red]Table '{TABLE}' is missing or empty. Run stage 4 first.[/red]")
+                return
+            if not table_exists(conn, PHOTOS_TABLE):
+                console.print(
+                    f"[red]Table '{PHOTOS_TABLE}' does not exist. Run stage 1 first.[/red]"
+                )
                 return
             with conn.cursor(row_factory=dict_row) as cur:
                 rows = cur.execute(QUERY).fetchall()
@@ -113,9 +126,15 @@ def to_json(row: dict) -> dict:
             "sporePrint": row["spore_print"],
             "ecology": row["ecology"],
             "conservationStatus": row["conservation_status"],
-            "coverImage": row["cover_image"],
+            "images": images(row),
         },
     }
+
+
+def images(row: dict) -> list[str]:
+    """The Wikipedia cover image, then the funghiitaliani.it photos, without repeats."""
+    urls = [row["cover_image"], *row["photos"]]
+    return list(dict.fromkeys(url for url in urls if url))
 
 
 def write_json(path: Path, data: dict) -> None:

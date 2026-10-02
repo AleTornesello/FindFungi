@@ -1,4 +1,4 @@
-"""Translations of the mushrooms characteristics, exported with the data by stage 6.
+"""Translations of the mushrooms characteristics, exported with the data by stage 7.
 
 The database keeps the English vocabulary produced by stage 5; the app filters on
 those values and shows them translated when a dictionary for its language exists.

@@ -88,8 +88,34 @@ CREATE TABLE wikipedia_pages (
 );
 """
 
+# funghiitaliani.it forum topics (stage 6), i.e. the detail pages linked from the
+# grid. Several funghi_italiani records (synonyms) can share a topic. url is NULL
+# when the topic does not exist, so a row always means "fetched".
+FUNGHI_ITALIANI_TOPICS = """
+CREATE TABLE funghi_italiani_topics (
+    topic_id            integer PRIMARY KEY,           -- funghi_italiani.topic_id
+    url                 text,                          -- canonical URL of page 1
+    pages               integer NOT NULL DEFAULT 0,
+    fetched_at          timestamptz NOT NULL DEFAULT now()
+);
+"""
+
+# Photos posted in a funghiitaliani.it topic (stage 6), in page order.
+FUNGHI_ITALIANI_PHOTOS = """
+CREATE TABLE funghi_italiani_photos (
+    topic_id            integer NOT NULL,              -- funghi_italiani_topics.topic_id
+    position            integer NOT NULL,              -- 1-based, in page order
+    post_id             integer NOT NULL,              -- forum post holding the photo
+    url                 text NOT NULL,                 -- full size image
+    thumbnail_url       text NOT NULL DEFAULT '',      -- '' when the post shows the full image
+    PRIMARY KEY (topic_id, position)
+);
+"""
+
 TABLES: dict[str, str] = {
     "funghi_italiani": FUNGHI_ITALIANI,
     "wikipedia_pages": WIKIPEDIA_PAGES,
     "mushrooms": MUSHROOMS,
+    "funghi_italiani_topics": FUNGHI_ITALIANI_TOPICS,
+    "funghi_italiani_photos": FUNGHI_ITALIANI_PHOTOS,
 }
