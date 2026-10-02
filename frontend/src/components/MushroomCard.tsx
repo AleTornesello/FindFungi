@@ -40,7 +40,7 @@ export function MushroomCard({ mushroom }: { mushroom: Mushroom }) {
         boxShadow: "0 6px 18px rgba(46,31,20,.08)",
       }}
     >
-      <MushroomPhoto src={properties.coverImage} h="36" />
+      <MushroomPhoto src={properties.images[0]} h="36" />
       <Box p="4">
         <HStack justify="space-between" align="flex-start" gap="2">
           <Box minW="0">

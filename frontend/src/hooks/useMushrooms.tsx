@@ -3,6 +3,7 @@ import {
   MUSHROOMS_URL,
   parseMushrooms,
   RESYNC_AFTER_MS,
+  withImages,
   type Mushroom,
   type ValueTranslations,
 } from "../data/mushrooms"
@@ -80,7 +81,7 @@ export function MushroomsProvider({ children }: { children: ReactNode }) {
     loadSnapshot().then((snapshot) => {
       if (cancelled) return
       if (snapshot) {
-        setMushrooms(snapshot.mushrooms)
+        setMushrooms(snapshot.mushrooms.map(withImages))
         setTranslations(snapshot.translations ?? {})
         setSyncedAt(snapshot.syncedAt)
         syncedAtRef.current = snapshot.syncedAt

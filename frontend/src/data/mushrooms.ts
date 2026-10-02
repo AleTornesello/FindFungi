@@ -33,7 +33,8 @@ export interface Mushroom {
     sporePrint: string;
     ecology: string;
     conservationStatus: string;
-    coverImage: string;
+    /** Wikipedia cover image first, then the funghiitaliani.it photos. */
+    images: string[];
   };
 }
 
@@ -55,6 +56,15 @@ export const scientificName = (m: Mushroom) =>
   `${m.taxonomy.genus} ${m.taxonomy.species}`.trim();
 
 export const speciesPath = (m: Mushroom) => `/species/${m.id}`;
+
+/** Older exports, and copies cached from them, had a single `coverImage` instead of `images`. */
+export function withImages(m: Mushroom): Mushroom {
+  if (Array.isArray(m.properties.images)) return m;
+  const { coverImage, ...properties } = m.properties as Mushroom["properties"] & {
+    coverImage?: string;
+  };
+  return { ...m, properties: { ...properties, images: coverImage ? [coverImage] : [] } };
+}
 
 /** Rejects payloads that would break the UI, so a bad download never replaces a good local copy. */
 export function parseMushrooms(data: unknown): MushroomData {
@@ -80,7 +90,7 @@ export function parseMushrooms(data: unknown): MushroomData {
     throw new Error("Mushroom translations have an unexpected shape");
   }
   return {
-    mushrooms: mushrooms as Mushroom[],
+    mushrooms: (mushrooms as Mushroom[]).map(withImages),
     translations: translations as ValueTranslations,
   };
 }

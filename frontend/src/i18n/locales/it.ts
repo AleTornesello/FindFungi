@@ -91,6 +91,13 @@ export const it: Messages = {
   "detail.relatedGenus": "Altre specie di {taxon}",
   "detail.relatedFamily": "Altre specie della famiglia {taxon}",
   "detail.relatedMore": "e altre {count}",
+  "detail.photos": "Foto",
+  "detail.showAllPhotos": "Mostra tutte le {count} foto",
+  "detail.openPhoto": "Apri la foto {index} di {count}",
+  "detail.previousPhoto": "Foto precedente",
+  "detail.nextPhoto": "Foto successiva",
+  "detail.closePhotos": "Chiudi le foto",
+  "detail.photoSource": "Foto da {source}",
   "detail.learnMore": "Approfondisci",
   "detail.wikipedia": "Cerca {name} su Wikipedia",
 

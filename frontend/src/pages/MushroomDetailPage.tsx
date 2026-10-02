@@ -7,6 +7,7 @@ import { hasTraitDrawing, TraitIcon } from "../components/TraitIcon"
 import { MushroomCard } from "../components/MushroomCard"
 import { EdibilityBadge } from "../components/EdibilityBadge"
 import { MushroomPhoto } from "../components/MushroomPhoto"
+import { PhotoGallery } from "../components/PhotoGallery"
 import { SporePrintSwatch } from "../components/SporePrintSwatch"
 import { useMushrooms, useValueLabel } from "../hooks/useMushrooms"
 import { useI18n } from "../i18n/I18nProvider"
@@ -104,7 +105,10 @@ export function MushroomDetailPage() {
       <Hero mushroom={mushroom} />
 
       <Grid templateColumns={{ base: "1fr", lg: "1fr 340px" }} gap={{ base: "6", lg: "8" }} mt={{ base: "8", md: "10" }} alignItems="start">
-        <Characteristics mushroom={mushroom} />
+        <Stack gap="6" minW="0">
+          <Characteristics mushroom={mushroom} />
+          <Photos mushroom={mushroom} />
+        </Stack>
         <Stack gap="6">
           <Classification mushroom={mushroom} />
           <LearnMore mushroom={mushroom} />
@@ -154,7 +158,7 @@ function Hero({ mushroom }: { mushroom: Mushroom }) {
   return (
     <Grid templateColumns={{ base: "1fr", md: "minmax(0, 5fr) minmax(0, 6fr)" }} gap={{ base: "5", md: "8" }} mt="2" alignItems="center">
       <MushroomPhoto
-        src={properties.coverImage}
+        src={properties.images[0]}
         alt={scientificName(mushroom)}
         aspectRatio="4 / 3"
         borderRadius="3xl"
@@ -405,6 +409,18 @@ function TraitDrawings({ property, value }: { property: Property; value: string 
         </Stack>
       ))}
     </Flex>
+  )
+}
+
+/** Every photo of the species; hidden when the one in the hero is all there is. */
+function Photos({ mushroom }: { mushroom: Mushroom }) {
+  const { t } = useI18n()
+  const { images } = mushroom.properties
+  if (images.length < 2) return null
+  return (
+    <Section title={t("detail.photos")}>
+      <PhotoGallery images={images} name={scientificName(mushroom)} />
+    </Section>
   )
 }
 
