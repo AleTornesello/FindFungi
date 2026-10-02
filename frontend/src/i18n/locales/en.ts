@@ -119,6 +119,12 @@ export const en = {
   "notFound.title": "This page isn't here",
   "notFound.body": "The link may be old or mistyped.",
   "notFound.cta": "Browse species",
+
+  "seo.homeTitle": "Wild mushroom species guide",
+  "seo.homeDescription": "Identify wild mushrooms by Latin name, family, cap, gills, spore print and ecology. A free field guide that works offline, with a journal for your finds.",
+  "seo.findsDescription": "Keep a private journal of your mushroom finds: species, place, date and notes, saved in your browser.",
+  "seo.speciesDescription": "{name} ({family}), {edibility}: identification characteristics, classification and related species in the FindFungi mushroom guide.",
+  "seo.speciesDescriptionNoFamily": "{name}, {edibility}: identification characteristics, classification and related species in the FindFungi mushroom guide.",
 }
 
 export type MessageKey = keyof typeof en

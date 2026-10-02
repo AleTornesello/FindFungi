@@ -117,4 +117,10 @@ export const it: Messages = {
   "notFound.title": "Questa pagina non esiste",
   "notFound.body": "Il link potrebbe essere vecchio o scritto male.",
   "notFound.cta": "Sfoglia le specie",
+
+  "seo.homeTitle": "Guida alle specie di funghi",
+  "seo.homeDescription": "Riconosci i funghi selvatici per nome latino, famiglia, cappello, lamelle, sporata ed ecologia. Una guida gratuita che funziona offline, con un diario dei tuoi ritrovamenti.",
+  "seo.findsDescription": "Tieni un diario privato dei tuoi ritrovamenti di funghi: specie, luogo, data e note, salvati nel tuo browser.",
+  "seo.speciesDescription": "{name} ({family}), {edibility}: caratteristiche per il riconoscimento, classificazione e specie affini nella guida ai funghi FindFungi.",
+  "seo.speciesDescriptionNoFamily": "{name}, {edibility}: caratteristiche per il riconoscimento, classificazione e specie affini nella guida ai funghi FindFungi.",
 }

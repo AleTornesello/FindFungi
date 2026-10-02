@@ -5,6 +5,8 @@ on:
     branches: [master]
     paths:
       - "frontend/**"
+      # The build writes a page per species and the sitemap from the dataset.
+      - "data/mushrooms.json"
       - ".github/workflows/deploy-frontend.yml"
   workflow_dispatch:
 
@@ -40,8 +42,8 @@ jobs:
       # Project pages live under /<repository>/, not at the domain root.
       - run: npm run build -- --base=/${{ github.event.repository.name }}/
 
-      # Pages has no SPA rewrites: serve the app for unknown paths so deep links like /finds work.
-      - run: cp dist/index.html dist/404.html
+      # Pages has no SPA rewrites: the build writes an HTML file per route, and a 404.html that
+      # still loads the app for anything else (see seoPages in vite.config.ts).
 
       - uses: actions/configure-pages@v5
 

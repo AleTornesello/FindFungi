@@ -1,9 +1,12 @@
 import { Button, Container, Heading, Text } from "@chakra-ui/react"
-import { Link } from "react-router"
+import { Link, useLocation } from "react-router"
 import { useI18n } from "../i18n/I18nProvider"
+import { usePageMeta } from "../hooks/usePageMeta"
+import { notFoundMeta } from "../seo"
 
 export function NotFoundPage() {
   const { t } = useI18n()
+  usePageMeta(notFoundMeta(t, useLocation().pathname))
   return (
     <Container maxW="md" px="4" pt="16" textAlign="center">
       <Heading as="h1" fontSize="4xl" fontWeight="800">

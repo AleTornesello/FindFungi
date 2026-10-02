@@ -9,6 +9,8 @@ import { MushroomPhoto } from "../components/MushroomPhoto"
 import { SporePrintSwatch } from "../components/SporePrintSwatch"
 import { useMushrooms, useValueLabel } from "../hooks/useMushrooms"
 import { useI18n } from "../i18n/I18nProvider"
+import { usePageMeta } from "../hooks/usePageMeta"
+import { notFoundMeta, speciesMeta } from "../seo"
 import type { MessageKey } from "../i18n/locales/en"
 
 type Property = keyof Mushroom["properties"]
@@ -65,17 +67,11 @@ export function MushroomDetailPage() {
     window.scrollTo(0, 0)
   }, [id])
 
-  useEffect(() => {
-    if (!mushroom) return
-    const previous = document.title
-    document.title = `${scientificName(mushroom)} · FindFungi`
-    return () => {
-      document.title = previous
-    }
-  }, [mushroom])
+  const loading = !mushroom && mushrooms.length === 0 && (status === "loading" || status === "syncing")
+  // While the guide loads, keep the head the static page for this route was built with.
+  usePageMeta(mushroom ? speciesMeta(mushroom, t) : loading ? null : notFoundMeta(t, `/species/${id}`, ["detail.notFoundTitle", "detail.notFoundBody"]))
 
   if (!mushroom) {
-    const loading = mushrooms.length === 0 && (status === "loading" || status === "syncing")
     return (
       <Container maxW="md" px="4" pt="16" textAlign="center">
         {loading ? (
@@ -157,6 +153,7 @@ function Hero({ mushroom }: { mushroom: Mushroom }) {
     <Grid templateColumns={{ base: "1fr", md: "minmax(0, 5fr) minmax(0, 6fr)" }} gap={{ base: "5", md: "8" }} mt="2" alignItems="center">
       <MushroomPhoto
         src={properties.coverImage}
+        alt={scientificName(mushroom)}
         aspectRatio="4 / 3"
         borderRadius="3xl"
         borderWidth="1px"

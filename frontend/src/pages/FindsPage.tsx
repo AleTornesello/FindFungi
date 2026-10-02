@@ -19,6 +19,8 @@ import { SPECIES, type Species } from "../data/species"
 import { MushroomIllustration } from "../components/MushroomIllustration"
 import { useFinds } from "../hooks/useFinds"
 import { useI18n } from "../i18n/I18nProvider"
+import { usePageMeta } from "../hooks/usePageMeta"
+import { findsMeta } from "../seo"
 import type { MessageKey } from "../i18n/locales/en"
 
 const today = () => new Date().toISOString().slice(0, 10)
@@ -31,6 +33,7 @@ export function FindsPage() {
   const [place, setPlace] = useState("")
   const [date, setDate] = useState(today)
   const [notes, setNotes] = useState("")
+  usePageMeta(findsMeta(t))
 
   const submit = (e: FormEvent) => {
     e.preventDefault()

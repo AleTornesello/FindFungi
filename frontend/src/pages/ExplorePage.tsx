@@ -27,6 +27,8 @@ import {
 } from "../data/advancedFilters"
 import { OFFLINE_ERROR, useMushrooms, useValueLabel } from "../hooks/useMushrooms"
 import { useI18n } from "../i18n/I18nProvider"
+import { usePageMeta } from "../hooks/usePageMeta"
+import { homeMeta } from "../seo"
 import type { MessageKey } from "../i18n/locales/en"
 
 type Filter = "all" | "edible" | "inedible"
@@ -68,6 +70,7 @@ export function ExplorePage() {
   const [advanced, setAdvanced] = useState<AdvancedFilters>(saved.advanced)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [shown, setShown] = useState(saved.shown)
+  usePageMeta(homeMeta(t))
 
   // Kept for the tab's lifetime so returning from a detail page restores the same results.
   useEffect(() => {
