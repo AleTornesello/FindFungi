@@ -1,7 +1,7 @@
 """Stage 4: fill the `mushrooms` table from the Wikipedia infoboxes.
 
 Every `funghi_italiani` record with a Wikipedia page (see stage 3) becomes a row:
-taxonomy and edibility come from funghi_italiani, the morphological properties,
+taxonomy, edibility, toxicity and its effect come from funghi_italiani, the morphological properties,
 conservation status and cover image from the Italian page, or from the English
 one when there is no Italian page. Records without any page are skipped.
 
@@ -66,14 +66,14 @@ INSERT_SQL = f"""
 INSERT INTO {TABLE} (
     funghi_italiani_id, funghi_italiani_topic_id, wikipedia_it_page_id, wikipedia_en_page_id,
     kingdom, division, taxon_class, taxon_order, family, genus, species,
-    edible, microscopic, cap, hymenium, lamella, stipe, gleba, spore_print, ecology,
-    conservation_status, cover_image
+    edible, poisonous, toxicity_effect_it, microscopic, cap, hymenium, lamella, stipe, gleba,
+    spore_print, ecology, conservation_status, cover_image
 ) VALUES (
     %(funghi_italiani_id)s, %(funghi_italiani_topic_id)s, %(wikipedia_it_page_id)s,
     %(wikipedia_en_page_id)s, %(kingdom)s, %(division)s, %(taxon_class)s, %(taxon_order)s,
-    %(family)s, %(genus)s, %(species)s, %(edible)s, %(microscopic)s, %(cap)s, %(hymenium)s,
-    %(lamella)s, %(stipe)s, %(gleba)s, %(spore_print)s, %(ecology)s,
-    %(conservation_status)s, %(cover_image)s
+    %(family)s, %(genus)s, %(species)s, %(edible)s, %(poisonous)s, %(toxicity_effect_it)s,
+    %(microscopic)s, %(cap)s, %(hymenium)s, %(lamella)s, %(stipe)s, %(gleba)s,
+    %(spore_print)s, %(ecology)s, %(conservation_status)s, %(cover_image)s
 )
 ON CONFLICT (funghi_italiani_id) DO UPDATE SET
     funghi_italiani_topic_id = EXCLUDED.funghi_italiani_topic_id,
@@ -87,6 +87,8 @@ ON CONFLICT (funghi_italiani_id) DO UPDATE SET
     genus = EXCLUDED.genus,
     species = EXCLUDED.species,
     edible = EXCLUDED.edible,
+    poisonous = EXCLUDED.poisonous,
+    toxicity_effect_it = EXCLUDED.toxicity_effect_it,
     microscopic = EXCLUDED.microscopic,
     cap = EXCLUDED.cap,
     hymenium = EXCLUDED.hymenium,
@@ -173,7 +175,8 @@ def load_records(conn: psycopg.Connection, only_missing: bool) -> list[dict]:
             it.page_id AS wikipedia_it_page_id,
             en.page_id AS wikipedia_en_page_id,
             f.kingdom, f.division, f.taxon_class, f.taxon_order, f.family,
-            f.genus, f.species, f.edibility, f.microscopic
+            f.genus, f.species, f.edibility, f.poisonous,
+            f.toxicity AS toxicity_effect_it, f.microscopic
         FROM funghi_italiani f
         LEFT JOIN wikipedia_pages it ON it.funghi_italiani_id = f.id AND it.lang = 'it'
         LEFT JOIN wikipedia_pages en ON en.funghi_italiani_id = f.id AND en.lang = 'en'

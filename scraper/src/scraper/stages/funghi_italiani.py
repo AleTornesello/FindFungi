@@ -23,18 +23,21 @@ PAGE_SIZE = 100
 MAX_ATTEMPTS = 3
 TABLE = "funghi_italiani"
 
+# Edibility code of poisonous species (V: velenoso).
+POISONOUS_CODE = "V"
+
 REPLACE = "Replace (delete all rows, then insert)"
 UPSERT = "Update (insert new rows, update existing ones)"
 CANCEL = "Cancel"
 
 INSERT_SQL = f"""
 INSERT INTO {TABLE} (
-    id, card_type, topic_id, genus, species, author, edibility, microscopic,
+    id, card_type, topic_id, genus, species, author, edibility, poisonous, microscopic,
     kingdom, division, taxon_class, taxon_order, family,
     toxicity, toxicity_topic_id, inserted_on
 ) VALUES (
     %(id)s, %(card_type)s, %(topic_id)s, %(genus)s, %(species)s, %(author)s,
-    %(edibility)s, %(microscopic)s, %(kingdom)s, %(division)s, %(taxon_class)s,
+    %(edibility)s, %(poisonous)s, %(microscopic)s, %(kingdom)s, %(division)s, %(taxon_class)s,
     %(taxon_order)s, %(family)s, %(toxicity)s, %(toxicity_topic_id)s, %(inserted_on)s
 )
 ON CONFLICT (id) DO UPDATE SET
@@ -44,6 +47,7 @@ ON CONFLICT (id) DO UPDATE SET
     species = EXCLUDED.species,
     author = EXCLUDED.author,
     edibility = EXCLUDED.edibility,
+    poisonous = EXCLUDED.poisonous,
     microscopic = EXCLUDED.microscopic,
     kingdom = EXCLUDED.kingdom,
     division = EXCLUDED.division,
@@ -156,6 +160,7 @@ def parse_row(row: dict) -> dict:
         "species": text["specie"],
         "author": text["autore"],
         "edibility": text["comme"],
+        "poisonous": text["comme"] == POISONOUS_CODE,
         "microscopic": {"1": True, "0": False}.get(text["micro"]),
         "kingdom": text["regno"],
         "division": text["divisione"],

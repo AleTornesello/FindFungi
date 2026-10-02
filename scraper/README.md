@@ -17,7 +17,8 @@ uv run scraper
    `data/8.json`). Missing tables are created. If some already exist, you can clean
    them, recreate them or leave them.
 2. **Download data from funghiitaliani.it**: reads every record from the grid API
-   (100 per page, with retries) and saves it into `funghi_italiani`. If the table
+   (100 per page, with retries) and saves it into `funghi_italiani`, setting
+   `poisonous` for the records with edibility code `V` (velenoso). If the table
    already has rows, you can replace them or update them (upsert).
 3. **Search Wikipedia pages**: for every `funghi_italiani` record, looks up a
    "<genus> <species>" page on it.wikipedia.org and en.wikipedia.org (50 titles per
@@ -27,7 +28,8 @@ uv run scraper
 4. **Scrape Wikipedia data**: for every `funghi_italiani` record with a Wikipedia
    page, scrapes the infoboxes of the Italian page (or the English one when there is
    no Italian page) through the [Firecrawl](https://www.firecrawl.dev) API and saves
-   a row into `mushrooms`: taxonomy and edibility from funghiitaliani.it, morphology
+   a row into `mushrooms`: taxonomy, edibility, `poisonous` and `toxicity_effect_it` (the
+   ingestion syndrome, in Italian) from funghiitaliani.it, morphology
    (cap, hymenium, lamella, stipe, gleba, spore print, ecology), conservation status
    and cover image from Wikipedia. Needs `FIRECRAWL_API_KEY` in `.env` (without it
    the keyless rate limits apply); `FIRECRAWL_CONCURRENCY` sets the parallel requests.

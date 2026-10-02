@@ -29,7 +29,7 @@ DEFAULT_PATH = "data/mushrooms.json"
 QUERY = f"""
 SELECT
     id, kingdom, division, taxon_class, taxon_order, family, genus, species,
-    edible, microscopic, cap, hymenium, lamella, stipe, gleba, spore_print,
+    edible, poisonous, toxicity_effect_it, microscopic, cap, hymenium, lamella, stipe, gleba, spore_print,
     ecology, conservation_status, cover_image
 FROM {TABLE}
 ORDER BY genus, species, id
@@ -102,6 +102,8 @@ def to_json(row: dict) -> dict:
         },
         "properties": {
             "edible": row["edible"],
+            "poisonous": row["poisonous"],
+            "toxicityEffectIt": row["toxicity_effect_it"],
             "microscopic": row["microscopic"],
             "cap": row["cap"],
             "hymenium": row["hymenium"],

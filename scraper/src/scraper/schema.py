@@ -27,6 +27,8 @@ CREATE TABLE mushrooms (
 
     -- properties
     edible                    boolean NOT NULL DEFAULT false,
+    poisonous                 boolean NOT NULL DEFAULT false,
+    toxicity_effect_it        text NOT NULL DEFAULT '',  -- funghi_italiani.toxicity
     microscopic               boolean NOT NULL DEFAULT false,
     cap                       text NOT NULL DEFAULT '',
     hymenium                  text NOT NULL DEFAULT '',
@@ -56,6 +58,7 @@ CREATE TABLE funghi_italiani (
     species             text NOT NULL,                 -- specie
     author              text NOT NULL DEFAULT '',      -- autore
     edibility           text NOT NULL DEFAULT '',      -- comme: C, C1, N, V, M or ''
+    poisonous           boolean NOT NULL DEFAULT false, -- comme = V (velenoso)
     microscopic         boolean,                       -- micro: 1, 0 or '' (NULL)
     kingdom             text NOT NULL DEFAULT '',      -- regno
     division            text NOT NULL DEFAULT '',      -- divisione
