@@ -13,7 +13,7 @@ export const en = {
   "language.label": "Language",
 
   "explore.title": "Explore",
-  "explore.intro": "Look up a species by its Latin name or family. The guide is saved on this device and works without signal.",
+  "explore.intro": "Look up a species found in Italy by its Latin name or family. The guide is saved on this device and works without signal.",
   "explore.searchPlaceholder": "Search by Latin name or family",
   "explore.searchLabel": "Search species",
   "explore.edibilityGroup": "Filter by edibility",
@@ -131,11 +131,11 @@ export const en = {
   "notFound.body": "The link may be old or mistyped.",
   "notFound.cta": "Browse species",
 
-  "seo.homeTitle": "Wild mushroom species guide",
-  "seo.homeDescription": "Identify wild mushrooms by Latin name, family, cap, gills, spore print and ecology. A free field guide that works offline, with a journal for your finds.",
+  "seo.homeTitle": "Guide to the wild mushrooms of Italy",
+  "seo.homeDescription": "Identify the wild mushrooms found in Italy by Latin name, family, cap, gills, spore print and ecology. A free field guide that works offline, with a journal for your finds.",
   "seo.findsDescription": "Keep a private journal of your mushroom finds: species, place, date and notes, saved in your browser.",
-  "seo.speciesDescription": "{name} ({family}), {edibility}: identification characteristics, classification and related species in the FindFungi mushroom guide.",
-  "seo.speciesDescriptionNoFamily": "{name}, {edibility}: identification characteristics, classification and related species in the FindFungi mushroom guide.",
+  "seo.speciesDescription": "{name} ({family}), {edibility}: identification characteristics, classification and related species in the FindFungi guide to the mushrooms of Italy.",
+  "seo.speciesDescriptionNoFamily": "{name}, {edibility}: identification characteristics, classification and related species in the FindFungi guide to the mushrooms of Italy.",
 }
 
 export type MessageKey = keyof typeof en
