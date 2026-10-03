@@ -251,7 +251,7 @@ function PoisonWarning({ mushroom }: { mushroom: Mushroom }) {
   return (
     <Flex
       position="sticky"
-      top="14"
+      top="16"
       zIndex="docked"
       mt="2"
       align="flex-start"
