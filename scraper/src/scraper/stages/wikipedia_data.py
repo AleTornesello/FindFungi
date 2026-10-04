@@ -3,7 +3,9 @@
 Every `funghi_italiani` record with a Wikipedia page (see stage 3) becomes a row:
 taxonomy, edibility, toxicity and its effect come from funghi_italiani, the morphological properties,
 conservation status, cover image and common names from the Italian page, or from the English
-one when there is no Italian page. Records without any page are skipped.
+one when there is no Italian page. Records without any page are skipped. The edibility of the
+page overrides the funghi_italiani one when it is more dangerous
+(poisonous > not edible > edible).
 
 Pages are fetched through the Firecrawl API, which returns only the infobox
 tables and the lead paragraphs; each page is scraped once even if several records
@@ -36,11 +38,32 @@ COMMIT_EVERY = 25
 
 COVER_WIDTH = 500
 UPLOAD_HOST = "https://upload.wikimedia.org"
+# Infobox images that are never a cover image, as returned by _image_url.
+COVER_BLACKLIST = {
+    "https://upload.wikimedia.org/wikipedia/commons/a/a1/Convex_cap_icon.svg",
+}
 THUMB_URL = re.compile(r"^https://[^/]+(/wikipedia/[^/]+)/thumb/(.+)/\d+px-([^/]+)$")
 
 # funghiitaliani.it edibility codes counted as edible (C: edible, C1: edible
 # with caution); N, V, M and '' are not.
 EDIBLE_CODES = {"C", "C1"}
+
+# Edibility levels, from the safest to the most dangerous: when funghiitaliani.it
+# and Wikipedia disagree, the more dangerous one wins.
+EDIBLE, INEDIBLE, POISONOUS = 0, 1, 2
+
+# Keywords of the Wikipedia edibility row ("Commestibilità" on Italian pages,
+# "Edibility is ..." on English ones), from the most dangerous level down. A value
+# can list several, e.g. "edible or poisonous", "edible but not recommended": the
+# first level with a match wins, so it is the most dangerous one. "ignota" and
+# "unknown" match nothing and leave the funghiitaliani.it data unchanged.
+EDIBILITY_KEYWORDS = (
+    (POISONOUS, ("velenos", "mortale", "tossic", "psicoattiv", "allucinogen",
+                 "poisonous", "deadly", "toxic", "psychoactive")),
+    (INEDIBLE, ("non commestibile", "sconsigliat", "sospett", "privo di valore",
+                "inedible", "not recommended", "too hard", "allergic")),
+    (EDIBLE, ("commestibil", "edible", "choice")),
+)
 
 PROPERTIES = ("cap", "hymenium", "lamella", "stipe", "gleba", "spore_print", "ecology")
 
@@ -55,6 +78,8 @@ IT_LABELS = {
     "Carne": "gleba",
     "Ecologia": "ecology",
 }
+
+IT_EDIBILITY_LABEL = "Commestibilità"
 
 # Italian taxobox header; the common names are in the row after it.
 IT_COMMON_NAMES_HEADER = "Nomi comuni"
@@ -260,9 +285,10 @@ def _scrape_and_save(
                     failed.append(str(e))
                     continue
                 data = parse_infobox(html, page.lang)
+                wikipedia_edibility = data.pop("wikipedia_edibility")
                 for record in records_by_page[page]:
                     names = parse_common_names(html, page.lang, record["genus"], record["species"])
-                    pending.append(record | data | names)
+                    pending.append(merge_edibility(record, wikipedia_edibility) | data | names)
                 if len(pending) >= COMMIT_EVERY:
                     flush()
     except FirecrawlFatalError as e:
@@ -289,20 +315,46 @@ def parse_infobox(html: str, lang: str) -> dict:
     tables = BeautifulSoup(html, "html.parser").select(INFOBOX_SELECTOR)
 
     data = {key: "" for key in PROPERTIES}
+    data["wikipedia_edibility"] = None
     morphology = _find_table(tables, morphology_header)
     if morphology is not None:
         rows = _parse_it_morphology(morphology) if lang == "it" else _parse_en_morphology(morphology)
+        data["wikipedia_edibility"] = edibility_level(", ".join(rows.pop("edibility", [])))
         for key, values in rows.items():
             data[key] = ", ".join(values)
 
     taxonomy = _find_table(tables, taxonomy_header)
     data["conservation_status"] = _conservation_status(tables, status_header)
-    # Prefer the taxobox picture; fall back to any other infobox image.
+    # Prefer the taxobox picture; fall back to any other infobox image, but not to
+    # the icons of the morphology box.
     candidates = [taxonomy, *tables] if taxonomy is not None else tables
+    if morphology is not None and morphology is not taxonomy:
+        candidates = [table for table in candidates if table is not morphology]
     data["cover_image"] = next(
         (image for table in candidates if (image := _cover_image(table))), ""
     )
     return data
+
+
+def edibility_level(value: str) -> int | None:
+    """The edibility level of a Wikipedia edibility value, None when unknown."""
+    value = value.lower()
+    for level, keywords in EDIBILITY_KEYWORDS:
+        if any(keyword in value for keyword in keywords):
+            return level
+    return None
+
+
+def merge_edibility(record: dict, wikipedia_level: int | None) -> dict:
+    """`record` with `edible` and `poisonous` set to the more dangerous level between
+    funghiitaliani.it and Wikipedia."""
+    if record["poisonous"]:
+        level = POISONOUS
+    else:
+        level = EDIBLE if record["edible"] else INEDIBLE
+    if wikipedia_level is not None:
+        level = max(level, wikipedia_level)
+    return record | {"edible": level == EDIBLE, "poisonous": level == POISONOUS}
 
 
 def parse_common_names(html: str, lang: str, genus: str, species: str) -> dict:
@@ -386,7 +438,8 @@ def _parse_it_morphology(table: Tag) -> dict[str, list[str]]:
         th, td = tr.find("th"), tr.find("td")
         if th is None or td is None:
             continue
-        key = IT_LABELS.get(_text(th))
+        label = _text(th)
+        key = "edibility" if label == IT_EDIBILITY_LABEL else IT_LABELS.get(label)
         value = _text(td)
         if key and value:
             rows.setdefault(key, []).append(value)
@@ -409,6 +462,9 @@ def _parse_en_morphology(table: Tag) -> dict[str, list[str]]:
 
 def _parse_en_sentence(sentence: str) -> tuple[str, str] | None:
     lower = sentence.lower()
+    if lower.startswith("edibility"):
+        # "Edibility is edible but not recommended"
+        return "edibility", re.sub(r"^edibility\s+is\s+", "", lower)
     if lower.startswith("hymenium"):
         # "Hymenium is adnate" describes how the gills attach: that's lamella.
         key = "lamella"
@@ -424,7 +480,7 @@ def _parse_en_sentence(sentence: str) -> tuple[str, str] | None:
     elif lower.startswith("ecology"):
         key = "ecology"
     else:
-        return None  # edibility, or an unknown row
+        return None  # an unknown row
     # "Cap is convex" -> "convex"; "Lacks a stipe" stays as it is.
     value = re.sub(r"^(hymenium( attachment)?|spore print|stipe|cap|ecology)\s+is\s+", "", lower)
     return key, value
@@ -446,7 +502,9 @@ def _cover_image(table: Tag) -> str:
         # Skip conservation status charts (e.g. File:Status_iucn3.1_LC.svg).
         if img is None or "/File:Status_" in link.get("href", ""):
             continue
-        return _image_url(img.get("src", ""), img.get("data-file-width", ""))
+        url = _image_url(img.get("src", ""), img.get("data-file-width", ""))
+        if url not in COVER_BLACKLIST:
+            return url
     return ""
 
 

@@ -32,7 +32,15 @@ uv run scraper
    a row into `mushrooms`: taxonomy, edibility, `poisonous` and `toxicity_effect_it` (the
    ingestion syndrome, in Italian) from funghiitaliani.it, morphology
    (cap, hymenium, lamella, stipe, gleba, spore print, ecology), conservation status
-   and cover image from Wikipedia. The common names go into `common_name_it` or
+   and cover image from Wikipedia. The edibility row of the Wikipedia infobox
+   ("Commestibilità", "Edibility is ...") can make `edible` and `poisonous` more
+   cautious, never less: when the two sources disagree the more dangerous level wins
+   (poisonous > not edible > edible). A value listing several levels ("edible or
+   poisonous", "edible but not recommended") counts as its most dangerous one; an
+   unknown edibility leaves the funghiitaliani.it data unchanged. Psychoactive species
+   count as poisonous. The cover image is the first infobox picture outside the
+   morphology box that is not a conservation status chart or in `COVER_BLACKLIST`;
+   add URLs there to skip more. The common names go into `common_name_it` or
    `common_name_en`, by the language of the page: on Italian pages they are the
    "Nomi comuni" of the taxobox (names in other languages are skipped); on English
    pages, and Italian ones without that row, they are the bold, non-italic terms of
