@@ -3,6 +3,10 @@ import type { Messages } from "./en"
 export const it: Messages = {
   "app.home": "Home di FindFungi",
   "app.disclaimer": "Non mangiare mai un fungo selvatico basandoti su un'app. Fai controllare ogni ritrovamento da un esperto locale.",
+  "app.madeWith": "Fatto con",
+  "app.love": "amore",
+  "app.madeBy": "da",
+  "app.author": "Informazioni sull'autore",
 
   "nav.main": "Principale",
   "nav.species": "Esplora",

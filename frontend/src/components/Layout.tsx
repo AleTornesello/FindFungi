@@ -1,6 +1,6 @@
-import { Box, Button, Container, Flex, HStack, Image, Menu, Portal, Text } from "@chakra-ui/react"
+import { Box, Button, Link as ChakraLink, Container, Flex, HStack, Image, Menu, Portal, Text } from "@chakra-ui/react"
 import { Link, NavLink, Outlet } from "react-router"
-import { BookOpen, Check, Languages, NotebookPen, type LucideIcon } from "lucide-react"
+import { BookOpen, Check, Globe, Heart, Languages, Mail, NotebookPen, type LucideIcon } from "lucide-react"
 import { useI18n } from "../i18n/I18nProvider"
 import type { MessageKey } from "../i18n/locales/en"
 import { isLocale, LOCALES } from "../i18n/locales"
@@ -46,15 +46,17 @@ export function Layout() {
         </Container>
       </Box>
 
-      <Box as="main" flex="1" pb={{ base: "24", md: "12" }}>
+      <Box as="main" flex="1" pb="12">
         <Outlet />
       </Box>
 
-      <Box as="footer" display={{ base: "none", md: "block" }} borderTopWidth="1px" borderColor="border" py="6">
-        <Container maxW="6xl" px="6">
+      {/* Bottom padding on phones keeps the footer clear of the fixed BottomNav. */}
+      <Box as="footer" borderTopWidth="1px" borderColor="border" pt="6" pb={{ base: "28", md: "6" }}>
+        <Container maxW="6xl" px={{ base: "4", md: "6" }}>
           <Text fontSize="sm" color="fg.muted">
             {t("app.disclaimer")}
           </Text>
+          <AuthorCredit />
         </Container>
       </Box>
 
@@ -74,6 +76,61 @@ function Logo() {
         </Text>
       </HStack>
     </Link>
+  )
+}
+
+const AUTHOR = {
+  name: "Alessandro Tornesello",
+  links: [
+    { label: "Email", href: "mailto:alessandro.tornesello99@gmail.com", icon: Mail },
+    { label: "Website", href: "https://alessandrotornesello.dev", icon: Globe },
+    { label: "GitHub", href: "https://github.com/AleTornesello", icon: GitHubIcon },
+  ],
+}
+
+function AuthorCredit() {
+  const { t } = useI18n()
+  return (
+    <Flex mt="3" align="center" gap="3" wrap="wrap" fontSize="sm" color="fg.muted">
+      <Text>
+        {t("app.madeWith")}{" "}
+        <Box as="span" display="inline-flex" verticalAlign="-0.125em" color="red.500">
+          <Heart size="1em" fill="currentColor" role="img" aria-label={t("app.love")} />
+        </Box>{" "}
+        {t("app.madeBy")}{" "}
+        <Text as="span" fontWeight="600" color="fg">
+          {AUTHOR.name}
+        </Text>
+      </Text>
+      <HStack as="ul" aria-label={t("app.author")} gap="1" listStyleType="none">
+        {AUTHOR.links.map(({ label, href, icon: Icon }) => (
+          <li key={label}>
+            <ChakraLink
+              href={href}
+              aria-label={label}
+              title={label}
+              {...(href.startsWith("http") && { target: "_blank", rel: "noopener noreferrer" })}
+              display="inline-flex"
+              p="1.5"
+              borderRadius="full"
+              color="fg.muted"
+              _hover={{ color: "fg", bg: "bg.muted" }}
+            >
+              <Icon size={18} aria-hidden />
+            </ChakraLink>
+          </li>
+        ))}
+      </HStack>
+    </Flex>
+  )
+}
+
+/** lucide dropped brand marks, so the GitHub logo is inlined. */
+function GitHubIcon({ size = 24 }: { size?: number; "aria-hidden"?: boolean }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2 0 1.9 1.2 1.9 1.2 1 1.8 2.8 1.3 3.5 1 0-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.3-3.1-.2-.4-.6-1.6 0-3.2 0 0 1-.3 3.4 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8 0 3.2.9.8 1.3 1.9 1.3 3.2 0 4.6-2.8 5.6-5.5 5.9.5.4.9 1 .9 2.2v3.3c0 .3.1.7.8.6A12 12 0 0 0 12 .3" />
+    </svg>
   )
 }
 

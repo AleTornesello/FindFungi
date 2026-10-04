@@ -5,6 +5,10 @@
 export const en = {
   "app.home": "FindFungi home",
   "app.disclaimer": "Never eat a wild mushroom on the strength of an app. Check every find with a local expert.",
+  "app.madeWith": "Made with",
+  "app.love": "love",
+  "app.madeBy": "by",
+  "app.author": "About the author",
 
   "nav.main": "Main",
   "nav.species": "Explore",
