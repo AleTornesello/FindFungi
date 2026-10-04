@@ -7,6 +7,8 @@ export const it: Messages = {
   "app.love": "amore",
   "app.madeBy": "da",
   "app.author": "Informazioni sull'autore",
+  "app.support": "Questo sito è gratuito e senza pubblicità, e lo resterà anche in futuro. Se ti è utile, offrimi un caffè.",
+  "app.supportCta": "Sostienimi su Ko-fi",
 
   "nav.main": "Principale",
   "nav.species": "Esplora",

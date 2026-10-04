@@ -9,6 +9,8 @@ export const en = {
   "app.love": "love",
   "app.madeBy": "by",
   "app.author": "About the author",
+  "app.support": "This site is free and ad-free, and it will stay that way. If you find it useful, buy me a coffee.",
+  "app.supportCta": "Support me on Ko-fi",
 
   "nav.main": "Main",
   "nav.species": "Explore",

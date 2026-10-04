@@ -1,6 +1,6 @@
 import { Box, Button, Link as ChakraLink, Container, Flex, HStack, Image, Menu, Portal, Text } from "@chakra-ui/react"
 import { Link, NavLink, Outlet } from "react-router"
-import { BookOpen, Check, Globe, Heart, Languages, Mail, NotebookPen, type LucideIcon } from "lucide-react"
+import { BookOpen, Check, Coffee, Globe, Heart, Languages, Mail, NotebookPen, type LucideIcon } from "lucide-react"
 import { useI18n } from "../i18n/I18nProvider"
 import type { MessageKey } from "../i18n/locales/en"
 import { isLocale, LOCALES } from "../i18n/locales"
@@ -56,6 +56,7 @@ export function Layout() {
           <Text fontSize="sm" color="fg.muted">
             {t("app.disclaimer")}
           </Text>
+          <SupportNote />
           <AuthorCredit />
         </Container>
       </Box>
@@ -86,6 +87,23 @@ const AUTHOR = {
     { label: "Website", href: "https://alessandrotornesello.dev", icon: Globe },
     { label: "GitHub", href: "https://github.com/AleTornesello", icon: GitHubIcon },
   ],
+}
+
+const KOFI_URL = "https://ko-fi.com/alessandrotornesello"
+
+function SupportNote() {
+  const { t } = useI18n()
+  return (
+    <Flex mt="3" align="center" gap="3" wrap="wrap" fontSize="sm" color="fg.muted">
+      <Text>{t("app.support")}</Text>
+      <Button asChild size="sm" borderRadius="full" bg="chanterelle.400" color="soil.900" _hover={{ bg: "chanterelle.300" }}>
+        <a href={KOFI_URL} target="_blank" rel="noopener noreferrer">
+          <Coffee aria-hidden />
+          {t("app.supportCta")}
+        </a>
+      </Button>
+    </Flex>
+  )
 }
 
 function AuthorCredit() {
