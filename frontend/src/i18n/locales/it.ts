@@ -25,6 +25,8 @@ export const it: Messages = {
   "explore.filter.inedible": "Non commestibili",
   "explore.filter.poisonous": "Velenosi",
   "explore.filters": "Filtri",
+  "explore.viewList": "Mostra come elenco",
+  "explore.viewGrid": "Mostra come griglia",
   "explore.activeFilters": "Filtri attivi",
   "explore.removeFilter": "Rimuovi filtro {field}: {value}",
   "explore.clearFilters": "Rimuovi filtri",

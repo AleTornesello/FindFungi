@@ -27,6 +27,8 @@ export const en = {
   "explore.filter.inedible": "Not edible",
   "explore.filter.poisonous": "Poisonous",
   "explore.filters": "Filters",
+  "explore.viewList": "Show as list",
+  "explore.viewGrid": "Show as grid",
   "explore.activeFilters": "Active filters",
   "explore.removeFilter": "Remove filter {field}: {value}",
   "explore.clearFilters": "Clear filters",

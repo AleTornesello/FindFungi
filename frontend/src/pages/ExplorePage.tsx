@@ -12,11 +12,13 @@ import {
   InputGroup,
   SimpleGrid,
   Spinner,
+  Stack,
   Text,
 } from "@chakra-ui/react"
-import { RefreshCw, Search, SlidersHorizontal, WifiOff, X } from "lucide-react"
+import { LayoutGrid, List, RefreshCw, Search, SlidersHorizontal, WifiOff, X } from "lucide-react"
 import { commonName, scientificName } from "../data/mushrooms"
 import { MushroomCard } from "../components/MushroomCard"
+import { MushroomListItem } from "../components/MushroomListItem"
 import { AdvancedFilterDialog } from "../components/AdvancedFilterDialog"
 import {
   activeFilterCount,
@@ -61,6 +63,18 @@ function loadState(): SavedState {
   }
 }
 
+type View = "grid" | "list"
+
+const VIEW_KEY = "findfungi.exploreView"
+
+function loadView(): View {
+  try {
+    return localStorage.getItem(VIEW_KEY) === "list" ? "list" : "grid"
+  } catch {
+    return "grid" // Storage blocked (private mode, disabled cookies).
+  }
+}
+
 export function ExplorePage() {
   const { mushrooms, status } = useMushrooms()
   const { locale, t } = useI18n()
@@ -71,6 +85,7 @@ export function ExplorePage() {
   const [advanced, setAdvanced] = useState<AdvancedFilters>(saved.advanced)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [shown, setShown] = useState(saved.shown)
+  const [view, setView] = useState(loadView)
   const searchRef = useRef<HTMLInputElement>(null)
   usePageMeta(homeMeta(t))
 
@@ -82,6 +97,15 @@ export function ExplorePage() {
       // Storage can be unavailable (private mode); filters then just reset on return.
     }
   }, [query, filter, advanced, shown])
+
+  // Unlike the filters, the layout is a lasting preference, so it outlives the tab.
+  useEffect(() => {
+    try {
+      localStorage.setItem(VIEW_KEY, view)
+    } catch {
+      // Storage unavailable; the view falls back to the grid next time.
+    }
+  }, [view])
 
   const searched = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -188,23 +212,37 @@ export function ExplorePage() {
             )
           })}
         </HStack>
-        <Button
-          size="sm"
-          borderRadius="full"
-          variant="outline"
-          bg="bg.panel"
-          borderColor={advancedCount ? "soil.900" : "border"}
-          _hover={{ borderColor: "soil.500" }}
-          onClick={() => setDialogOpen(true)}
-        >
-          <SlidersHorizontal />
-          {t("explore.filters")}
-          {advancedCount > 0 && (
-            <Badge bg="soil.900" color="lichen.300" borderRadius="full" px="2">
-              {advancedCount}
-            </Badge>
-          )}
-        </Button>
+        <HStack gap="2">
+          <Button
+            size="sm"
+            borderRadius="full"
+            variant="outline"
+            bg="bg.panel"
+            borderColor={advancedCount ? "soil.900" : "border"}
+            _hover={{ borderColor: "soil.500" }}
+            onClick={() => setDialogOpen(true)}
+          >
+            <SlidersHorizontal />
+            {t("explore.filters")}
+            {advancedCount > 0 && (
+              <Badge bg="soil.900" color="lichen.300" borderRadius="full" px="2">
+                {advancedCount}
+              </Badge>
+            )}
+          </Button>
+          <IconButton
+            size="sm"
+            borderRadius="full"
+            variant="outline"
+            bg="bg.panel"
+            _hover={{ borderColor: "soil.500" }}
+            aria-label={view === "grid" ? t("explore.viewList") : t("explore.viewGrid")}
+            title={view === "grid" ? t("explore.viewList") : t("explore.viewGrid")}
+            onClick={() => setView(view === "grid" ? "list" : "grid")}
+          >
+            {view === "grid" ? <List /> : <LayoutGrid />}
+          </IconButton>
+        </HStack>
       </HStack>
 
       {advancedCount > 0 && (
@@ -245,11 +283,19 @@ export function ExplorePage() {
         <EmptyGuide loading={status === "loading" || status === "syncing"} />
       ) : results.length > 0 ? (
         <>
-          <SimpleGrid columns={{ base: 1, sm: 2, lg: 3 }} gap="4" mt="6">
-            {results.slice(0, shown).map((m) => (
-              <MushroomCard key={m.id} mushroom={m} />
-            ))}
-          </SimpleGrid>
+          {view === "list" ? (
+            <Stack gap="2" mt="6">
+              {results.slice(0, shown).map((m) => (
+                <MushroomListItem key={m.id} mushroom={m} />
+              ))}
+            </Stack>
+          ) : (
+            <SimpleGrid columns={{ base: 1, sm: 2, lg: 3 }} gap="4" mt="6">
+              {results.slice(0, shown).map((m) => (
+                <MushroomCard key={m.id} mushroom={m} />
+              ))}
+            </SimpleGrid>
+          )}
           <Flex direction="column" align="center" mt="6" gap="3">
             <Text fontSize="sm" color="fg.muted">
               {t("explore.showing", { shown: Math.min(shown, results.length), total: results.length })}
