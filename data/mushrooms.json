@@ -199,6 +199,7 @@
         "ecology": "saprotrophic",
         "conservationStatus": "",
         "images": [
+          "https://upload.wikimedia.org/wikipedia/commons/a/a1/Convex_cap_icon.svg",
           "https://www.funghiitaliani.it/uploads/monthly_06_2014/post-12947-0-66647900-1403082332.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_06_2014/post-12947-0-10627300-1403082346.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_06_2014/post-12947-0-81230500-1403082518.jpg",
@@ -3110,7 +3111,7 @@
         "gleba": "unchanging",
         "sporePrint": "white",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Least Concern",
+        "conservationStatus": "least concern",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Amanita_caesarea.JPG/500px-Amanita_caesarea.JPG",
           "https://www.funghiitaliani.it/uploads/monthly_06_2012/post-2993-0-22584400-1338845441.jpg",
@@ -3487,7 +3488,7 @@
         "gleba": "",
         "sporePrint": "white",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Not Evaluated",
+        "conservationStatus": "not evaluated",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Amanita_eliae_1.png/500px-Amanita_eliae_1.png",
           "https://www.funghiitaliani.it/uploads/monthly_06_2008/post-127-1213034073.jpg",
@@ -3652,7 +3653,7 @@
         "gleba": "",
         "sporePrint": "white",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Secure (NatureServe)",
+        "conservationStatus": "secure",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Amanita_flavoconia_48569.jpg/500px-Amanita_flavoconia_48569.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_2020_08/01.jpg.2a89911344b87dd66ede43a3998fc7b8.jpg",
@@ -4198,7 +4199,7 @@
         "gleba": "unchanging",
         "sporePrint": "white",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Least Concern",
+        "conservationStatus": "least concern",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Amanita_muscaria_3_vliegenzwammen_op_rij.jpg/500px-Amanita_muscaria_3_vliegenzwammen_op_rij.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_07_2016/post-12947-0-96545100-1469091993.jpg",
@@ -5659,8 +5660,8 @@
         "species": "virosa"
       },
       "properties": {
-        "commonNameIt": "Destroying Angel (EN)",
-        "commonNameEn": "",
+        "commonNameIt": "",
+        "commonNameEn": "Destroying Angel",
         "edible": false,
         "poisonous": true,
         "toxicityEffectIt": "Sindrome falloidea",
@@ -7045,7 +7046,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Secure (NatureServe)",
+        "conservationStatus": "secure",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/2008-08-03_Arrhenia_lobata_%28Pers.%29_K%C3%BChner_%26_Lamoure_ex_Redhead_16371_crop.jpg/500px-2008-08-03_Arrhenia_lobata_%28Pers.%29_K%C3%BChner_%26_Lamoure_ex_Redhead_16371_crop.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_07_2016/post-12947-0-07534000-1469093950.jpg",
@@ -9226,7 +9227,7 @@
         "gleba": "unchanging",
         "sporePrint": "olive",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Near Threatened",
+        "conservationStatus": "near threatened",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/BoletusAestivalis.JPG/500px-BoletusAestivalis.JPG",
           "https://www.funghiitaliani.it/uploads/monthly_07_2016/post-12947-0-52561400-1469095150.jpg",
@@ -9924,7 +9925,7 @@
         "gleba": "staining",
         "sporePrint": "olive",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Vulnerable",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Boletus_dupainii.jpg/500px-Boletus_dupainii.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_09_2013/post-12947-0-74337900-1379690049.jpg",
@@ -10028,7 +10029,7 @@
         "gleba": "unchanging",
         "sporePrint": "olive",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Least Concern",
+        "conservationStatus": "least concern",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Boletus_edulis_IT.jpg/500px-Boletus_edulis_IT.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_08_2008/post-620-1218734639.jpg",
@@ -10985,7 +10986,7 @@
         "gleba": "staining",
         "sporePrint": "brown",
         "ecology": "saprotrophic",
-        "conservationStatus": "Least Concern",
+        "conservationStatus": "least concern",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Boletus_luridus_2011_G1.jpg/500px-Boletus_luridus_2011_G1.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_02_2008/post-21-1202433716.jpg",
@@ -11459,7 +11460,7 @@
         "gleba": "staining",
         "sporePrint": "olive",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Least Concern",
+        "conservationStatus": "least concern",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Boletus_pinophilus3.JPG/500px-Boletus_pinophilus3.JPG",
           "https://www.funghiitaliani.it/uploads/monthly_09_2008/post-620-1220355389.jpg",
@@ -11535,7 +11536,7 @@
         "gleba": "staining",
         "sporePrint": "olive",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Least Concern",
+        "conservationStatus": "least concern",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Boletus_pinophilus3.JPG/500px-Boletus_pinophilus3.JPG",
           "https://www.funghiitaliani.it/uploads/monthly_09_2008/post-620-1220355389.jpg",
@@ -12344,7 +12345,7 @@
         "gleba": "unchanging",
         "sporePrint": "olive",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Near Threatened",
+        "conservationStatus": "near threatened",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/BoletusAestivalis.JPG/500px-BoletusAestivalis.JPG",
           "https://www.funghiitaliani.it/uploads/monthly_07_2016/post-12947-0-52561400-1469095150.jpg",
@@ -15256,7 +15257,7 @@
         "gleba": "",
         "sporePrint": "white",
         "ecology": "saprotrophic",
-        "conservationStatus": "Least Concern (IUCN 3.1)",
+        "conservationStatus": "least concern",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/2011-10-21_Cantharellula_umbonata_%28Fr.%29_Singer_176396.jpg/500px-2011-10-21_Cantharellula_umbonata_%28Fr.%29_Singer_176396.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_09_2008/post-620-1220645651.jpg"
@@ -15540,7 +15541,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Least Concern (IUCN 3.1)",
+        "conservationStatus": "least concern",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Cantharellus_ferruginascens_%28Western_Greece%29_2.jpg/500px-Cantharellus_ferruginascens_%28Western_Greece%29_2.jpg",
           "https://www.funghiitaliani.it/uploads/post-3093-1163773929.jpg",
@@ -17238,7 +17239,7 @@
         "gleba": "",
         "sporePrint": "white",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Secure (NatureServe)",
+        "conservationStatus": "secure",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Clavariadelphus_ligula_060922b.jpg/500px-Clavariadelphus_ligula_060922b.jpg",
           "https://www.funghiitaliani.it/uploads/post-4-1130231995.jpg",
@@ -17639,7 +17640,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Apparently Secure (NatureServe)",
+        "conservationStatus": "apparently secure",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Climacocystis_borealis_38653.jpg/500px-Climacocystis_borealis_38653.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_2022_04/01.jpg.a59c8dbdee2ffc1534c282cdecd144e0.jpg",
@@ -19758,7 +19759,7 @@
         "gleba": "staining",
         "sporePrint": "olive",
         "ecology": "saprotrophic",
-        "conservationStatus": "Not Evaluated",
+        "conservationStatus": "not evaluated",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Colus_hirudinosus.jpg/500px-Colus_hirudinosus.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_11_2008/post-620-1227782085.jpg",
@@ -22636,7 +22637,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Vulnerable (NatureServe)",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Tolypocladium_Ophioglossoides_2024.jpg/500px-Tolypocladium_Ophioglossoides_2024.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_07_2016/post-12947-0-49549700-1469118012.jpg",
@@ -23234,7 +23235,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Near Threatened (IUCN 3.1)",
+        "conservationStatus": "near threatened",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Calonarius_cupreorufus.jpg/500px-Calonarius_cupreorufus.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_08_2007/post-620-1187708057.jpg",
@@ -23267,7 +23268,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Vulnerable (NatureServe)",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Cortinarius_cyanites_-_20121016-01.jpg/500px-Cortinarius_cyanites_-_20121016-01.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_2025_07/image.jpeg.38cfbb02ae5d86f549a00ca878510696.jpeg",
@@ -25382,7 +25383,7 @@
         "gleba": "",
         "sporePrint": "cream to salmon",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Least Concern (IUCN 3.1)",
+        "conservationStatus": "least concern",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Craterellus_tubaeformis_1345904803_69350246bb_o.jpg/500px-Craterellus_tubaeformis_1345904803_69350246bb_o.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_07_2016/post-12947-0-04359600-1469108619.jpg",
@@ -25460,7 +25461,7 @@
         "gleba": "",
         "sporePrint": "cream to salmon",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Least Concern (IUCN 3.1)",
+        "conservationStatus": "least concern",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Craterellus_tubaeformis_1345904803_69350246bb_o.jpg/500px-Craterellus_tubaeformis_1345904803_69350246bb_o.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_07_2016/post-12947-0-04359600-1469108619.jpg",
@@ -27964,7 +27965,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Vulnerable (NatureServe)",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Tolypocladium_Ophioglossoides_2024.jpg/500px-Tolypocladium_Ophioglossoides_2024.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_07_2016/post-12947-0-49549700-1469118012.jpg",
@@ -28114,7 +28115,7 @@
         "gleba": "",
         "sporePrint": "pink",
         "ecology": "saprotrophic",
-        "conservationStatus": "Vulnerable (IUCN 3.1)",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Bresadola_-_Entoloma_bloxamii.png/500px-Bresadola_-_Entoloma_bloxamii.png",
           "https://www.funghiitaliani.it/uploads/monthly_11_2010/post-2993-047827200%201288805463.jpg",
@@ -29154,7 +29155,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Secure (NatureServe)",
+        "conservationStatus": "secure",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Black_Witches%27_Butter_-_Exidia_glandulosa_%2826170322375%29.jpg/500px-Black_Witches%27_Butter_-_Exidia_glandulosa_%2826170322375%29.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_04_2013/post-10020-0-20534300-1365521902.jpg",
@@ -29778,7 +29779,7 @@
         "gleba": "",
         "sporePrint": "brown",
         "ecology": "parasitic",
-        "conservationStatus": "Secure (NatureServe)",
+        "conservationStatus": "secure",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Ganoderma_applanatum_2010_G1.jpg/500px-Ganoderma_applanatum_2010_G1.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_09_2008/post-21-1222466417.jpg",
@@ -30118,7 +30119,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "parasitic or saprotrophic",
-        "conservationStatus": "Endangered (IUCN 3.1)",
+        "conservationStatus": "endangered",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Fomitopsis_officinalis_483579.jpg/500px-Fomitopsis_officinalis_483579.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_04_2016/post-36492-0-14765000-1460109257.jpg",
@@ -32466,7 +32467,7 @@
         "gleba": "",
         "sporePrint": "blackish-brown",
         "ecology": "parasitic",
-        "conservationStatus": "Least Concern (IUCN 3.1)",
+        "conservationStatus": "least concern",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Gomphidius_roseus.jpg/500px-Gomphidius_roseus.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_12_2011/post-735-0-76593900-1323364608.jpg",
@@ -35161,7 +35162,7 @@
         "gleba": "",
         "sporePrint": "white",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Apparently Secure (NatureServe)",
+        "conservationStatus": "apparently secure",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Helvella_elastica.jpg/500px-Helvella_elastica.jpg",
           "https://www.funghiitaliani.it/uploads/post-1526-1107035196.jpg",
@@ -36757,7 +36758,7 @@
         "gleba": "",
         "sporePrint": "brown",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Vulnerable (IUCN 3.1)",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Hydnellum_40869.jpg/500px-Hydnellum_40869.jpg",
           "https://www.funghiitaliani.it/uploads/post-21-1120152604.jpg",
@@ -37295,7 +37296,7 @@
         "gleba": "",
         "sporePrint": "white",
         "ecology": "",
-        "conservationStatus": "Vulnerable (IUCN 3.1)",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/2007-10-06_Hygrocybe_calyptriformis_369513.jpg/500px-2007-10-06_Hygrocybe_calyptriformis_369513.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_10_2008/post-620-1224960036.jpg",
@@ -37435,7 +37436,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Vulnerable (IUCN 3.1)",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Hygrocybe_citrinovirens_MS7_%284%29.jpg/500px-Hygrocybe_citrinovirens_MS7_%284%29.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_12_2011/post-735-0-20340800-1323363479.jpg",
@@ -37536,7 +37537,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Vulnerable (IUCN 3.1)",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/2008-11-08_Cuphophyllus_colemannianus.jpg/500px-2008-11-08_Cuphophyllus_colemannianus.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_04_2016/post-36492-0-95287800-1460493196.jpg",
@@ -37706,7 +37707,7 @@
         "gleba": "",
         "sporePrint": "white",
         "ecology": "",
-        "conservationStatus": "Vulnerable (IUCN 3.1)",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Dingy_Waxcap_from_iNaturalist_photo_143784437.jpg/500px-Dingy_Waxcap_from_iNaturalist_photo_143784437.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_02_2009/post-2286-1233604742.jpg",
@@ -37740,7 +37741,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Vulnerable (IUCN 3.1)",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Hygrocybe_intermedia_%2830013310471%29.jpg/500px-Hygrocybe_intermedia_%2830013310471%29.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_10_2009/post-2286-1255469932.jpg",
@@ -37832,7 +37833,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Vulnerable (IUCN 3.1)",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/2012-10-14_Hygrocybe_lacmus_%28Schumach.%29_P.D._Orton_%26_Watling_272584.jpg/500px-2012-10-14_Hygrocybe_lacmus_%28Schumach.%29_P.D._Orton_%26_Watling_272584.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_11_2008/post-4-1226876793.jpg",
@@ -37974,7 +37975,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Vulnerable (IUCN 3.1)",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Hygrocybe_mucronella.jpg/500px-Hygrocybe_mucronella.jpg",
           "https://www.funghiitaliani.it/uploads/post-1526-1106434220.jpg",
@@ -38036,7 +38037,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Vulnerable (IUCN 3.1)",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/2008-10-19_Hygrocybe_nitrata_20200_cropped.jpg/500px-2008-10-19_Hygrocybe_nitrata_20200_cropped.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_08_2011/post-12381-0-97255100-1313332746.jpg",
@@ -38073,7 +38074,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Vulnerable (IUCN 3.1)",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/2012-12-13_Hygrocybe_ovina_%28Bull._-Fr.%29_Kuhner_294486.jpg/500px-2012-12-13_Hygrocybe_ovina_%28Bull._-Fr.%29_Kuhner_294486.jpg",
           "https://www.funghiitaliani.it/uploads/post-2832-1161073908.jpg",
@@ -38290,7 +38291,7 @@
         "gleba": "unchanging",
         "sporePrint": "white",
         "ecology": "saprotrophic",
-        "conservationStatus": "Vulnerable",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Crimson_Waxcap._Hygrocybe_punicea_%2849055268862%29.jpg/500px-Crimson_Waxcap._Hygrocybe_punicea_%2849055268862%29.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_04_2016/post-36492-0-60796500-1460493839.jpg",
@@ -38355,7 +38356,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Vulnerable (IUCN 3.1)",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/2009-10-01_Hygrocybe_quieta_26372.jpg/500px-2009-10-01_Hygrocybe_quieta_26372.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_2020_03/001.jpg.3ff37cabb881ed7daf95407181d41b9d.jpg",
@@ -38394,7 +38395,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Vulnerable (IUCN 3.1)",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Hygrocybe_spadicea.jpg/500px-Hygrocybe_spadicea.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_04_2016/post-36492-0-57208900-1460493921.jpg",
@@ -38427,7 +38428,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Vulnerable (IUCN 3.1)",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/2007-10-06_Hygrocybe_splendidissima_%28P.D._Orton%29_M.M._Moser_369512.jpg/500px-2007-10-06_Hygrocybe_splendidissima_%28P.D._Orton%29_M.M._Moser_369512.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_11_2008/post-620-1225886462.jpg",
@@ -39792,7 +39793,7 @@
         "gleba": "",
         "sporePrint": "purple-brown",
         "ecology": "saprotrophic",
-        "conservationStatus": "Least Concern (IUCN 3.1)",
+        "conservationStatus": "least concern",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Hypholoma-capnoides.jpg/500px-Hypholoma-capnoides.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_2020_01/806586934_Hypholomacapnoides01IMG_2268.jpg.ec38a6dfc691c60d11d88d4629d10a8c.jpg",
@@ -42627,7 +42628,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Endangered (IUCN 3.1)",
+        "conservationStatus": "endangered",
         "images": [
           "https://www.funghiitaliani.it/uploads/monthly_01_2016/post-12947-0-26628300-1451914168.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_01_2016/post-12947-0-13854400-1451914223.jpg",
@@ -44359,7 +44360,7 @@
         "gleba": "",
         "sporePrint": "cream",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Secure (NatureServe)",
+        "conservationStatus": "secure",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Lacpub2big.jpg/500px-Lacpub2big.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_10_2009/post-3496-1255355862.jpg",
@@ -44622,7 +44623,7 @@
         "gleba": "",
         "sporePrint": "white",
         "ecology": "",
-        "conservationStatus": "Secure (NatureServe)",
+        "conservationStatus": "secure",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Lact.ruf.jpg/500px-Lact.ruf.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_10_2008/post-3093-1224785284.jpg",
@@ -48239,7 +48240,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Vulnerable (IUCN 3.1)",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Star_dap.jpg/500px-Star_dap.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_11_2008/post-127-1226590638.jpg",
@@ -52152,7 +52153,7 @@
         "gleba": "",
         "sporePrint": "white",
         "ecology": "",
-        "conservationStatus": "Apparently Secure (NatureServe)",
+        "conservationStatus": "apparently secure",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Lyophyllum_decastes_071012.jpg/500px-Lyophyllum_decastes_071012.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_12_2011/post-2993-0-12413400-1324420030.jpg",
@@ -54991,7 +54992,7 @@
         "gleba": "unchanging",
         "sporePrint": "ochre",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Least Concern",
+        "conservationStatus": "least concern",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/2/23/Morchella_esculenta_08.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_2022_03/105.jpg.d597fcbdcecb2ada8266e4eff791fa0a.jpg",
@@ -56862,7 +56863,7 @@
         "gleba": "",
         "sporePrint": "white to purple-brown",
         "ecology": "saprotrophic",
-        "conservationStatus": "Secure (NatureServe)",
+        "conservationStatus": "secure",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Mycenastrum_corium_164174.jpg/500px-Mycenastrum_corium_164174.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_2020_01/Mycenastrum-corium-TL200126-01-11.jpg.fc8e7801e321583e6c12a392f85b0aa0.jpg",
@@ -58412,7 +58413,7 @@
         "gleba": "unchanging",
         "sporePrint": "cream",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Not Evaluated",
+        "conservationStatus": "not evaluated",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Panaeolus_acuminatus.jpg/500px-Panaeolus_acuminatus.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_04_2016/post-36492-0-45143000-1461829274.jpg"
@@ -58583,7 +58584,7 @@
         "gleba": "unchanging",
         "sporePrint": "black",
         "ecology": "saprotrophic",
-        "conservationStatus": "Not Evaluated",
+        "conservationStatus": "not evaluated",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Panaeolus_papilionaceus_var._parvisporus.jpg/500px-Panaeolus_papilionaceus_var._parvisporus.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_02_2010/post-2993-1265244294.jpg",
@@ -58839,7 +58840,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Not Evaluated",
+        "conservationStatus": "not evaluated",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Pan.semi_%282%29.jpg/500px-Pan.semi_%282%29.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_06_2008/post-2993-1214840480.jpg",
@@ -58912,7 +58913,7 @@
         "gleba": "unchanging",
         "sporePrint": "black",
         "ecology": "saprotrophic",
-        "conservationStatus": "Not Evaluated",
+        "conservationStatus": "not evaluated",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Panaeolus_papilionaceus_var._parvisporus.jpg/500px-Panaeolus_papilionaceus_var._parvisporus.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_06_2007/post-127-1181593615.jpg",
@@ -64004,7 +64005,7 @@
         "gleba": "",
         "sporePrint": "white",
         "ecology": "saprotrophic",
-        "conservationStatus": "Secure (NatureServe)",
+        "conservationStatus": "secure",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Crimped_Gill_fungus_%28Plicaturopsis_crispa%29.jpg/500px-Crimped_Gill_fungus_%28Plicaturopsis_crispa%29.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_11_2013/post-10687-0-59340900-1384379550.jpg",
@@ -65137,7 +65138,7 @@
         "gleba": "",
         "sporePrint": "brown",
         "ecology": "parasitic",
-        "conservationStatus": "Secure (NatureServe)",
+        "conservationStatus": "secure",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Ganoderma_applanatum_2010_G1.jpg/500px-Ganoderma_applanatum_2010_G1.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_09_2008/post-21-1222466417.jpg",
@@ -65615,7 +65616,7 @@
         "gleba": "",
         "sporePrint": "white",
         "ecology": "saprotrophic",
-        "conservationStatus": "Secure (NatureServe)",
+        "conservationStatus": "secure",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/2026-07-24_Polyporus_tuberaster_%28Z5-10330E%29_by_Achim-Lammerts.jpg/500px-2026-07-24_Polyporus_tuberaster_%28Z5-10330E%29_by_Achim-Lammerts.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_09_2008/post-3501-1222038402.jpg",
@@ -66046,6 +66047,7 @@
         "ecology": "saprotrophic",
         "conservationStatus": "",
         "images": [
+          "https://upload.wikimedia.org/wikipedia/commons/a/a1/Convex_cap_icon.svg",
           "https://www.funghiitaliani.it/uploads/monthly_06_2014/post-12947-0-66647900-1403082332.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_06_2014/post-12947-0-10627300-1403082346.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_06_2014/post-12947-0-81230500-1403082518.jpg",
@@ -67757,7 +67759,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Apparently Secure (NatureServe)",
+        "conservationStatus": "apparently secure",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Ramaria_abietina.jpg/500px-Ramaria_abietina.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_10_2007/post-3093-1193249726.jpg"
@@ -68126,7 +68128,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Apparently Secure (NatureServe)",
+        "conservationStatus": "apparently secure",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Zierliche_Koralle_Ramaria_gracilis.JPG/500px-Zierliche_Koralle_Ramaria_gracilis.JPG",
           "https://www.funghiitaliani.it/uploads/monthly_08_2012/post-2993-0-77864500-1344852516.jpg",
@@ -69490,7 +69492,7 @@
         "gleba": "staining",
         "sporePrint": "olive",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Vulnerable",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Boletus_dupainii.jpg/500px-Boletus_dupainii.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_09_2013/post-12947-0-74337900-1379690049.jpg",
@@ -71305,7 +71307,7 @@
         "gleba": "",
         "sporePrint": "yellow to ochre",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Secure (NatureServe)",
+        "conservationStatus": "secure",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Russula_decolorans.jpg/500px-Russula_decolorans.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_09_2009/post-4-1253106517.jpg",
@@ -75046,7 +75048,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Near Threatened (IUCN 3.1)",
+        "conservationStatus": "near threatened",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Sarcodon_leucopus_77512.jpg/500px-Sarcodon_leucopus_77512.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_09_2007/post-3093-1189519798.jpg",
@@ -76838,7 +76840,7 @@
         "gleba": "",
         "sporePrint": "buff",
         "ecology": "saprotrophic",
-        "conservationStatus": "Apparently Secure (NatureServe)",
+        "conservationStatus": "apparently secure",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Spathularia_flavida_29116.jpg/500px-Spathularia_flavida_29116.jpg",
           "https://www.funghiitaliani.it/uploads/post-4-1158785345.jpg",
@@ -76953,7 +76955,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Endangered (IUCN 3.1)",
+        "conservationStatus": "endangered",
         "images": [
           "https://www.funghiitaliani.it/uploads/monthly_2022_07/1165977227_1(1).jpg.d639a02148200b550b70034e45981a37.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_2022_07/832643943_1(5).jpg.213b9ce6a20bd3d5c115b9890ed18a39.jpg",
@@ -78206,7 +78208,7 @@
         "gleba": "staining",
         "sporePrint": "brown",
         "ecology": "saprotrophic",
-        "conservationStatus": "Least Concern",
+        "conservationStatus": "least concern",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Boletus_luridus_2011_G1.jpg/500px-Boletus_luridus_2011_G1.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_02_2008/post-21-1202433716.jpg",
@@ -78365,7 +78367,7 @@
         "gleba": "staining",
         "sporePrint": "olive",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Not Evaluated",
+        "conservationStatus": "not evaluated",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/2014-07-19_Boletus_permagnificus_P%C3%B6der_437177.jpg/500px-2014-07-19_Boletus_permagnificus_P%C3%B6der_437177.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_05_2016/post-36492-0-42779200-1463412213.jpg",
@@ -78584,7 +78586,7 @@
         "gleba": "unchanging",
         "sporePrint": "olive",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Least Concern",
+        "conservationStatus": "least concern",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Suillus_bovinus.jpg/500px-Suillus_bovinus.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_05_2016/post-36492-0-08436000-1462883860.jpg",
@@ -79485,7 +79487,7 @@
         "gleba": "staining",
         "sporePrint": "brown",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Least Concern",
+        "conservationStatus": "least concern",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/b/bf/Suillus_variegatus.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_05_2016/post-36492-0-05650100-1462884801.jpg",
@@ -79921,7 +79923,7 @@
         "gleba": "",
         "sporePrint": "white",
         "ecology": "saprotrophic",
-        "conservationStatus": "Apparently Secure (NatureServe)",
+        "conservationStatus": "apparently secure",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Tephrocybe_rancida_369085.jpg/500px-Tephrocybe_rancida_369085.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_05_2016/post-36492-0-42613100-1462885321.jpg"
@@ -80123,7 +80125,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Vulnerable (NatureServe)",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Tolypocladium_Ophioglossoides_2024.jpg/500px-Tolypocladium_Ophioglossoides_2024.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_07_2016/post-12947-0-49549700-1469118012.jpg",
@@ -81209,7 +81211,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Vulnerable (IUCN 3.1)",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/2016-09-14_Trichoglossum_walteri_%28Berk.%29_E.J._Durand_665220.jpg/500px-2016-09-14_Trichoglossum_walteri_%28Berk.%29_E.J._Durand_665220.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_04_2012/post-2993-0-48950200-1335446958.jpg",
@@ -81646,7 +81648,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Vulnerable (IUCN 3.1)",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Tricholoma_colossus.jpg/500px-Tricholoma_colossus.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_10_2010/post-3243-001760900%201288386239.jpg",
@@ -82588,7 +82590,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Near Threatened (IUCN 3.1)",
+        "conservationStatus": "near threatened",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Tricholoma_roseoacerbum_27981.jpg/500px-Tricholoma_roseoacerbum_27981.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_2022_11/1709101912_tricholomarosaacerbum.jpg.ca241dd4a401b65b6b0c7720793f8a2a.jpg"
@@ -83192,7 +83194,7 @@
         "gleba": "",
         "sporePrint": "white",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Secure (NatureServe)",
+        "conservationStatus": "secure",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Tricholoma_vaccinum_99338.jpg/500px-Tricholoma_vaccinum_99338.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_09_2007/post-4-1190838202.jpg",
@@ -84615,7 +84617,7 @@
         "gleba": "staining",
         "sporePrint": "olive",
         "ecology": "mycorrhizal",
-        "conservationStatus": "Vulnerable",
+        "conservationStatus": "vulnerable",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Boletus_dupainii.jpg/500px-Boletus_dupainii.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_09_2013/post-12947-0-74337900-1379690049.jpg",
@@ -85016,7 +85018,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "parasitic or saprotrophic",
-        "conservationStatus": "Apparently Secure (NatureServe)",
+        "conservationStatus": "apparently secure",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Urnula_craterium_mature.jpg/500px-Urnula_craterium_mature.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_04_2014/post-14567-0-07171900-1397852357.jpg",
@@ -85336,7 +85338,7 @@
         "gleba": "",
         "sporePrint": "",
         "ecology": "",
-        "conservationStatus": "Secure (NatureServe)",
+        "conservationStatus": "secure",
         "images": [
           "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Vibrissea_truncorum_155191.jpg/500px-Vibrissea_truncorum_155191.jpg",
           "https://www.funghiitaliani.it/uploads/monthly_06_2009/post-735-1244397285.jpg",
@@ -88040,20 +88042,13 @@
         "saprotrophic or parasitic": "saprofita o parassita"
       },
       "conservationStatus": {
-        "Apparently Secure": "Apparentemente sicura",
-        "Apparently Secure (NatureServe)": "Apparentemente sicura (NatureServe)",
-        "Endangered": "In pericolo",
-        "Endangered (IUCN 3.1)": "In pericolo (IUCN 3.1)",
-        "Least Concern": "Rischio minimo",
-        "Least Concern (IUCN 3.1)": "Rischio minimo (IUCN 3.1)",
-        "Near Threatened": "Prossima alla minaccia",
-        "Near Threatened (IUCN 3.1)": "Prossima alla minaccia (IUCN 3.1)",
-        "Not Evaluated": "Non valutata",
-        "Secure": "Sicura",
-        "Secure (NatureServe)": "Sicura (NatureServe)",
-        "Vulnerable": "Vulnerabile",
-        "Vulnerable (IUCN 3.1)": "Vulnerabile (IUCN 3.1)",
-        "Vulnerable (NatureServe)": "Vulnerabile (NatureServe)"
+        "apparently secure": "apparentemente sicura",
+        "endangered": "in pericolo",
+        "least concern": "rischio minimo",
+        "near threatened": "prossima alla minaccia",
+        "not evaluated": "non valutata",
+        "secure": "sicura",
+        "vulnerable": "vulnerabile"
       }
     }
   }

@@ -2,8 +2,8 @@
 
 Stage 4 fills these columns from the Italian page when there is one, so they mix
 Italian ("convesso") and English ("convex") values. Each column has a dictionary
-from every known value (lowercase) to its English form; English values map to
-themselves, so the stage can run again safely. Compound values such as
+from every known value (lowercase) to its lowercase English form; English values
+map to themselves, so the stage can run again safely. Compound values such as
 "convex or flat" or "white to cream" are translated part by part.
 
 Values missing from the dictionaries are left unchanged and printed, so the
@@ -26,7 +26,7 @@ TABLE = "mushrooms"
 
 def _english(*terms: str) -> dict[str, str]:
     """Entries for values that are already in English."""
-    return {term.lower(): term for term in terms}
+    return {term.lower(): term.lower() for term in terms}
 
 
 # Italian terms follow it.wikipedia's Template:Fungo, English ones the
@@ -128,16 +128,31 @@ DICTIONARIES: dict[str, dict[str, str]] = {
         "simbionte": "mycorrhizal",
         **_english("mycorrhizal", "parasitic", "saprotrophic"),
     },
+    # IUCN Red List categories; the source of the English infobox, e.g.
+    # "(IUCN 3.1)" or "(NatureServe)", is dropped.
     "conservation_status": {
-        "prossimo alla minaccia (nt)": "Near Threatened",
-        "rischio minimo": "Least Concern",
-        "specie non valutata": "Not Evaluated",
-        "vulnerabile": "Vulnerable",
+        "a rischio minimo": "least concern",
+        "carente di dati": "data deficient",
+        "dati insufficienti": "data deficient",
+        "estinta": "extinct",
+        "estinta in natura": "extinct in the wild",
+        "in pericolo": "endangered",
+        "in pericolo critico": "critically endangered",
+        "minacciata": "endangered",
+        "non valutata": "not evaluated",
+        "prossima alla minaccia": "near threatened",
+        "prossimo alla minaccia": "near threatened",
+        "prossimo alla minaccia (nt)": "near threatened",
+        "quasi minacciata": "near threatened",
+        "rischio minimo": "least concern",
+        "specie non valutata": "not evaluated",
+        "vulnerabile": "vulnerable",
         **_english(
-            "Apparently Secure (NatureServe)", "Endangered (IUCN 3.1)",
-            "Least Concern (IUCN 3.1)", "Near Threatened (IUCN 3.1)",
-            "Secure (NatureServe)", "Vulnerable (IUCN 3.1)", "Vulnerable (NatureServe)",
-            "Least Concern", "Near Threatened", "Not Evaluated", "Vulnerable",
+            "critically endangered", "data deficient", "endangered", "extinct",
+            "extinct in the wild", "least concern", "near threatened", "not evaluated",
+            "vulnerable",
+            # NatureServe ranks
+            "apparently secure", "secure",
         ),
     },
 }
@@ -146,6 +161,8 @@ DICTIONARIES: dict[str, dict[str, str]] = {
 WIKI_FILE = re.compile(r"\[\[File:[^\]]*\]\]")
 # "convex or flat", "white to cream": translate each part.
 SEPARATOR = re.compile(r"\s+(or|to)\s+")
+# "vulnerable (iucn 3.1)": keep only the status.
+SOURCE_NOTE = re.compile(r"^(.*?)\s*\([^()]*\)$")
 
 console = Console()
 
@@ -223,6 +240,8 @@ def normalize(column: str, value: str) -> str | None:
         return ""
     if text in dictionary:
         return dictionary[text]
+    if column == "conservation_status" and (match := SOURCE_NOTE.match(text)):
+        return dictionary.get(match.group(1))
 
     # parts at even indexes, separators ("or", "to") at odd ones
     tokens = SEPARATOR.split(text)

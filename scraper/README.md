@@ -51,9 +51,11 @@ uv run scraper
    saved yet (e.g. after an interruption or failed pages) or all of them again.
 5. **Normalize characteristics**: translates the Italian values of the characteristic
    columns of `mushrooms` (cap, hymenium, lamella, stipe, gleba, spore print, ecology,
-   conservation status) to English with the dictionaries in
+   conservation status) to lowercase English with the dictionaries in
    `src/scraper/stages/normalize.py`; compound values like "convex or flat" are
-   translated part by part. Values not in the dictionaries are left unchanged and
+   translated part by part. Conservation statuses become IUCN categories
+   ("vulnerabile" → "vulnerable"); the source of English pages is dropped
+   ("Vulnerable (IUCN 3.1)" → "vulnerable"). Values not in the dictionaries are left unchanged and
    listed on screen. Running it again changes nothing.
 6. **Download photos from funghiitaliani.it topics**: for every `topic_id` in
    `funghi_italiani` (the detail page linked from the grid, a forum topic shared by

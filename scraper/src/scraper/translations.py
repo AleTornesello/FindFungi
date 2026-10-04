@@ -5,7 +5,7 @@ those values and shows them translated when a dictionary for its language exists
 For each language, `terms` maps every English term of a field (the JSON key) to
 its translation, and compound values are translated part by part:
 "convex or flat" joins the parts with `separators["or"]`, "white to cream" fills
-the `separators["to"]` pattern. Source notes such as "(IUCN 3.1)" are kept as they are.
+the `separators["to"]` pattern. Source notes such as "(iucn 3.1)" are kept as they are.
 
 To add a language, add an entry to LANGUAGES with the same fields. Terms missing
 from a dictionary are left out of the export (the app shows them in English) and
@@ -17,7 +17,7 @@ from collections.abc import Iterable
 
 # Same separators the app splits values on for the filter options.
 SEPARATOR = re.compile(r"\s+(or|and|to)\s+")
-# "Vulnerable (IUCN 3.1)": the status is translated, the source is not.
+# "vulnerable (iucn 3.1)": the status is translated, the source is not.
 SOURCE_NOTE = re.compile(r"^(.*?)(\s*\([^)]*\))$")
 
 FIELDS = ("cap", "hymenium", "lamella", "stipe", "gleba", "sporePrint", "ecology", "conservationStatus")
@@ -109,13 +109,17 @@ LANGUAGES: dict[str, dict] = {
                 "saprotrophic": "saprofita",
             },
             "conservationStatus": {
-                "Apparently Secure": "Apparentemente sicura",
-                "Endangered": "In pericolo",
-                "Least Concern": "Rischio minimo",
-                "Near Threatened": "Prossima alla minaccia",
-                "Not Evaluated": "Non valutata",
-                "Secure": "Sicura",
-                "Vulnerable": "Vulnerabile",
+                "apparently secure": "apparentemente sicura",
+                "critically endangered": "in pericolo critico",
+                "data deficient": "dati insufficienti",
+                "endangered": "in pericolo",
+                "extinct": "estinta",
+                "extinct in the wild": "estinta in natura",
+                "least concern": "rischio minimo",
+                "near threatened": "prossima alla minaccia",
+                "not evaluated": "non valutata",
+                "secure": "sicura",
+                "vulnerable": "vulnerabile",
             },
         },
     },
