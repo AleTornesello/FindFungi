@@ -16,7 +16,18 @@ export function MushroomPhoto({
   return (
     <Flex align="center" justify="center" bg="soil.50" overflow="hidden" {...frame}>
       {src && !failed ? (
-        <Image src={src} alt={alt} loading="lazy" w="full" h="full" objectFit="cover" onError={() => setFailed(true)} />
+        // The frame sets the size; width and height only give the browser an aspect ratio before the photo loads.
+        <Image
+          src={src}
+          alt={alt}
+          loading="lazy"
+          htmlWidth="400"
+          htmlHeight="300"
+          w="full"
+          h="full"
+          objectFit="cover"
+          onError={() => setFailed(true)}
+        />
       ) : (
         <MushroomIllustration capColor="#B58962" stemColor="#E9D9C8" w={illustrationWidth} />
       )}

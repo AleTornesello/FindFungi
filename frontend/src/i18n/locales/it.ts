@@ -140,8 +140,8 @@ export const it: Messages = {
   "notFound.cta": "Sfoglia le specie",
 
   "seo.homeTitle": "Guida ai funghi spontanei d'Italia",
-  "seo.homeDescription": "Riconosci i funghi selvatici presenti in Italia per nome latino, famiglia, cappello, lamelle, sporata ed ecologia. Una guida gratuita che funziona offline, con un diario dei tuoi ritrovamenti.",
+  "seo.homeDescription": "Riconosci i funghi spontanei d'Italia per nome, famiglia, cappello, lamelle, sporata ed ecologia. Guida gratuita e offline, con un diario dei tuoi ritrovamenti.",
   "seo.findsDescription": "Tieni un diario privato dei tuoi ritrovamenti di funghi: specie, luogo, data e note, salvati nel tuo browser.",
-  "seo.speciesDescription": "{name} ({family}), {edibility}: caratteristiche per il riconoscimento, classificazione e specie affini nella guida FindFungi ai funghi d'Italia.",
-  "seo.speciesDescriptionNoFamily": "{name}, {edibility}: caratteristiche per il riconoscimento, classificazione e specie affini nella guida FindFungi ai funghi d'Italia.",
+  "seo.speciesDescription": "{name} ({family}), {edibility}: come riconoscerlo, classificazione e specie simili nella guida FindFungi ai funghi d'Italia.",
+  "seo.speciesDescriptionNoFamily": "{name}, {edibility}: come riconoscerlo, classificazione e specie simili nella guida FindFungi ai funghi d'Italia.",
 }

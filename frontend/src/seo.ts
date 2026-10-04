@@ -14,7 +14,7 @@ export interface PageMeta {
   description: string
   /** Route path inside the app, e.g. "/species/139". */
   path: string
-  /** Absolute URL of a preview image. */
+  /** Absolute URL of a preview image; pages without one share DEFAULT_IMAGE. */
   image?: string
   type?: "website" | "article"
   /** Keep the page out of search results (not-found pages). */
@@ -24,6 +24,19 @@ export interface PageMeta {
 }
 
 export const withSiteName = (title: string) => `${title} · ${SITE_NAME}`
+
+/** Site-wide preview image in public/, 1200×630 as link previews expect. */
+const DEFAULT_IMAGE = { path: "/og-image.png", width: "1200", height: "630" }
+
+/** Search engines cut descriptions at around 160 characters. */
+const MAX_DESCRIPTION = 160
+
+/** Shortens text to at most `max` characters at a word boundary, ending with an ellipsis. */
+export function clampText(text: string, max = MAX_DESCRIPTION) {
+  if (text.length <= max) return text
+  const cut = text.slice(0, max)
+  return cut.slice(0, cut.lastIndexOf(" ")).replace(/[\s,;:.]+$/, "") + "…"
+}
 
 export const OG_LOCALES: Record<string, string> = { en: "en_US", it: "it_IT" }
 
@@ -39,18 +52,23 @@ type Tag = { tag: "meta" | "link"; key: "name" | "property" | "rel"; id: string;
 /** The head tags a page owns, in a form both the DOM updater and the HTML writer can apply. */
 export function metaTags(meta: PageMeta, siteUrl: string): Tag[] {
   const url = absoluteUrl(siteUrl, meta.path)
+  const description = clampText(meta.description)
+  const defaultImage = meta.image === undefined
   return [
-    { tag: "meta", key: "name", id: "description", attr: "content", value: meta.description },
+    { tag: "meta", key: "name", id: "description", attr: "content", value: description },
     { tag: "meta", key: "name", id: "robots", attr: "content", value: meta.noindex ? "noindex" : undefined },
     { tag: "link", key: "rel", id: "canonical", attr: "href", value: meta.noindex ? undefined : url },
     { tag: "meta", key: "property", id: "og:site_name", attr: "content", value: SITE_NAME },
     { tag: "meta", key: "property", id: "og:type", attr: "content", value: meta.type ?? "website" },
     { tag: "meta", key: "property", id: "og:title", attr: "content", value: meta.title },
-    { tag: "meta", key: "property", id: "og:description", attr: "content", value: meta.description },
+    { tag: "meta", key: "property", id: "og:description", attr: "content", value: description },
     { tag: "meta", key: "property", id: "og:url", attr: "content", value: url },
-    { tag: "meta", key: "property", id: "og:image", attr: "content", value: meta.image },
+    { tag: "meta", key: "property", id: "og:image", attr: "content", value: meta.image ?? absoluteUrl(siteUrl, DEFAULT_IMAGE.path) },
+    { tag: "meta", key: "property", id: "og:image:width", attr: "content", value: defaultImage ? DEFAULT_IMAGE.width : undefined },
+    { tag: "meta", key: "property", id: "og:image:height", attr: "content", value: defaultImage ? DEFAULT_IMAGE.height : undefined },
+    { tag: "meta", key: "property", id: "og:image:alt", attr: "content", value: meta.title },
     { tag: "meta", key: "property", id: "og:locale", attr: "content", value: meta.locale ?? OG_LOCALES.en },
-    { tag: "meta", key: "name", id: "twitter:card", attr: "content", value: meta.image ? "summary_large_image" : "summary" },
+    { tag: "meta", key: "name", id: "twitter:card", attr: "content", value: "summary_large_image" },
   ]
 }
 

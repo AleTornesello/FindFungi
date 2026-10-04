@@ -142,10 +142,10 @@ export const en = {
   "notFound.cta": "Browse species",
 
   "seo.homeTitle": "Guide to the wild mushrooms of Italy",
-  "seo.homeDescription": "Identify the wild mushrooms found in Italy by Latin name, family, cap, gills, spore print and ecology. A free field guide that works offline, with a journal for your finds.",
+  "seo.homeDescription": "Identify the wild mushrooms of Italy by name, family, cap, gills, spore print and ecology. A free field guide that works offline, with a journal for your finds.",
   "seo.findsDescription": "Keep a private journal of your mushroom finds: species, place, date and notes, saved in your browser.",
-  "seo.speciesDescription": "{name} ({family}), {edibility}: identification characteristics, classification and related species in the FindFungi guide to the mushrooms of Italy.",
-  "seo.speciesDescriptionNoFamily": "{name}, {edibility}: identification characteristics, classification and related species in the FindFungi guide to the mushrooms of Italy.",
+  "seo.speciesDescription": "{name} ({family}), {edibility}: identification, classification and similar species in the FindFungi guide to Italian mushrooms.",
+  "seo.speciesDescriptionNoFamily": "{name}, {edibility}: identification, classification and similar species in the FindFungi guide to Italian mushrooms.",
 }
 
 export type MessageKey = keyof typeof en

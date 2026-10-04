@@ -100,7 +100,20 @@ function PhotoViewer({
                 {count > 1 && <StepButton label={t("detail.previousPhoto")} onClick={() => go(-1)} icon={<ChevronLeft />} />}
                 <Flex flex="1" minW="0" h="full" align="center" justify="center">
                   {src && (
-                    <Image key={src} src={src} alt={name} maxW="full" maxH="full" objectFit="contain" borderRadius="lg" />
+                    // Auto size keeps the photo's own dimensions; the attributes are only a placeholder ratio until it loads.
+                    <Image
+                      key={src}
+                      src={src}
+                      alt={name}
+                      htmlWidth="1200"
+                      htmlHeight="900"
+                      w="auto"
+                      h="auto"
+                      maxW="full"
+                      maxH="full"
+                      objectFit="contain"
+                      borderRadius="lg"
+                    />
                   )}
                 </Flex>
                 {count > 1 && <StepButton label={t("detail.nextPhoto")} onClick={() => go(1)} icon={<ChevronRight />} />}
