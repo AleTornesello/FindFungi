@@ -2,6 +2,7 @@ import psycopg
 from psycopg import sql
 
 from scraper.config import DbConfig
+from scraper.schema import MIGRATIONS
 
 
 def connect(config: DbConfig) -> psycopg.Connection:
@@ -24,3 +25,9 @@ def row_count(conn: psycopg.Connection, table: str) -> int:
     query = sql.SQL("SELECT count(*) FROM {}").format(sql.Identifier(table))
     row = conn.execute(query).fetchone()
     return row[0] if row else 0
+
+
+def migrate(conn: psycopg.Connection, table: str) -> None:
+    """Add the columns `table` lacks if an older version created it. Not committed."""
+    for statement in MIGRATIONS.get(table, []):
+        conn.execute(statement)

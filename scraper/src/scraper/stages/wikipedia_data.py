@@ -2,12 +2,12 @@
 
 Every `funghi_italiani` record with a Wikipedia page (see stage 3) becomes a row:
 taxonomy, edibility, toxicity and its effect come from funghi_italiani, the morphological properties,
-conservation status and cover image from the Italian page, or from the English
+conservation status, cover image and common names from the Italian page, or from the English
 one when there is no Italian page. Records without any page are skipped.
 
 Pages are fetched through the Firecrawl API, which returns only the infobox
-tables; each page is scraped once even if several records point to it. Rows are
-committed in small batches, so an interrupted run can be resumed.
+tables and the lead paragraphs; each page is scraped once even if several records
+point to it. Rows are committed in small batches, so an interrupted run can be resumed.
 """
 
 import re
@@ -22,13 +22,16 @@ from rich.console import Console
 from rich.progress import BarColumn, MofNCompleteColumn, Progress, TextColumn
 
 from scraper.config import ConfigError, load_db_config, load_firecrawl_config
-from scraper.db import connect, row_count, table_exists
+from scraper.db import connect, migrate, row_count, table_exists
 from scraper.firecrawl import Firecrawl, FirecrawlError, FirecrawlFatalError
 
 TABLE = "mushrooms"
 REQUIRED_TABLES = ("funghi_italiani", "wikipedia_pages", TABLE)
 PAGE_URL = "https://{lang}.wikipedia.org/?curid={page_id}"
 INFOBOX_SELECTOR = "table.infobox"
+# Paragraphs before the first heading: Firecrawl returns the Parsoid HTML, where
+# every section is a <section> element.
+LEAD_SELECTOR = 'section[data-mw-section-id="0"] > p'
 COMMIT_EVERY = 25
 
 COVER_WIDTH = 500
@@ -53,6 +56,10 @@ IT_LABELS = {
     "Ecologia": "ecology",
 }
 
+# Italian taxobox header; the common names are in the row after it.
+IT_COMMON_NAMES_HEADER = "Nomi comuni"
+FOREIGN_NAMES = re.compile(r"^\s*\(\s*[A-Za-z]{2,3}\s*\)")
+
 INFOBOX_HEADERS = {
     "it": ("Classificazione scientifica", "Caratteristiche morfologiche", "Stato di conservazione"),
     "en": ("Scientific classification", "Mycological characteristics", "Conservation status"),
@@ -66,12 +73,14 @@ INSERT_SQL = f"""
 INSERT INTO {TABLE} (
     funghi_italiani_id, funghi_italiani_topic_id, wikipedia_it_page_id, wikipedia_en_page_id,
     kingdom, division, taxon_class, taxon_order, family, genus, species,
+    common_name_it, common_name_en,
     edible, poisonous, toxicity_effect_it, microscopic, cap, hymenium, lamella, stipe, gleba,
     spore_print, ecology, conservation_status, cover_image
 ) VALUES (
     %(funghi_italiani_id)s, %(funghi_italiani_topic_id)s, %(wikipedia_it_page_id)s,
     %(wikipedia_en_page_id)s, %(kingdom)s, %(division)s, %(taxon_class)s, %(taxon_order)s,
-    %(family)s, %(genus)s, %(species)s, %(edible)s, %(poisonous)s, %(toxicity_effect_it)s,
+    %(family)s, %(genus)s, %(species)s, %(common_name_it)s, %(common_name_en)s,
+    %(edible)s, %(poisonous)s, %(toxicity_effect_it)s,
     %(microscopic)s, %(cap)s, %(hymenium)s, %(lamella)s, %(stipe)s, %(gleba)s,
     %(spore_print)s, %(ecology)s, %(conservation_status)s, %(cover_image)s
 )
@@ -86,6 +95,8 @@ ON CONFLICT (funghi_italiani_id) DO UPDATE SET
     family = EXCLUDED.family,
     genus = EXCLUDED.genus,
     species = EXCLUDED.species,
+    common_name_it = EXCLUDED.common_name_it,
+    common_name_en = EXCLUDED.common_name_en,
     edible = EXCLUDED.edible,
     poisonous = EXCLUDED.poisonous,
     toxicity_effect_it = EXCLUDED.toxicity_effect_it,
@@ -137,6 +148,8 @@ def run() -> None:
                         f"[red]Table '{table}' does not exist. Run stage 1 first.[/red]"
                     )
                     return
+            migrate(conn, TABLE)
+            conn.commit()
 
             only_missing = False
             count = row_count(conn, TABLE)
@@ -231,20 +244,25 @@ def _scrape_and_save(
         ) as progress:
             task = progress.add_task("scrape", total=len(records_by_page))
             futures: dict[Future[str], Page] = {
-                pool.submit(firecrawl.scrape_html, page.url, [INFOBOX_SELECTOR]): page
+                pool.submit(
+                    firecrawl.scrape_html, page.url, [INFOBOX_SELECTOR, LEAD_SELECTOR]
+                ): page
                 for page in records_by_page
             }
             for future in as_completed(futures):
                 page = futures[future]
                 progress.advance(task)
                 try:
-                    data = parse_infobox(future.result(), page.lang)
+                    html = future.result()
                 except FirecrawlFatalError:
                     raise
                 except FirecrawlError as e:
                     failed.append(str(e))
                     continue
-                pending.extend(record | data for record in records_by_page[page])
+                data = parse_infobox(html, page.lang)
+                for record in records_by_page[page]:
+                    names = parse_common_names(html, page.lang, record["genus"], record["species"])
+                    pending.append(record | data | names)
                 if len(pending) >= COMMIT_EVERY:
                     flush()
     except FirecrawlFatalError as e:
@@ -285,6 +303,77 @@ def parse_infobox(html: str, lang: str) -> dict:
         (image for table in candidates if (image := _cover_image(table))), ""
     )
     return data
+
+
+def parse_common_names(html: str, lang: str, genus: str, species: str) -> dict:
+    """The common names of the mushroom on a Wikipedia page, keyed by column.
+
+    Italian pages list them in the taxobox, under "Nomi comuni". Otherwise they are
+    the bold terms of the lead that are not in italics, which is how the scientific
+    name and its synonyms are written ("Agaricus campestris is ... commonly known
+    as the field mushroom").
+    """
+    soup = BeautifulSoup(html, "html.parser")
+    names = _it_common_names(soup.select(INFOBOX_SELECTOR)) if lang == "it" else []
+    if not names:
+        names = _lead_common_names(soup, genus, species)
+    return {
+        "common_name_it": ", ".join(names) if lang == "it" else "",
+        "common_name_en": ", ".join(names) if lang == "en" else "",
+    }
+
+
+def _it_common_names(tables: list[Tag]) -> list[str]:
+    for table in tables:
+        for tr in table.find_all("tr"):
+            if _text(tr) != IT_COMMON_NAMES_HEADER:
+                continue
+            row = tr.find_next_sibling("tr")
+            if row is None:
+                return []
+            # Names come in list items, paragraphs or lines, several separated by
+            # commas; those in other languages start with the language code,
+            # e.g. "(EN) Ruby Bolete".
+            for citation in row.select("sup.reference"):
+                citation.decompose()
+            for br in row.find_all("br"):
+                br.replace_with("\n")
+            for item in row.find_all(["li", "p"]):
+                item.append("\n")
+            lines = row.get_text().split("\n")
+            return _unique(
+                name
+                for line in lines
+                if not FOREIGN_NAMES.match(line)
+                for name in line.split(",")
+            )
+    return []
+
+
+def _lead_common_names(soup: BeautifulSoup, genus: str, species: str) -> list[str]:
+    scientific = {genus.lower(), species.lower()}
+    names = []
+    for p in soup.find_all("p"):
+        if p.find_parent("table") is not None:
+            continue
+        for b in p.find_all("b"):
+            if b.find_parent("i") is not None or b.find("i") is not None:
+                continue
+            name = _text(b)
+            if not scientific.isdisjoint(re.findall(r"\w+", name.lower())):
+                continue  # a scientific name not written in italics
+            names.append(name)
+    return _unique(names)
+
+
+def _unique(names) -> list[str]:
+    """Non-empty names with whitespace collapsed, without case-insensitive repeats."""
+    unique: dict[str, str] = {}
+    for name in names:
+        name = " ".join(name.split()).strip(" .;:")
+        if name:
+            unique.setdefault(name.casefold(), name)
+    return list(unique.values())
 
 
 def _find_table(tables: list[Tag], header: str) -> Tag | None:

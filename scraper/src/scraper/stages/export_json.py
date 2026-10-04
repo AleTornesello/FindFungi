@@ -6,7 +6,9 @@ The output is an object with two keys:
   `taxonomy` and a `properties` object, keys in camelCase. The source ids
   (funghi_italiani and Wikipedia) and the timestamps are not exported.
   `properties.images` lists the Wikipedia cover image first, then the photos of
-  the funghiitaliani.it topic (stage 6) in page order.
+  the funghiitaliani.it topic (stage 6) in page order. `properties.commonNameIt`
+  and `properties.commonNameEn` hold the common names from the Wikipedia page of
+  that language, comma separated ('' when there are none).
 - `translations`: per language and property, the translation of every English
   characteristic value in the export, from the dictionaries in
   `scraper.translations`.
@@ -32,7 +34,7 @@ DEFAULT_PATH = "data/mushrooms.json"
 QUERY = f"""
 SELECT
     id, kingdom, division, taxon_class, taxon_order, family, genus, species,
-    edible, poisonous, toxicity_effect_it, microscopic, cap, hymenium, lamella, stipe, gleba, spore_print,
+    common_name_it, common_name_en, edible, poisonous, toxicity_effect_it, microscopic, cap, hymenium, lamella, stipe, gleba, spore_print,
     ecology, conservation_status, cover_image,
     ARRAY(
         SELECT p.url FROM {PHOTOS_TABLE} p
@@ -114,6 +116,8 @@ def to_json(row: dict) -> dict:
             "species": row["species"],
         },
         "properties": {
+            "commonNameIt": row["common_name_it"],
+            "commonNameEn": row["common_name_en"],
             "edible": row["edible"],
             "poisonous": row["poisonous"],
             "toxicityEffectIt": row["toxicity_effect_it"],

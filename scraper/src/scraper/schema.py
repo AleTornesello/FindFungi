@@ -25,6 +25,10 @@ CREATE TABLE mushrooms (
     genus                     text NOT NULL,
     species                   text NOT NULL,
 
+    -- common names, from the Wikipedia page of the same language
+    common_name_it            text NOT NULL DEFAULT '',
+    common_name_en            text NOT NULL DEFAULT '',
+
     -- properties
     edible                    boolean NOT NULL DEFAULT false,
     poisonous                 boolean NOT NULL DEFAULT false,
@@ -111,6 +115,15 @@ CREATE TABLE funghi_italiani_photos (
     PRIMARY KEY (topic_id, position)
 );
 """
+
+# Columns added after a table was first released, to bring tables created by an
+# older version up to date. Every statement must be idempotent.
+MIGRATIONS: dict[str, list[str]] = {
+    "mushrooms": [
+        "ALTER TABLE mushrooms ADD COLUMN IF NOT EXISTS common_name_it text NOT NULL DEFAULT ''",
+        "ALTER TABLE mushrooms ADD COLUMN IF NOT EXISTS common_name_en text NOT NULL DEFAULT ''",
+    ],
+}
 
 TABLES: dict[str, str] = {
     "funghi_italiani": FUNGHI_ITALIANI,

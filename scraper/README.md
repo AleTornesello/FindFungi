@@ -14,8 +14,9 @@ uv run scraper
 
 1. **Setup database**: creates the tables defined in `src/scraper/schema.py`:
    `funghi_italiani` (raw API data), `wikipedia_pages`, `mushrooms` (the flattened structure of
-   `data/8.json`), `funghi_italiani_topics` and `funghi_italiani_photos`. Missing tables are created. If some already exist, you can clean
-   them, recreate them or leave them.
+   `data/8.json`), `funghi_italiani_topics` and `funghi_italiani_photos`. Missing tables are created, and
+   existing ones get the columns added since they were created. If some already exist,
+   you can clean them, recreate them or leave them.
 2. **Download data from funghiitaliani.it**: reads every record from the grid API
    (100 per page, with retries) and saves it into `funghi_italiani`, setting
    `poisonous` for the records with edibility code `V` (velenoso). If the table
@@ -31,7 +32,12 @@ uv run scraper
    a row into `mushrooms`: taxonomy, edibility, `poisonous` and `toxicity_effect_it` (the
    ingestion syndrome, in Italian) from funghiitaliani.it, morphology
    (cap, hymenium, lamella, stipe, gleba, spore print, ecology), conservation status
-   and cover image from Wikipedia. Needs `FIRECRAWL_API_KEY` in `.env` (without it
+   and cover image from Wikipedia. The common names go into `common_name_it` or
+   `common_name_en`, by the language of the page: on Italian pages they are the
+   "Nomi comuni" of the taxobox (names in other languages are skipped); on English
+   pages, and Italian ones without that row, they are the bold, non-italic terms of
+   the lead ("commonly known as the **field mushroom**"). Several names are comma
+   separated. Needs `FIRECRAWL_API_KEY` in `.env` (without it
    the keyless rate limits apply); `FIRECRAWL_CONCURRENCY` sets the parallel requests.
    Rows are committed in batches: on later runs you can scrape only the mushrooms not
    saved yet (e.g. after an interruption or failed pages) or all of them again.
@@ -56,7 +62,8 @@ uv run scraper
    `data/mushrooms.json`). Its `mushrooms` list has the structure of `data/8.json`:
    `id`, a `taxonomy` and a `properties` object with camelCase keys. Its `images`
    property lists the Wikipedia cover image first, then the funghiitaliani.it photos
-   of stage 6 in page order. The funghiitaliani.it and Wikipedia ids and the
+   of stage 6 in page order; `commonNameIt` and `commonNameEn` hold the common names
+   of stage 4. The funghiitaliani.it and Wikipedia ids and the
    timestamps are not exported. Its
    `translations` object holds, per language and property, the translation of every
    characteristic value (e.g. `translations.it.cap["convex or flat"]` is

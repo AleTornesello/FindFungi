@@ -1,7 +1,8 @@
 """Stage 1: create the tables defined in scraper.schema.
 
 If some tables already exist, ask whether to clean them, recreate them or leave
-them as they are. Missing tables are always created.
+them as they are. Missing tables are always created, and existing ones get the
+columns added since they were created.
 """
 
 import psycopg
@@ -10,7 +11,7 @@ from psycopg import sql
 from rich.console import Console
 
 from scraper.config import ConfigError, load_db_config
-from scraper.db import connect, row_count, table_exists
+from scraper.db import connect, migrate, row_count, table_exists
 from scraper.schema import TABLES
 
 CLEAN = "Clean them (delete all rows, keep the tables)"
@@ -42,6 +43,8 @@ def _setup(conn: psycopg.Connection) -> None:
     for table in missing:
         conn.execute(TABLES[table])
         console.print(f"[green]Table '{table}' created.[/green]")
+    for table in existing:
+        migrate(conn, table)
     conn.commit()
 
     if not existing:
