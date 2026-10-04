@@ -3,6 +3,7 @@ import { Badge, Box, Button, Container, Flex, Grid, Heading, HStack, Link, Simpl
 import { Link as RouterLink, useLocation, useNavigate, useParams } from "react-router"
 import { ArrowLeft, ChevronRight, ExternalLink, Microscope, ShieldAlert, Skull, TriangleAlert, Utensils, type LucideIcon } from "lucide-react"
 import { commonName, scientificName, type Mushroom } from "../data/mushrooms"
+import { isThreatened } from "../data/conservation"
 import { hasTraitDrawing, TraitIcon } from "../components/TraitIcon"
 import { MushroomCard } from "../components/MushroomCard"
 import { EdibilityBadge } from "../components/EdibilityBadge"
@@ -54,9 +55,6 @@ const RANKS: { key: keyof Mushroom["taxonomy"]; label: MessageKey }[] = [
 const RELATED_LIMIT = 6
 
 const hasValue = (v: unknown): v is string => typeof v === "string" && v !== "" && v !== "not applicable"
-
-/** IUCN categories that mean the species is at risk, as opposed to "Least Concern" or "Secure". */
-const isThreatened = (status: string) => /vulnerable|endangered|threatened/i.test(status)
 
 export function MushroomDetailPage() {
   const { id } = useParams()

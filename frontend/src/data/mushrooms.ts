@@ -1,3 +1,5 @@
+import { normalizeConservationStatus } from "./conservation";
+
 /** In dev the Vite server serves the repo's own data/mushrooms.json (see vite.config.ts). */
 export const MUSHROOMS_URL = import.meta.env.DEV
   ? "/data/mushrooms.json"
@@ -76,6 +78,18 @@ export function withImages(m: Mushroom): Mushroom {
   return { ...m, properties: { ...properties, images: coverImage ? [coverImage] : [] } };
 }
 
+/** Brings mushrooms from older exports, and copies cached from them, to the current shape. */
+export function upgradeMushroom(m: Mushroom): Mushroom {
+  const { properties } = withImages(m);
+  return {
+    ...m,
+    properties: {
+      ...properties,
+      conservationStatus: normalizeConservationStatus(properties.conservationStatus ?? ""),
+    },
+  };
+}
+
 /** Rejects payloads that would break the UI, so a bad download never replaces a good local copy. */
 export function parseMushrooms(data: unknown): MushroomData {
   // Older exports were a bare list, without translations.
@@ -100,7 +114,7 @@ export function parseMushrooms(data: unknown): MushroomData {
     throw new Error("Mushroom translations have an unexpected shape");
   }
   return {
-    mushrooms: (mushrooms as Mushroom[]).map(withImages),
+    mushrooms: (mushrooms as Mushroom[]).map(upgradeMushroom),
     translations: translations as ValueTranslations,
   };
 }

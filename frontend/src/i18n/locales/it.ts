@@ -76,6 +76,18 @@ export const it: Messages = {
   "field.conservationStatus": "Stato di conservazione",
   "field.microscopic": "Microscopia",
 
+  "conservation.extinct": "Estinta",
+  "conservation.extinctInTheWild": "Estinta in natura",
+  "conservation.criticallyEndangered": "In pericolo critico",
+  "conservation.endangered": "In pericolo",
+  "conservation.vulnerable": "Vulnerabile",
+  "conservation.nearThreatened": "Prossima alla minaccia",
+  "conservation.leastConcern": "Rischio minimo",
+  "conservation.dataDeficient": "Dati insufficienti",
+  "conservation.notEvaluated": "Non valutata",
+  "conservation.apparentlySecure": "Apparentemente sicura",
+  "conservation.secure": "Sicura",
+
   "edibility.edible": "Commestibile",
   "edibility.inedible": "Non commestibile",
   "edibility.poisonous": "Velenoso",

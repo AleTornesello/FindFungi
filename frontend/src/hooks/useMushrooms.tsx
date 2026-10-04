@@ -3,11 +3,12 @@ import {
   MUSHROOMS_URL,
   parseMushrooms,
   RESYNC_AFTER_MS,
-  withImages,
+  upgradeMushroom,
   type Mushroom,
   type ValueTranslations,
 } from "../data/mushrooms"
 import { loadSnapshot, saveSnapshot } from "../data/mushroomStore"
+import { CONSERVATION_STATUS_LABELS } from "../data/conservation"
 import { useI18n } from "../i18n/I18nProvider"
 
 export type SyncStatus = "loading" | "syncing" | "idle" | "error"
@@ -81,7 +82,7 @@ export function MushroomsProvider({ children }: { children: ReactNode }) {
     loadSnapshot().then((snapshot) => {
       if (cancelled) return
       if (snapshot) {
-        setMushrooms(snapshot.mushrooms.map(withImages))
+        setMushrooms(snapshot.mushrooms.map(upgradeMushroom))
         setTranslations(snapshot.translations ?? {})
         setSyncedAt(snapshot.syncedAt)
         syncedAtRef.current = snapshot.syncedAt
@@ -117,12 +118,18 @@ export function useMushrooms() {
   return ctx
 }
 
-/** Shows a characteristic value in the current language, or in English when it has no translation. */
+/**
+ * Shows a characteristic value in the current language, or in English when it has no translation.
+ * Conservation statuses are a fixed list, so the app translates them itself.
+ */
 export function useValueLabel() {
   const { translations } = useMushrooms()
-  const { locale } = useI18n()
+  const { locale, t } = useI18n()
   return useCallback(
-    (property: keyof Mushroom["properties"], value: string) => translations[locale]?.[property]?.[value] ?? value,
-    [translations, locale],
+    (property: keyof Mushroom["properties"], value: string) => {
+      const status = property === "conservationStatus" ? CONSERVATION_STATUS_LABELS[value] : undefined
+      return status ? t(status) : (translations[locale]?.[property]?.[value] ?? value)
+    },
+    [translations, locale, t],
   )
 }

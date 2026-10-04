@@ -78,6 +78,18 @@ export const en = {
   "field.conservationStatus": "Conservation status",
   "field.microscopic": "Microscopy",
 
+  "conservation.extinct": "Extinct",
+  "conservation.extinctInTheWild": "Extinct in the wild",
+  "conservation.criticallyEndangered": "Critically endangered",
+  "conservation.endangered": "Endangered",
+  "conservation.vulnerable": "Vulnerable",
+  "conservation.nearThreatened": "Near threatened",
+  "conservation.leastConcern": "Least concern",
+  "conservation.dataDeficient": "Data deficient",
+  "conservation.notEvaluated": "Not evaluated",
+  "conservation.apparentlySecure": "Apparently secure",
+  "conservation.secure": "Secure",
+
   "edibility.edible": "Edible",
   "edibility.inedible": "Not edible",
   "edibility.poisonous": "Poisonous",
