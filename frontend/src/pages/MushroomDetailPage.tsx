@@ -2,7 +2,7 @@ import { useEffect, useMemo, type ReactNode } from "react"
 import { Badge, Box, Button, Container, Flex, Grid, Heading, HStack, Link, SimpleGrid, Spinner, Stack, Text } from "@chakra-ui/react"
 import { Link as RouterLink, useLocation, useNavigate, useParams } from "react-router"
 import { ArrowLeft, ChevronRight, ExternalLink, Microscope, Skull, TriangleAlert, Utensils, type LucideIcon } from "lucide-react"
-import { scientificName, type Mushroom } from "../data/mushrooms"
+import { commonName, scientificName, type Mushroom } from "../data/mushrooms"
 import { hasTraitDrawing, TraitIcon } from "../components/TraitIcon"
 import { MushroomCard } from "../components/MushroomCard"
 import { EdibilityBadge } from "../components/EdibilityBadge"
@@ -107,6 +107,7 @@ export function MushroomDetailPage() {
       <Grid templateColumns={{ base: "1fr", lg: "1fr 340px" }} gap={{ base: "6", lg: "8" }} mt={{ base: "8", md: "10" }} alignItems="start">
         <Stack gap="6" minW="0">
           <Characteristics mushroom={mushroom} />
+          <CommonNames mushroom={mushroom} />
           <Photos mushroom={mushroom} />
         </Stack>
         <Stack gap="6">
@@ -409,6 +410,27 @@ function TraitDrawings({ property, value }: { property: Property; value: string 
         </Stack>
       ))}
     </Flex>
+  )
+}
+
+/** Common names in the UI language; hidden when the species has none in it. */
+function CommonNames({ mushroom }: { mushroom: Mushroom }) {
+  const { locale, t } = useI18n()
+  const names = commonName(mushroom, locale)
+    .split(",")
+    .map((name) => name.trim())
+    .filter(Boolean)
+  if (names.length === 0) return null
+  return (
+    <Section title={t("detail.commonNames")}>
+      <Flex as="ul" listStyleType="none" wrap="wrap" gap="2" mt="4">
+        {names.map((name) => (
+          <Box as="li" key={name} bg="bg.subtle" borderRadius="full" px="3.5" py="1.5" fontWeight="600" _firstLetter={{ textTransform: "uppercase" }}>
+            {name}
+          </Box>
+        ))}
+      </Flex>
+    </Section>
   )
 }
 

@@ -97,6 +97,7 @@ export const en = {
   "detail.relatedGenus": "Other species of {taxon}",
   "detail.relatedFamily": "Other species in the family {taxon}",
   "detail.relatedMore": "and {count} more",
+  "detail.commonNames": "Common names",
   "detail.photos": "Photos",
   "detail.showAllPhotos": "Show all {count} photos",
   "detail.openPhoto": "Open photo {index} of {count}",
