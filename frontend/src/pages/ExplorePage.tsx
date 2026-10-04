@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import {
   Badge,
   Box,
@@ -71,6 +71,7 @@ export function ExplorePage() {
   const [advanced, setAdvanced] = useState<AdvancedFilters>(saved.advanced)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [shown, setShown] = useState(saved.shown)
+  const searchRef = useRef<HTMLInputElement>(null)
   usePageMeta(homeMeta(t))
 
   // Kept for the tab's lifetime so returning from a detail page restores the same results.
@@ -124,8 +125,30 @@ export function ExplorePage() {
       </Text>
       <SyncStatusBar />
 
-      <InputGroup mt="6" startElement={<Search size={18} />}>
+      <InputGroup
+        mt="6"
+        startElement={<Search size={18} />}
+        endElement={
+          query && (
+            <IconButton
+              size="xs"
+              variant="ghost"
+              borderRadius="full"
+              me="-2"
+              aria-label={t("explore.clearSearch")}
+              onClick={() => {
+                setQuery("")
+                setShown(PAGE_SIZE)
+                searchRef.current?.focus()
+              }}
+            >
+              <X />
+            </IconButton>
+          )
+        }
+      >
         <Input
+          ref={searchRef}
           value={query}
           onChange={(e) => {
             setQuery(e.target.value)
