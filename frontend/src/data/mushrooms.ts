@@ -20,6 +20,12 @@ export interface Mushroom {
     species: string;
   };
   properties: {
+    /**
+     * Common names from the Wikipedia page of that language, comma separated; '' when there
+     * are none. Missing in exports made before the dataset carried them.
+     */
+    commonNameIt?: string;
+    commonNameEn?: string;
     edible: boolean;
     poisonous: boolean;
     /** Ingestion syndrome in Italian, e.g. "Sindrome muscarinica"; '' when none is recorded. */
@@ -55,7 +61,11 @@ export interface MushroomData {
 export const scientificName = (m: Mushroom) =>
   `${m.taxonomy.genus} ${m.taxonomy.species}`.trim();
 
-export const speciesPath = (m: Mushroom) => `/species/${m.id}`;
+/** Common names in Italian for the Italian UI, in English otherwise; '' when there are none. */
+export const commonName = (m: Mushroom, locale: string) =>
+  (locale === "it" ? m.properties.commonNameIt : m.properties.commonNameEn) ?? "";
+
+export const speciesPath =(m: Mushroom) => `/species/${m.id}`;
 
 /** Older exports, and copies cached from them, had a single `coverImage` instead of `images`. */
 export function withImages(m: Mushroom): Mushroom {

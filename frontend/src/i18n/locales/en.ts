@@ -18,7 +18,7 @@ export const en = {
 
   "explore.title": "Explore",
   "explore.intro": "Look up a species found in Italy by its Latin name or family. The guide is saved on this device and works without signal.",
-  "explore.searchPlaceholder": "Search by Latin name or family",
+  "explore.searchPlaceholder": "Search by common or Latin name, or family",
   "explore.searchLabel": "Search species",
   "explore.edibilityGroup": "Filter by edibility",
   "explore.filter.all": "All",

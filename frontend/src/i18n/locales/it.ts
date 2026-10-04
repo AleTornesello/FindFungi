@@ -16,7 +16,7 @@ export const it: Messages = {
 
   "explore.title": "Esplora",
   "explore.intro": "Cerca una specie presente in Italia per nome latino o famiglia. La guida è salvata su questo dispositivo e funziona anche senza campo.",
-  "explore.searchPlaceholder": "Cerca per nome latino o famiglia",
+  "explore.searchPlaceholder": "Cerca per nome comune o latino, o famiglia",
   "explore.searchLabel": "Cerca specie",
   "explore.edibilityGroup": "Filtra per commestibilità",
   "explore.filter.all": "Tutte",

@@ -15,7 +15,7 @@ import {
   Text,
 } from "@chakra-ui/react"
 import { RefreshCw, Search, SlidersHorizontal, WifiOff, X } from "lucide-react"
-import { scientificName } from "../data/mushrooms"
+import { commonName, scientificName } from "../data/mushrooms"
 import { MushroomCard } from "../components/MushroomCard"
 import { AdvancedFilterDialog } from "../components/AdvancedFilterDialog"
 import {
@@ -63,7 +63,7 @@ function loadState(): SavedState {
 
 export function ExplorePage() {
   const { mushrooms, status } = useMushrooms()
-  const { t } = useI18n()
+  const { locale, t } = useI18n()
   const valueLabel = useValueLabel()
   const [saved] = useState(loadState)
   const [query, setQuery] = useState(saved.query)
@@ -88,9 +88,12 @@ export function ExplorePage() {
       (m) =>
         (filter === "all" ||
           (filter === "poisonous" ? m.properties.poisonous : m.properties.edible === (filter === "edible"))) &&
-        (!q || scientificName(m).toLowerCase().includes(q) || m.taxonomy.family.toLowerCase().includes(q)),
+        (!q ||
+          scientificName(m).toLowerCase().includes(q) ||
+          commonName(m, locale).toLowerCase().includes(q) ||
+          m.taxonomy.family.toLowerCase().includes(q)),
     )
-  }, [mushrooms, query, filter])
+  }, [mushrooms, query, filter, locale])
 
   const results = useMemo(
     () =>
