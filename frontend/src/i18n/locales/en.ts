@@ -90,6 +90,7 @@ export const en = {
   "detail.inedibleNote": "Not listed as edible. This includes poisonous species: don't eat or taste it.",
   "detail.poisonousNote": "Poisonous species: don't eat or taste it, not even a small amount.",
   "detail.toxicityEffect": "Effects of ingestion",
+  "detail.threatenedNote": "This species is at risk in the wild: don't pick it. Photograph it and leave it where it grows.",
   "detail.microscopyBadge": "Microscopy documented",
   "detail.atGlance": "At a glance",
   "detail.characteristics": "Characteristics",

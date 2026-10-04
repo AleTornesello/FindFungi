@@ -1,7 +1,7 @@
 import { useEffect, useMemo, type ReactNode } from "react"
 import { Badge, Box, Button, Container, Flex, Grid, Heading, HStack, Link, SimpleGrid, Spinner, Stack, Text } from "@chakra-ui/react"
 import { Link as RouterLink, useLocation, useNavigate, useParams } from "react-router"
-import { ArrowLeft, ChevronRight, ExternalLink, Microscope, Skull, TriangleAlert, Utensils, type LucideIcon } from "lucide-react"
+import { ArrowLeft, ChevronRight, ExternalLink, Microscope, ShieldAlert, Skull, TriangleAlert, Utensils, type LucideIcon } from "lucide-react"
 import { commonName, scientificName, type Mushroom } from "../data/mushrooms"
 import { hasTraitDrawing, TraitIcon } from "../components/TraitIcon"
 import { MushroomCard } from "../components/MushroomCard"
@@ -102,6 +102,7 @@ export function MushroomDetailPage() {
     <Container maxW="6xl" px={{ base: "4", md: "6" }} pt={{ base: "4", md: "6" }}>
       <BackLink />
       {mushroom.properties.poisonous && <PoisonWarning mushroom={mushroom} />}
+      {isThreatened(mushroom.properties.conservationStatus) && <ConservationWarning mushroom={mushroom} />}
       <Hero mushroom={mushroom} />
 
       <Grid templateColumns={{ base: "1fr", lg: "1fr 340px" }} gap={{ base: "6", lg: "8" }} mt={{ base: "8", md: "10" }} alignItems="start">
@@ -244,38 +245,70 @@ function Hero({ mushroom }: { mushroom: Mushroom }) {
 }
 
 /**
- * Stays pinned under the header while the page scrolls, so the warning is on screen whatever part
- * of the page is being read, on every screen size.
+ * A pinned alert stays under the header while the page scrolls, so the warning is on screen whatever
+ * part of the page is being read, on every screen size.
  */
-function PoisonWarning({ mushroom }: { mushroom: Mushroom }) {
-  const { t } = useI18n()
+function WarningBanner({
+  icon: Icon,
+  palette,
+  title,
+  sticky,
+  children,
+}: {
+  icon: LucideIcon
+  palette: string
+  title: string
+  sticky: boolean
+  children: ReactNode
+}) {
   return (
     <Flex
-      position="sticky"
-      top="16"
-      zIndex="docked"
+      position={sticky ? "sticky" : undefined}
+      top={sticky ? "16" : undefined}
+      zIndex={sticky ? "docked" : undefined}
       mt="2"
       align="flex-start"
       gap="3"
       px="4"
       py="3"
       borderRadius="xl"
-      bg="amanita.solid"
-      color="amanita.contrast"
+      bg={`${palette}.solid`}
+      color={`${palette}.contrast`}
       boxShadow="0 6px 18px rgba(46,31,20,.25)"
       role="alert"
     >
       <Box flexShrink={0} mt="0.5">
-        <Skull size={22} aria-hidden />
+        <Icon size={22} aria-hidden />
       </Box>
       <Box minW="0">
         <Text fontWeight="800" fontSize="md" textTransform="uppercase" letterSpacing="0.04em">
-          {t("edibility.poisonous")}
+          {title}
         </Text>
-        <Text fontSize="sm">{t("detail.poisonousNote")}</Text>
-        <ToxicityEffect value={mushroom.properties.toxicityEffectIt} />
+        {children}
       </Box>
     </Flex>
+  )
+}
+
+function PoisonWarning({ mushroom }: { mushroom: Mushroom }) {
+  const { t } = useI18n()
+  return (
+    <WarningBanner icon={Skull} palette="amanita" title={t("edibility.poisonous")} sticky>
+      <Text fontSize="sm">{t("detail.poisonousNote")}</Text>
+      <ToxicityEffect value={mushroom.properties.toxicityEffectIt} />
+    </WarningBanner>
+  )
+}
+
+/** Only one banner is pinned at a time; next to the poison warning this one scrolls with the page. */
+function ConservationWarning({ mushroom }: { mushroom: Mushroom }) {
+  const { t } = useI18n()
+  const valueLabel = useValueLabel()
+  const { conservationStatus, poisonous } = mushroom.properties
+  return (
+    <WarningBanner icon={ShieldAlert} palette="chanterelle" title={valueLabel("conservationStatus", conservationStatus)} sticky={!poisonous}>
+      <Text fontSize="sm">{t("detail.threatenedNote")}</Text>
+    </WarningBanner>
   )
 }
 

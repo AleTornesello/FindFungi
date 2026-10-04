@@ -88,6 +88,7 @@ export const it: Messages = {
   "detail.inedibleNote": "Non indicata come commestibile. Questo comprende le specie velenose: non mangiarla e non assaggiarla.",
   "detail.poisonousNote": "Specie velenosa: non mangiarla e non assaggiarla, nemmeno in piccola quantità.",
   "detail.toxicityEffect": "Effetti dell'ingestione",
+  "detail.threatenedNote": "Questa specie è a rischio in natura: non raccoglierla. Fotografala e lasciala dove cresce.",
   "detail.microscopyBadge": "Microscopia documentata",
   "detail.atGlance": "In breve",
   "detail.characteristics": "Caratteristiche",
