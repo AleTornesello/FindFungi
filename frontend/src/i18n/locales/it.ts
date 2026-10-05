@@ -10,6 +10,17 @@ export const it: Messages = {
   "app.support": "Questo sito è gratuito e senza pubblicità, e lo resterà anche in futuro. Se ti è utile, offrimi un caffè.",
   "app.supportCta": "Sostienimi su Ko-fi",
 
+  "safety.title": "Prima di raccogliere qualsiasi cosa",
+  "safety.body": "Le informazioni su questo sito provengono da fonti pubbliche e non sono state verificate. Possono essere incomplete o errate, e una foto o una descrizione non bastano mai per riconoscere un fungo in sicurezza.",
+  "safety.expert": "Fai sempre controllare un fungo da un micologo o da un altro esperto locale prima di mangiarlo o toccarlo.",
+  "safety.accept": "Ho letto il disclaimer e lo accetto",
+  "safety.confirm": "Ho capito",
+  "safety.readMore": "Leggi il disclaimer completo",
+
+  "legal.title": "Disclaimer, avvertenze di sicurezza e limitazione di responsabilità",
+  "legal.updated": "Ultimo aggiornamento: {date}",
+  "legal.translationNote": "Questa è una traduzione dell'originale in inglese, che prevale in caso di discrepanze.",
+
   "nav.main": "Principale",
   "nav.species": "Esplora",
   "nav.finds": "I miei ritrovamenti",
@@ -156,5 +167,6 @@ export const it: Messages = {
   "seo.homeDescription": "Riconosci i funghi spontanei d'Italia per nome, famiglia, cappello, lamelle, sporata ed ecologia. Guida gratuita e offline, con un diario dei tuoi ritrovamenti.",
   "seo.findsDescription": "Tieni un diario privato dei tuoi ritrovamenti di funghi: specie, luogo, data e note, salvati nel tuo browser.",
   "seo.speciesDescription": "{name} ({family}), {edibility}: come riconoscerlo, classificazione e specie simili nella guida FindFungi ai funghi d'Italia.",
+  "seo.disclaimerDescription": "Le informazioni di FindFungi non sono verificate e hanno solo scopo educativo. Non usarle mai per stabilire se un fungo è commestibile: rivolgiti a un micologo.",
   "seo.speciesDescriptionNoFamily": "{name}, {edibility}: come riconoscerlo, classificazione e specie simili nella guida FindFungi ai funghi d'Italia.",
 }

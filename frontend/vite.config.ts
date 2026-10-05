@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 import react from '@vitejs/plugin-react'
 import { defineConfig, loadEnv, type Plugin, type ResolvedConfig } from 'vite'
 import { en, type MessageKey } from './src/i18n/locales/en.ts'
-import { absoluteUrl, fill, findsMeta, homeMeta, metaHtml, notFoundMeta, SITE_NAME, speciesMeta, type PageMeta } from './src/seo.ts'
+import { absoluteUrl, disclaimerMeta, fill, findsMeta, homeMeta, metaHtml, notFoundMeta, SITE_NAME, speciesMeta, type PageMeta } from './src/seo.ts'
 
 const LOCAL_DATASET = fileURLToPath(new URL('../data/mushrooms.json', import.meta.url))
 
@@ -69,7 +69,7 @@ function seoPages(): Plugin {
       const { mushrooms } = JSON.parse(await readFile(LOCAL_DATASET, 'utf8')) as {
         mushrooms: Parameters<typeof speciesMeta>[0][]
       }
-      const indexed = [homeMeta(t), findsMeta(t), ...mushrooms.map((m) => speciesMeta(m, t))]
+      const indexed = [homeMeta(t), findsMeta(t), disclaimerMeta(t), ...mushrooms.map((m) => speciesMeta(m, t))]
       for (const meta of indexed.slice(1)) await write(`${meta.path.slice(1)}.html`, page(meta))
       // Unknown paths still load the app (species added since this build show up there), but stay out of search.
       await write('404.html', page(notFoundMeta(t, '/404')))

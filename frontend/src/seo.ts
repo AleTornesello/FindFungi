@@ -97,6 +97,12 @@ export const findsMeta = (t: Translate): PageMeta => ({
   path: "/finds",
 })
 
+export const disclaimerMeta = (t: Translate): PageMeta => ({
+  title: withSiteName(t("legal.title")),
+  description: t("seo.disclaimerDescription"),
+  path: "/disclaimer",
+})
+
 export const notFoundMeta = (
   t: Translate,
   path: string,

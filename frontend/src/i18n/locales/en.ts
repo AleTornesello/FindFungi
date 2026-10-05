@@ -12,6 +12,17 @@ export const en = {
   "app.support": "This site is free and ad-free, and it will stay that way. If you find it useful, buy me a coffee.",
   "app.supportCta": "Support me on Ko-fi",
 
+  "safety.title": "Before you pick anything",
+  "safety.body": "The information on this site is collected from public sources and has not been verified. It may be incomplete or wrong, and a photo or description is never enough to identify a mushroom safely.",
+  "safety.expert": "Always have a mycologist or other local expert check a mushroom before you eat or touch it.",
+  "safety.accept": "I have read the disclaimer and accept it",
+  "safety.confirm": "I understand",
+  "safety.readMore": "Read the full disclaimer",
+
+  "legal.title": "Disclaimer, Safety Warning and Limitation of Liability",
+  "legal.updated": "Last updated: {date}",
+  "legal.translationNote": "This is a translation of the English original, which prevails in case of any discrepancy.",
+
   "nav.main": "Main",
   "nav.species": "Explore",
   "nav.finds": "My finds",
@@ -158,6 +169,7 @@ export const en = {
   "seo.homeDescription": "Identify the wild mushrooms of Italy by name, family, cap, gills, spore print and ecology. A free field guide that works offline, with a journal for your finds.",
   "seo.findsDescription": "Keep a private journal of your mushroom finds: species, place, date and notes, saved in your browser.",
   "seo.speciesDescription": "{name} ({family}), {edibility}: identification, classification and similar species in the FindFungi guide to Italian mushrooms.",
+  "seo.disclaimerDescription": "FindFungi information is unverified and for education only. Never use it to decide whether a mushroom is edible: always consult a qualified mycologist.",
   "seo.speciesDescriptionNoFamily": "{name}, {edibility}: identification, classification and similar species in the FindFungi guide to Italian mushrooms.",
 }
 
