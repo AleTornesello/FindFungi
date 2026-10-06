@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react"
+import { FunctionsHttpError } from "@supabase/supabase-js"
 import {
-  MUSHROOMS_URL,
+  MUSHROOMS_FUNCTION,
   parseMushrooms,
   RESYNC_AFTER_MS,
   upgradeMushroom,
@@ -8,6 +9,7 @@ import {
   type ValueTranslations,
 } from "../data/mushrooms"
 import { loadSnapshot, saveSnapshot } from "../data/mushroomStore"
+import { supabase } from "../data/supabase"
 import { CONSERVATION_STATUS_LABELS } from "../data/conservation"
 import { useI18n } from "../i18n/I18nProvider"
 
@@ -50,9 +52,10 @@ export function MushroomsProvider({ children }: { children: ReactNode }) {
     setStatus("syncing")
     inFlight.current = (async () => {
       try {
-        const res = await fetch(MUSHROOMS_URL, { cache: "no-cache" })
-        if (!res.ok) throw new Error(`Download failed (HTTP ${res.status})`)
-        const data = parseMushrooms(await res.json())
+        const { data: body, error } = await supabase.functions.invoke(MUSHROOMS_FUNCTION, { method: "GET" })
+        if (error instanceof FunctionsHttpError) throw new Error(`Download failed (HTTP ${error.context.status})`)
+        if (error) throw error
+        const data = parseMushrooms(body)
         const snapshot = { ...data, syncedAt: Date.now() }
         setMushrooms(data.mushrooms)
         setTranslations(data.translations)

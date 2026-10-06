@@ -1,9 +1,7 @@
 import { normalizeConservationStatus } from "./conservation";
 
-/** In dev the Vite server serves the repo's own data/mushrooms.json (see vite.config.ts). */
-export const MUSHROOMS_URL = import.meta.env.DEV
-  ? "/data/mushrooms.json"
-  : "https://raw.githubusercontent.com/AleTornesello/FindFungi/refs/heads/master/data/mushrooms.json";
+/** Supabase edge function that exports the dataset (supabase/functions/export-mushrooms). */
+export const MUSHROOMS_FUNCTION = "export-mushrooms";
 
 /** Re-download the dataset once the local copy is this old; in dev, on every launch, to pick up new exports. */
 export const RESYNC_AFTER_MS = import.meta.env.DEV
