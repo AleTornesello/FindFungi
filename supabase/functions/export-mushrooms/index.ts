@@ -3,7 +3,8 @@
 //
 // - `mushrooms`: the row id, a `taxonomy` and a `properties` object, keys in
 //   camelCase. `properties.images` lists the Wikipedia cover image first, then the
-//   funghiitaliani.it topic photos in page order.
+//   funghiitaliani.it topic photos in page order, as `{ url, region }`: the Italian
+//   region the photo was taken in, '' when unknown (always for the cover image).
 // - `translations`: per language and property, the translation of every English
 //   characteristic value in the export.
 //
@@ -48,7 +49,12 @@ interface Row {
   ecology: string;
   conservation_status: string;
   cover_image: string;
-  photos: string[];
+  photos: Image[];
+}
+
+interface Image {
+  url: string;
+  region: string;
 }
 
 function toJson(row: Row) {
@@ -83,9 +89,14 @@ function toJson(row: Row) {
   };
 }
 
-/** The Wikipedia cover image, then the funghiitaliani.it photos, without repeats. */
-function images(row: Row): string[] {
-  return [...new Set([row.cover_image, ...row.photos].filter(Boolean))];
+/** The Wikipedia cover image, then the funghiitaliani.it photos, without repeated URLs. */
+function images(row: Row): Image[] {
+  const seen = new Set<string>();
+  return [{ url: row.cover_image, region: "" }, ...row.photos].filter((image) => {
+    if (!image.url || seen.has(image.url)) return false;
+    seen.add(image.url);
+    return true;
+  });
 }
 
 Deno.serve(async (req) => {
@@ -105,10 +116,13 @@ Deno.serve(async (req) => {
           common_name_it, common_name_en, edible, poisonous, toxicity_effect_it, microscopic,
           cap, hymenium, lamella, stipe, gleba, spore_print, ecology, conservation_status,
           cover_image,
-          ARRAY(
-              SELECT p.url FROM funghi_italiani_photos p
+          (
+              SELECT coalesce(
+                  json_agg(json_build_object('url', p.url, 'region', p.region) ORDER BY p.position),
+                  '[]'
+              )
+              FROM funghi_italiani_photos p
               WHERE p.topic_id = m.funghi_italiani_topic_id
-              ORDER BY p.position
           ) AS photos
       FROM mushrooms m
       ORDER BY genus, species, id
