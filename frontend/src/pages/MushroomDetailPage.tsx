@@ -158,7 +158,7 @@ function Hero({ mushroom }: { mushroom: Mushroom }) {
   return (
     <Grid templateColumns={{ base: "1fr", md: "minmax(0, 5fr) minmax(0, 6fr)" }} gap={{ base: "5", md: "8" }} mt="2" alignItems="center">
       <MushroomPhoto
-        src={properties.images[0]}
+        src={properties.images[0]?.url}
         alt={scientificName(mushroom)}
         aspectRatio="4 / 3"
         borderRadius="3xl"

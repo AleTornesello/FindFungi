@@ -134,6 +134,7 @@ export const en = {
   "detail.nextPhoto": "Next photo",
   "detail.closePhotos": "Close photos",
   "detail.photoSource": "Photo from {source}",
+  "detail.photoRegion": "Taken in {region}",
   "detail.learnMore": "Learn more",
   "detail.wikipedia": "Search {name} on Wikipedia",
 

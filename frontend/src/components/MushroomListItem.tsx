@@ -23,7 +23,7 @@ export function MushroomListItem({ mushroom }: { mushroom: Mushroom }) {
       _hover={{ borderColor: properties.poisonous ? "amanita.solid" : "soil.300" }}
     >
       <HStack gap="3" pe="3">
-        <MushroomPhoto src={properties.images[0]} w="16" minH="16" alignSelf="stretch" flexShrink={0} illustrationWidth="10" />
+        <MushroomPhoto src={properties.images[0]?.url} w="16" minH="16" alignSelf="stretch" flexShrink={0} illustrationWidth="10" />
         <Box minW="0" flex="1">
           <Text fontFamily="heading" fontWeight="700" lineHeight="1.2" fontStyle="italic">
             <LinkOverlay asChild>

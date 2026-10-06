@@ -82,7 +82,7 @@ type Translate = (key: MessageKey, params?: Record<string, string>) => string
 interface SpeciesFields {
   id: number
   taxonomy: { genus: string; species: string; family: string }
-  properties: { edible: boolean; poisonous?: boolean; images: string[] }
+  properties: { edible: boolean; poisonous?: boolean; images: { url: string }[] }
 }
 
 export const homeMeta = (t: Translate): PageMeta => ({
@@ -126,7 +126,7 @@ export function speciesMeta(m: SpeciesFields, t: Translate): PageMeta {
       ? t("seo.speciesDescription", { name, family, edibility })
       : t("seo.speciesDescriptionNoFamily", { name, edibility }),
     path: `/species/${m.id}`,
-    image: m.properties.images[0],
+    image: m.properties.images[0]?.url,
     type: "article",
   }
 }

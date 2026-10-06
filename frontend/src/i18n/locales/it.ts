@@ -132,6 +132,7 @@ export const it: Messages = {
   "detail.nextPhoto": "Foto successiva",
   "detail.closePhotos": "Chiudi le foto",
   "detail.photoSource": "Foto da {source}",
+  "detail.photoRegion": "Scattata in {region}",
   "detail.learnMore": "Approfondisci",
   "detail.wikipedia": "Cerca {name} su Wikipedia",
 

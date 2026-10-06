@@ -8,6 +8,12 @@ export const RESYNC_AFTER_MS = import.meta.env.DEV
   ? 0
   : 7 * 24 * 60 * 60 * 1000;
 
+export interface MushroomImage {
+  url: string;
+  /** Italian region the photo was taken in, e.g. "Lombardia"; '' when unknown. */
+  region: string;
+}
+
 export interface Mushroom {
   id: number;
   taxonomy: {
@@ -40,7 +46,7 @@ export interface Mushroom {
     ecology: string;
     conservationStatus: string;
     /** Wikipedia cover image first, then the funghiitaliani.it photos. */
-    images: string[];
+    images: MushroomImage[];
   };
 }
 
@@ -67,13 +73,23 @@ export const commonName = (m: Mushroom, locale: string) =>
 
 export const speciesPath =(m: Mushroom) => `/species/${m.id}`;
 
-/** Older exports, and copies cached from them, had a single `coverImage` instead of `images`. */
+/**
+ * Older exports, and copies cached from them, had a single `coverImage` instead of `images`,
+ * then `images` as plain URLs.
+ */
 export function withImages(m: Mushroom): Mushroom {
-  if (Array.isArray(m.properties.images)) return m;
-  const { coverImage, ...properties } = m.properties as Mushroom["properties"] & {
+  const { coverImage, images, ...properties } = m.properties as Omit<Mushroom["properties"], "images"> & {
     coverImage?: string;
+    images?: (MushroomImage | string)[];
   };
-  return { ...m, properties: { ...properties, images: coverImage ? [coverImage] : [] } };
+  const list = Array.isArray(images) ? images : coverImage ? [coverImage] : [];
+  return {
+    ...m,
+    properties: {
+      ...properties,
+      images: list.map((image) => (typeof image === "string" ? { url: image, region: "" } : image)),
+    },
+  };
 }
 
 /** Brings mushrooms from older exports, and copies cached from them, to the current shape. */

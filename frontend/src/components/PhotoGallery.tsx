@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react"
 import { Box, Button, CloseButton, Dialog, Flex, HStack, IconButton, Image, Link, Portal, SimpleGrid, Text } from "@chakra-ui/react"
-import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react"
+import { ChevronLeft, ChevronRight, ExternalLink, MapPin } from "lucide-react"
+import type { MushroomImage } from "../data/mushrooms"
 import { useI18n } from "../i18n/I18nProvider"
 import { MushroomPhoto } from "./MushroomPhoto"
 
@@ -17,7 +18,7 @@ function sourceName(url: string): string {
   return SOURCES.find(([h]) => host === h || host.endsWith(`.${h}`))?.[1] ?? host
 }
 
-export function PhotoGallery({ images, name }: { images: string[]; name: string }) {
+export function PhotoGallery({ images, name }: { images: MushroomImage[]; name: string }) {
   const { t } = useI18n()
   const [showAll, setShowAll] = useState(false)
   const [current, setCurrent] = useState<number | null>(null)
@@ -26,9 +27,9 @@ export function PhotoGallery({ images, name }: { images: string[]; name: string 
   return (
     <>
       <SimpleGrid columns={{ base: 2, sm: 3 }} gap="2" mt="4">
-        {shown.map((src, i) => (
+        {shown.map(({ url }, i) => (
           <Box
-            key={src}
+            key={url}
             as="button"
             onClick={() => setCurrent(i)}
             aria-label={t("detail.openPhoto", { index: i + 1, count: images.length })}
@@ -38,7 +39,7 @@ export function PhotoGallery({ images, name }: { images: string[]; name: string 
             focusVisibleRing="outside"
             focusRingColor="moss.solid"
           >
-            <MushroomPhoto src={src} aspectRatio="1" w="full" illustrationWidth="16" />
+            <MushroomPhoto src={url} aspectRatio="1" w="full" illustrationWidth="16" />
           </Box>
         ))}
       </SimpleGrid>
@@ -60,14 +61,15 @@ function PhotoViewer({
   index,
   onIndexChange,
 }: {
-  images: string[]
+  images: MushroomImage[]
   name: string
   index: number | null
   onIndexChange: (index: number | null) => void
 }) {
   const { t } = useI18n()
   const count = images.length
-  const src = index === null ? undefined : images[index]
+  const image = index === null ? undefined : images[index]
+  const src = image?.url
   const go = (step: number) => index !== null && onIndexChange((index + step + count) % count)
 
   return (
@@ -120,7 +122,13 @@ function PhotoViewer({
               </Flex>
 
               {src && (
-                <HStack justify="center" pt="3">
+                <HStack justify="center" pt="3" gap="3" flexWrap="wrap" color="whiteAlpha.800" fontSize="sm">
+                  {image?.region && (
+                    <Text display="inline-flex" alignItems="center" gap="1.5">
+                      <MapPin size={14} aria-hidden />
+                      {t("detail.photoRegion", { region: image.region })}
+                    </Text>
+                  )}
                   <Link href={src} target="_blank" rel="noopener noreferrer" color="whiteAlpha.800" fontSize="sm" display="inline-flex" gap="1.5">
                     {t("detail.photoSource", { source: sourceName(src) })}
                     <ExternalLink size={14} aria-hidden />
