@@ -2,7 +2,10 @@ import { useCallback, useEffect, useState } from "react"
 
 export interface Find {
   id: string
-  speciesId: string
+  /** Id of the species in the mushroom dataset; missing for finds logged before the app used it. */
+  mushroomId?: number
+  /** Kept with the find so it still shows, and can be matched again, if the dataset changes ids. */
+  scientificName: string
   place: string
   date: string
   notes: string
@@ -10,10 +13,28 @@ export interface Find {
 
 const KEY = "findfungi:finds"
 
+/** Finds were first logged against a short hardcoded list of species, by slug. */
+const LEGACY_SPECIES: Record<string, string> = {
+  chanterelle: "Cantharellus cibarius",
+  porcini: "Boletus edulis",
+  "fly-agaric": "Amanita muscaria",
+  "death-cap": "Amanita phalloides",
+  "chicken-of-the-woods": "Laetiporus sulphureus",
+  parasol: "Macrolepiota procera",
+  morel: "Morchella esculenta",
+  "turkey-tail": "Trametes versicolor",
+}
+
+function upgradeFind(find: Find & { speciesId?: string }): Find {
+  const { speciesId, ...rest } = find
+  if (speciesId === undefined) return rest
+  return { ...rest, scientificName: LEGACY_SPECIES[speciesId] ?? speciesId }
+}
+
 function load(): Find[] {
   try {
     const raw = localStorage.getItem(KEY)
-    return raw ? (JSON.parse(raw) as Find[]) : []
+    return raw ? (JSON.parse(raw) as Find[]).map(upgradeFind) : []
   } catch {
     return []
   }

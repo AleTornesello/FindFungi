@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react"
+import { useMemo, useState, type FormEvent } from "react"
 import {
   Box,
   Button,
@@ -9,36 +9,58 @@ import {
   Heading,
   IconButton,
   Input,
-  NativeSelect,
+  Link as ChakraLink,
   Stack,
   Text,
   Textarea,
 } from "@chakra-ui/react"
 import { MapPin, Trash2 } from "lucide-react"
-import { SPECIES, type Species } from "../data/species"
+import { Link } from "react-router"
+import { commonName, scientificName, speciesPath, type Mushroom } from "../data/mushrooms"
 import { MushroomIllustration } from "../components/MushroomIllustration"
-import { useFinds } from "../hooks/useFinds"
+import { MushroomPhoto } from "../components/MushroomPhoto"
+import { SpeciesCombobox } from "../components/SpeciesCombobox"
+import { useFinds, type Find } from "../hooks/useFinds"
+import { useMushrooms } from "../hooks/useMushrooms"
 import { useI18n } from "../i18n/I18nProvider"
 import { usePageMeta } from "../hooks/usePageMeta"
 import { findsMeta } from "../seo"
-import type { MessageKey } from "../i18n/locales/en"
 
 const today = () => new Date().toISOString().slice(0, 10)
 
 export function FindsPage() {
   const { finds, addFind, removeFind } = useFinds()
+  const { mushrooms } = useMushrooms()
   const { locale, t } = useI18n()
-  const speciesName = (s: Species) => t(`species.${s.id}` as MessageKey)
-  const [speciesId, setSpeciesId] = useState(SPECIES[0].id)
+  const [species, setSpecies] = useState<Mushroom>()
+  const [speciesMissing, setSpeciesMissing] = useState(false)
   const [place, setPlace] = useState("")
   const [date, setDate] = useState(today)
   const [notes, setNotes] = useState("")
   usePageMeta(findsMeta(t))
 
+  // Finds remember the Latin name too, so they still resolve if the dataset changes ids.
+  const lookup = useMemo(() => {
+    const byId = new Map(mushrooms.map((m) => [m.id, m]))
+    const byName = new Map(mushrooms.map((m) => [scientificName(m).toLowerCase(), m]))
+    return (f: Find) =>
+      (f.mushroomId !== undefined ? byId.get(f.mushroomId) : undefined) ?? byName.get(f.scientificName.toLowerCase())
+  }, [mushrooms])
+
   const submit = (e: FormEvent) => {
     e.preventDefault()
+    if (!species) {
+      setSpeciesMissing(true)
+      return
+    }
     if (!place.trim()) return
-    addFind({ speciesId, place: place.trim(), date, notes: notes.trim() })
+    addFind({
+      mushroomId: species.id,
+      scientificName: scientificName(species),
+      place: place.trim(),
+      date,
+      notes: notes.trim(),
+    })
     setPlace("")
     setNotes("")
     setDate(today())
@@ -59,18 +81,18 @@ export function FindsPage() {
             {t("finds.formTitle")}
           </Heading>
           <Stack gap="4">
-            <Field.Root>
-              <Field.Label>{t("finds.species")}</Field.Label>
-              <NativeSelect.Root>
-                <NativeSelect.Field value={speciesId} onChange={(e) => setSpeciesId(e.target.value)}>
-                  {SPECIES.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {speciesName(s)}
-                    </option>
-                  ))}
-                </NativeSelect.Field>
-                <NativeSelect.Indicator />
-              </NativeSelect.Root>
+            <Field.Root required invalid={speciesMissing}>
+              <Field.Label>
+                {t("finds.species")} <Field.RequiredIndicator />
+              </Field.Label>
+              <SpeciesCombobox
+                value={species?.id}
+                onChange={(m) => {
+                  setSpecies(m)
+                  if (m) setSpeciesMissing(false)
+                }}
+              />
+              <Field.ErrorText>{t("finds.speciesRequired")}</Field.ErrorText>
             </Field.Root>
             <Field.Root required>
               <Field.Label>
@@ -111,8 +133,9 @@ export function FindsPage() {
           ) : (
             <Stack as="ul" gap="3" listStyleType="none">
               {finds.map((f) => {
-                const s = SPECIES.find((sp) => sp.id === f.speciesId)
-                const name = s ? speciesName(s) : t("finds.unknownSpecies")
+                const m = lookup(f)
+                const name = m ? scientificName(m) : f.scientificName || t("finds.unknownSpecies")
+                const common = m ? commonName(m, locale) : ""
                 return (
                   <Flex
                     as="li"
@@ -125,19 +148,29 @@ export function FindsPage() {
                     borderRadius="2xl"
                     p="3"
                   >
-                    <Flex
+                    <MushroomPhoto
+                      src={m?.properties.images[0]?.url ?? ""}
                       w="16"
                       h="16"
                       flexShrink={0}
-                      align="center"
-                      justify="center"
                       borderRadius="xl"
-                      bg={s ? `color-mix(in srgb, ${s.capColor} 18%, transparent)` : "bg.subtle"}
-                    >
-                      {s && <MushroomIllustration capColor={s.capColor} stemColor={s.stemColor} spots={s.spots} w="12" />}
-                    </Flex>
+                      illustrationWidth="10"
+                    />
                     <Box flex="1" minW="0">
-                      <Text fontWeight="700">{name}</Text>
+                      <Text fontWeight="700" fontStyle="italic">
+                        {m ? (
+                          <ChakraLink asChild>
+                            <Link to={speciesPath(m)}>{name}</Link>
+                          </ChakraLink>
+                        ) : (
+                          name
+                        )}
+                      </Text>
+                      {common && (
+                        <Text fontSize="sm" color="fg.muted" truncate>
+                          {common}
+                        </Text>
+                      )}
                       <Flex align="center" gap="1" color="fg.muted" fontSize="sm">
                         <MapPin size={14} aria-hidden />
                         <Text truncate>{f.place}</Text>
