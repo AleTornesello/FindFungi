@@ -61,7 +61,14 @@ uv run scraper
    `funghi_italiani` (the detail page linked from the grid, a forum topic shared by
    synonyms), reads all the pages of the topic and saves the photos posted in it into
    `funghi_italiani_photos`, in page order: the forum post id, the full size image URL
-   and, when the post shows a smaller one, the thumbnail URL. Avatars, badges,
+   and, when the post shows a smaller one, the thumbnail URL, and the `region` the
+   photo was taken in. The region comes from the caption of the post ("…; Regione
+   Lombardia, Brallo (PV); Ottobre 2010; Foto di …", see `src/scraper/regions.py`): a
+   province code in brackets gives its region and wins over the region names on the
+   same line ("Parco Nazionale d'Abruzzo Lazio e Molise - Villetta Barrea (AQ)" is
+   Abruzzo); region names count on lines that say "Regione" or "Foto" or are short,
+   so the descriptions are skipped. It is '' when the post names no Italian region
+   (e.g. a place abroad). Run stage 1 to add the column to an older table. Avatars, badges,
    emoticons, quoted posts and images hosted elsewhere are skipped; a photo posted
    twice is kept once. Every fetched topic gets a row in `funghi_italiani_topics`, with
    a NULL `url` when it is deleted or restricted. Only the URLs are stored, not the

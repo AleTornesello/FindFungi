@@ -3,7 +3,8 @@ topic linked from the grid) into `funghi_italiani_photos`.
 
 Every page of a topic is read and the images posted in it are kept in page order:
 avatars, badges, emoticons and quoted posts are skipped, and a linked full size
-image is preferred to its thumbnail. Only the image URLs are stored. Each topic is
+image is preferred to its thumbnail. Only the image URLs are stored, with the
+Italian region named in the caption of the post (see scraper.regions). Each topic is
 saved with its photos in `funghi_italiani_topics`, and saves are committed in
 small batches, so an interrupted run can be resumed.
 """
@@ -16,12 +17,13 @@ from urllib.parse import urljoin, urlparse
 import httpx
 import psycopg
 import questionary
-from bs4 import BeautifulSoup, Tag
+from bs4 import BeautifulSoup, NavigableString, Tag
 from rich.console import Console
 from rich.progress import BarColumn, MofNCompleteColumn, Progress, TextColumn
 
 from scraper.config import ConfigError, load_db_config
 from scraper.db import connect, row_count, table_exists
+from scraper.regions import caption_region
 
 SITE_URL = "https://www.funghiitaliani.it/"
 TOPIC_URL = SITE_URL + "index.php?showtopic={topic_id}"
@@ -41,6 +43,8 @@ BASE_URL_PLACEHOLDER = re.compile(r"^(%7B|\{)___base_url___(%7D|\})/?", re.IGNOR
 # Thumbnail of the old forum (e.g. post-2286-1191440772_thumb.jpg): the full size
 # image has the same name without "_thumb".
 LEGACY_THUMB = re.compile(r"_thumb(\.\w+)$")
+# Elements that end a line of text.
+BLOCK_TAGS = ["p", "div", "li", "td", "h1", "h2", "h3", "h4", "h5", "h6", "figcaption"]
 # Restricted (403) and deleted (404, 410) topics.
 UNAVAILABLE_STATUSES = {403, 404, 410}
 
@@ -58,8 +62,8 @@ ON CONFLICT (topic_id) DO UPDATE SET
 """
 
 PHOTO_SQL = f"""
-INSERT INTO {PHOTOS_TABLE} (topic_id, position, post_id, url, thumbnail_url)
-VALUES (%(topic_id)s, %(position)s, %(post_id)s, %(url)s, %(thumbnail_url)s)
+INSERT INTO {PHOTOS_TABLE} (topic_id, position, post_id, url, thumbnail_url, region)
+VALUES (%(topic_id)s, %(position)s, %(post_id)s, %(url)s, %(thumbnail_url)s, %(region)s)
 """
 
 console = Console()
@@ -244,7 +248,11 @@ def page_count(soup: BeautifulSoup) -> int:
 
 
 def parse_photos(soup: BeautifulSoup) -> list[dict]:
-    """Photos posted on a topic page, in order, as {post_id, url, thumbnail_url}."""
+    """Photos posted on a topic page, in order, as {post_id, url, thumbnail_url, region}.
+
+    Every photo gets the region of its post's caption: no post seen names more
+    than one.
+    """
     photos: list[dict] = []
     for article in soup.select("article[id^='elComment_']"):
         content = article.select_one("[data-role='commentContent']")
@@ -253,11 +261,24 @@ def parse_photos(soup: BeautifulSoup) -> list[dict]:
             continue
         for quote in content.select("blockquote"):
             quote.decompose()  # quoted photos belong to another post
-        for img in content.find_all("img"):
-            photo = _photo(img)
-            if photo:
-                photos.append(photo | {"post_id": int(post_id)})
+        post_photos = [photo for img in content.find_all("img") if (photo := _photo(img))]
+        if not post_photos:
+            continue
+        region = caption_region(_lines(content))
+        photos += [photo | {"post_id": int(post_id), "region": region} for photo in post_photos]
     return photos
+
+
+def _lines(content: Tag) -> list[str]:
+    """The text of `content` split at line breaks and block elements, so the inline
+    markup of a caption (e.g. the species in italics) stays on its line. Changes
+    `content`."""
+    for br in content.find_all("br"):
+        br.replace_with(NavigableString("\n"))
+    for block in content.find_all(BLOCK_TAGS):
+        block.append(NavigableString("\n"))
+    lines = (" ".join(line.split()) for line in content.get_text().split("\n"))
+    return [line for line in lines if line]
 
 
 def _photo(img: Tag) -> dict | None:

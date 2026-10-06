@@ -104,7 +104,8 @@ CREATE TABLE funghi_italiani_topics (
 );
 """
 
-# Photos posted in a funghiitaliani.it topic (stage 6), in page order.
+# Photos posted in a funghiitaliani.it topic (stage 6), in page order. region is
+# the Italian region named in the caption of the post, as in scraper.regions.REGION_ALIASES.
 FUNGHI_ITALIANI_PHOTOS = """
 CREATE TABLE funghi_italiani_photos (
     topic_id            integer NOT NULL,              -- funghi_italiani_topics.topic_id
@@ -112,6 +113,7 @@ CREATE TABLE funghi_italiani_photos (
     post_id             integer NOT NULL,              -- forum post holding the photo
     url                 text NOT NULL,                 -- full size image
     thumbnail_url       text NOT NULL DEFAULT '',      -- '' when the post shows the full image
+    region              text NOT NULL DEFAULT '',      -- '' when not given or abroad
     PRIMARY KEY (topic_id, position)
 );
 """
@@ -122,6 +124,9 @@ MIGRATIONS: dict[str, list[str]] = {
     "mushrooms": [
         "ALTER TABLE mushrooms ADD COLUMN IF NOT EXISTS common_name_it text NOT NULL DEFAULT ''",
         "ALTER TABLE mushrooms ADD COLUMN IF NOT EXISTS common_name_en text NOT NULL DEFAULT ''",
+    ],
+    "funghi_italiani_photos": [
+        "ALTER TABLE funghi_italiani_photos ADD COLUMN IF NOT EXISTS region text NOT NULL DEFAULT ''",
     ],
 }
 
