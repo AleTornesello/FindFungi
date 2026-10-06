@@ -135,6 +135,10 @@ export const en = {
   "detail.closePhotos": "Close photos",
   "detail.photoSource": "Photo from {source}",
   "detail.photoRegion": "Taken in {region}",
+  "detail.sightings": "Confirmed sightings",
+  "detail.sightingsMap": "Map of Italy, the regions with confirmed sightings highlighted: {regions}",
+  "detail.sightingsNote": "Highlighted: the regions where the photos were taken.",
+  "detail.noSightings": "No photo names an Italian region yet.",
   "detail.learnMore": "Learn more",
   "detail.wikipedia": "Search {name} on Wikipedia",
 

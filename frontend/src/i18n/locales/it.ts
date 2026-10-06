@@ -133,6 +133,10 @@ export const it: Messages = {
   "detail.closePhotos": "Chiudi le foto",
   "detail.photoSource": "Foto da {source}",
   "detail.photoRegion": "Scattata in {region}",
+  "detail.sightings": "Avvistamenti confermati",
+  "detail.sightingsMap": "Mappa dell'Italia, evidenziate le regioni con avvistamenti confermati: {regions}",
+  "detail.sightingsNote": "Evidenziate le regioni in cui sono state scattate le foto.",
+  "detail.noSightings": "Nessuna foto indica ancora una regione italiana.",
   "detail.learnMore": "Approfondisci",
   "detail.wikipedia": "Cerca {name} su Wikipedia",
 

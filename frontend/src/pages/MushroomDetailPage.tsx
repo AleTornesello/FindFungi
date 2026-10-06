@@ -5,6 +5,7 @@ import { ArrowLeft, ChevronRight, ExternalLink, Microscope, ShieldAlert, Skull, 
 import { commonName, scientificName, type Mushroom } from "../data/mushrooms"
 import { isThreatened } from "../data/conservation"
 import { hasTraitDrawing, TraitIcon } from "../components/TraitIcon"
+import { ItalyRegionsMap } from "../components/ItalyRegionsMap"
 import { MushroomCard } from "../components/MushroomCard"
 import { EdibilityBadge } from "../components/EdibilityBadge"
 import { MushroomPhoto } from "../components/MushroomPhoto"
@@ -111,6 +112,7 @@ export function MushroomDetailPage() {
         </Stack>
         <Stack gap="6">
           <Classification mushroom={mushroom} />
+          <Sightings mushroom={mushroom} />
           <LearnMore mushroom={mushroom} />
         </Stack>
       </Grid>
@@ -512,6 +514,24 @@ function Classification({ mushroom }: { mushroom: Mushroom }) {
           {t("detail.higherRanksMissing")}
         </Text>
       )}
+    </Section>
+  )
+}
+
+/** The regions the photos were taken in, on a map of Italy. */
+function Sightings({ mushroom }: { mushroom: Mushroom }) {
+  const { t } = useI18n()
+  const regions = new Set(mushroom.properties.images.map((image) => image.region).filter(Boolean))
+  const list = [...regions].sort().join(", ")
+
+  return (
+    <Section title={t("detail.sightings")}>
+      <Box mt="4" maxW="72" mx="auto">
+        <ItalyRegionsMap highlighted={regions} label={t("detail.sightingsMap", { regions: list || "-" })} />
+      </Box>
+      <Text fontSize="sm" color="fg.muted" mt="4">
+        {regions.size > 0 ? t("detail.sightingsNote") : t("detail.noSightings")}
+      </Text>
     </Section>
   )
 }
