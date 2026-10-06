@@ -5,9 +5,9 @@ on:
     branches: [master]
     paths:
       - "frontend/**"
-      # The build writes a page per species and the sitemap from the dataset.
-      - "data/mushrooms.json"
       - ".github/workflows/deploy-frontend.yml"
+  # The build writes a page per species and the sitemap from the export-mushrooms edge function:
+  # run it by hand after adding species to Supabase.
   workflow_dispatch:
 
 permissions:

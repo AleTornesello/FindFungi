@@ -10,6 +10,17 @@ export const it: Messages = {
   "app.support": "Questo sito è gratuito e senza pubblicità, e lo resterà anche in futuro. Se ti è utile, offrimi un caffè.",
   "app.supportCta": "Sostienimi su Ko-fi",
 
+  "safety.title": "Prima di raccogliere qualsiasi cosa",
+  "safety.body": "Le informazioni su questo sito provengono da fonti pubbliche e non sono state verificate. Possono essere incomplete o errate, e una foto o una descrizione non bastano mai per riconoscere un fungo in sicurezza.",
+  "safety.expert": "Fai sempre controllare un fungo da un micologo o da un altro esperto locale prima di mangiarlo o toccarlo.",
+  "safety.accept": "Ho letto il disclaimer e lo accetto",
+  "safety.confirm": "Ho capito",
+  "safety.readMore": "Leggi il disclaimer completo",
+
+  "legal.title": "Disclaimer, avvertenze di sicurezza e limitazione di responsabilità",
+  "legal.updated": "Ultimo aggiornamento: {date}",
+  "legal.translationNote": "Questa è una traduzione dell'originale in inglese, che prevale in caso di discrepanze.",
+
   "nav.main": "Principale",
   "nav.species": "Esplora",
   "nav.finds": "I miei ritrovamenti",
@@ -76,6 +87,18 @@ export const it: Messages = {
   "field.conservationStatus": "Stato di conservazione",
   "field.microscopic": "Microscopia",
 
+  "conservation.extinct": "Estinta",
+  "conservation.extinctInTheWild": "Estinta in natura",
+  "conservation.criticallyEndangered": "In pericolo critico",
+  "conservation.endangered": "In pericolo",
+  "conservation.vulnerable": "Vulnerabile",
+  "conservation.nearThreatened": "Prossima alla minaccia",
+  "conservation.leastConcern": "Rischio minimo",
+  "conservation.dataDeficient": "Dati insufficienti",
+  "conservation.notEvaluated": "Non valutata",
+  "conservation.apparentlySecure": "Apparentemente sicura",
+  "conservation.secure": "Sicura",
+
   "edibility.edible": "Commestibile",
   "edibility.inedible": "Non commestibile",
   "edibility.poisonous": "Velenoso",
@@ -88,6 +111,7 @@ export const it: Messages = {
   "detail.inedibleNote": "Non indicata come commestibile. Questo comprende le specie velenose: non mangiarla e non assaggiarla.",
   "detail.poisonousNote": "Specie velenosa: non mangiarla e non assaggiarla, nemmeno in piccola quantità.",
   "detail.toxicityEffect": "Effetti dell'ingestione",
+  "detail.threatenedNote": "Questa specie è a rischio in natura: non raccoglierla. Fotografala e lasciala dove cresce.",
   "detail.microscopyBadge": "Microscopia documentata",
   "detail.atGlance": "In breve",
   "detail.characteristics": "Caratteristiche",
@@ -108,6 +132,11 @@ export const it: Messages = {
   "detail.nextPhoto": "Foto successiva",
   "detail.closePhotos": "Chiudi le foto",
   "detail.photoSource": "Foto da {source}",
+  "detail.photoRegion": "Scattata in {region}",
+  "detail.sightings": "Avvistamenti confermati",
+  "detail.sightingsMap": "Mappa dell'Italia, evidenziate le regioni con avvistamenti confermati: {regions}",
+  "detail.sightingsNote": "Evidenziate le regioni in cui sono state scattate le foto.",
+  "detail.noSightings": "Nessuna foto indica ancora una regione italiana.",
   "detail.learnMore": "Approfondisci",
   "detail.wikipedia": "Cerca {name} su Wikipedia",
 
@@ -143,5 +172,6 @@ export const it: Messages = {
   "seo.homeDescription": "Riconosci i funghi spontanei d'Italia per nome, famiglia, cappello, lamelle, sporata ed ecologia. Guida gratuita e offline, con un diario dei tuoi ritrovamenti.",
   "seo.findsDescription": "Tieni un diario privato dei tuoi ritrovamenti di funghi: specie, luogo, data e note, salvati nel tuo browser.",
   "seo.speciesDescription": "{name} ({family}), {edibility}: come riconoscerlo, classificazione e specie simili nella guida FindFungi ai funghi d'Italia.",
+  "seo.disclaimerDescription": "Le informazioni di FindFungi non sono verificate e hanno solo scopo educativo. Non usarle mai per stabilire se un fungo è commestibile: rivolgiti a un micologo.",
   "seo.speciesDescriptionNoFamily": "{name}, {edibility}: come riconoscerlo, classificazione e specie simili nella guida FindFungi ai funghi d'Italia.",
 }

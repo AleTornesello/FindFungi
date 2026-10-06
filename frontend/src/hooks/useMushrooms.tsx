@@ -1,13 +1,16 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react"
+import { FunctionsHttpError } from "@supabase/supabase-js"
 import {
-  MUSHROOMS_URL,
+  MUSHROOMS_FUNCTION,
   parseMushrooms,
   RESYNC_AFTER_MS,
-  withImages,
+  upgradeMushroom,
   type Mushroom,
   type ValueTranslations,
 } from "../data/mushrooms"
 import { loadSnapshot, saveSnapshot } from "../data/mushroomStore"
+import { supabase } from "../data/supabase"
+import { CONSERVATION_STATUS_LABELS } from "../data/conservation"
 import { useI18n } from "../i18n/I18nProvider"
 
 export type SyncStatus = "loading" | "syncing" | "idle" | "error"
@@ -49,9 +52,10 @@ export function MushroomsProvider({ children }: { children: ReactNode }) {
     setStatus("syncing")
     inFlight.current = (async () => {
       try {
-        const res = await fetch(MUSHROOMS_URL, { cache: "no-cache" })
-        if (!res.ok) throw new Error(`Download failed (HTTP ${res.status})`)
-        const data = parseMushrooms(await res.json())
+        const { data: body, error } = await supabase.functions.invoke(MUSHROOMS_FUNCTION, { method: "GET" })
+        if (error instanceof FunctionsHttpError) throw new Error(`Download failed (HTTP ${error.context.status})`)
+        if (error) throw error
+        const data = parseMushrooms(body)
         const snapshot = { ...data, syncedAt: Date.now() }
         setMushrooms(data.mushrooms)
         setTranslations(data.translations)
@@ -81,7 +85,7 @@ export function MushroomsProvider({ children }: { children: ReactNode }) {
     loadSnapshot().then((snapshot) => {
       if (cancelled) return
       if (snapshot) {
-        setMushrooms(snapshot.mushrooms.map(withImages))
+        setMushrooms(snapshot.mushrooms.map(upgradeMushroom))
         setTranslations(snapshot.translations ?? {})
         setSyncedAt(snapshot.syncedAt)
         syncedAtRef.current = snapshot.syncedAt
@@ -117,12 +121,18 @@ export function useMushrooms() {
   return ctx
 }
 
-/** Shows a characteristic value in the current language, or in English when it has no translation. */
+/**
+ * Shows a characteristic value in the current language, or in English when it has no translation.
+ * Conservation statuses are a fixed list, so the app translates them itself.
+ */
 export function useValueLabel() {
   const { translations } = useMushrooms()
-  const { locale } = useI18n()
+  const { locale, t } = useI18n()
   return useCallback(
-    (property: keyof Mushroom["properties"], value: string) => translations[locale]?.[property]?.[value] ?? value,
-    [translations, locale],
+    (property: keyof Mushroom["properties"], value: string) => {
+      const status = property === "conservationStatus" ? CONSERVATION_STATUS_LABELS[value] : undefined
+      return status ? t(status) : (translations[locale]?.[property]?.[value] ?? value)
+    },
+    [translations, locale, t],
   )
 }

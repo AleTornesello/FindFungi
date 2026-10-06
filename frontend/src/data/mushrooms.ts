@@ -1,12 +1,18 @@
-/** In dev the Vite server serves the repo's own data/mushrooms.json (see vite.config.ts). */
-export const MUSHROOMS_URL = import.meta.env.DEV
-  ? "/data/mushrooms.json"
-  : "https://raw.githubusercontent.com/AleTornesello/FindFungi/refs/heads/master/data/mushrooms.json";
+import { normalizeConservationStatus } from "./conservation";
+
+/** Supabase edge function that exports the dataset (supabase/functions/export-mushrooms). */
+export const MUSHROOMS_FUNCTION = "export-mushrooms";
 
 /** Re-download the dataset once the local copy is this old; in dev, on every launch, to pick up new exports. */
 export const RESYNC_AFTER_MS = import.meta.env.DEV
   ? 0
   : 7 * 24 * 60 * 60 * 1000;
+
+export interface MushroomImage {
+  url: string;
+  /** Italian region the photo was taken in, e.g. "Lombardia"; '' when unknown. */
+  region: string;
+}
 
 export interface Mushroom {
   id: number;
@@ -40,7 +46,7 @@ export interface Mushroom {
     ecology: string;
     conservationStatus: string;
     /** Wikipedia cover image first, then the funghiitaliani.it photos. */
-    images: string[];
+    images: MushroomImage[];
   };
 }
 
@@ -67,13 +73,35 @@ export const commonName = (m: Mushroom, locale: string) =>
 
 export const speciesPath =(m: Mushroom) => `/species/${m.id}`;
 
-/** Older exports, and copies cached from them, had a single `coverImage` instead of `images`. */
+/**
+ * Older exports, and copies cached from them, had a single `coverImage` instead of `images`,
+ * then `images` as plain URLs.
+ */
 export function withImages(m: Mushroom): Mushroom {
-  if (Array.isArray(m.properties.images)) return m;
-  const { coverImage, ...properties } = m.properties as Mushroom["properties"] & {
+  const { coverImage, images, ...properties } = m.properties as Omit<Mushroom["properties"], "images"> & {
     coverImage?: string;
+    images?: (MushroomImage | string)[];
   };
-  return { ...m, properties: { ...properties, images: coverImage ? [coverImage] : [] } };
+  const list = Array.isArray(images) ? images : coverImage ? [coverImage] : [];
+  return {
+    ...m,
+    properties: {
+      ...properties,
+      images: list.map((image) => (typeof image === "string" ? { url: image, region: "" } : image)),
+    },
+  };
+}
+
+/** Brings mushrooms from older exports, and copies cached from them, to the current shape. */
+export function upgradeMushroom(m: Mushroom): Mushroom {
+  const { properties } = withImages(m);
+  return {
+    ...m,
+    properties: {
+      ...properties,
+      conservationStatus: normalizeConservationStatus(properties.conservationStatus ?? ""),
+    },
+  };
 }
 
 /** Rejects payloads that would break the UI, so a bad download never replaces a good local copy. */
@@ -100,7 +128,7 @@ export function parseMushrooms(data: unknown): MushroomData {
     throw new Error("Mushroom translations have an unexpected shape");
   }
   return {
-    mushrooms: (mushrooms as Mushroom[]).map(withImages),
+    mushrooms: (mushrooms as Mushroom[]).map(upgradeMushroom),
     translations: translations as ValueTranslations,
   };
 }

@@ -27,9 +27,6 @@ export const splitValues = (v: string) =>
     .map((s) => s.trim())
     .filter((s) => s && s !== "not applicable")
 
-// "Vulnerable (IUCN 3.1)" and "Vulnerable (NatureServe)" are the same status from different sources.
-const withoutSource = (v: string) => single(v.replace(/\s*\(.*\)$/, ""))
-
 const taxon = (key: keyof Mushroom["taxonomy"], label: MessageKey): FilterField => ({
   key,
   label,
@@ -56,7 +53,7 @@ export const FILTER_FIELDS: FilterField[] = [
   trait("gleba", "field.gleba", single),
   trait("sporePrint", "field.sporePrint"),
   trait("ecology", "field.ecology"),
-  trait("conservationStatus", "field.conservationStatus", withoutSource),
+  trait("conservationStatus", "field.conservationStatus", single),
   {
     key: "microscopic",
     label: "field.microscopic",

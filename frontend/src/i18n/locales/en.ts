@@ -12,6 +12,17 @@ export const en = {
   "app.support": "This site is free and ad-free, and it will stay that way. If you find it useful, buy me a coffee.",
   "app.supportCta": "Support me on Ko-fi",
 
+  "safety.title": "Before you pick anything",
+  "safety.body": "The information on this site is collected from public sources and has not been verified. It may be incomplete or wrong, and a photo or description is never enough to identify a mushroom safely.",
+  "safety.expert": "Always have a mycologist or other local expert check a mushroom before you eat or touch it.",
+  "safety.accept": "I have read the disclaimer and accept it",
+  "safety.confirm": "I understand",
+  "safety.readMore": "Read the full disclaimer",
+
+  "legal.title": "Disclaimer, Safety Warning and Limitation of Liability",
+  "legal.updated": "Last updated: {date}",
+  "legal.translationNote": "This is a translation of the English original, which prevails in case of any discrepancy.",
+
   "nav.main": "Main",
   "nav.species": "Explore",
   "nav.finds": "My finds",
@@ -78,6 +89,18 @@ export const en = {
   "field.conservationStatus": "Conservation status",
   "field.microscopic": "Microscopy",
 
+  "conservation.extinct": "Extinct",
+  "conservation.extinctInTheWild": "Extinct in the wild",
+  "conservation.criticallyEndangered": "Critically endangered",
+  "conservation.endangered": "Endangered",
+  "conservation.vulnerable": "Vulnerable",
+  "conservation.nearThreatened": "Near threatened",
+  "conservation.leastConcern": "Least concern",
+  "conservation.dataDeficient": "Data deficient",
+  "conservation.notEvaluated": "Not evaluated",
+  "conservation.apparentlySecure": "Apparently secure",
+  "conservation.secure": "Secure",
+
   "edibility.edible": "Edible",
   "edibility.inedible": "Not edible",
   "edibility.poisonous": "Poisonous",
@@ -90,6 +113,7 @@ export const en = {
   "detail.inedibleNote": "Not listed as edible. This includes poisonous species: don't eat or taste it.",
   "detail.poisonousNote": "Poisonous species: don't eat or taste it, not even a small amount.",
   "detail.toxicityEffect": "Effects of ingestion",
+  "detail.threatenedNote": "This species is at risk in the wild: don't pick it. Photograph it and leave it where it grows.",
   "detail.microscopyBadge": "Microscopy documented",
   "detail.atGlance": "At a glance",
   "detail.characteristics": "Characteristics",
@@ -110,6 +134,11 @@ export const en = {
   "detail.nextPhoto": "Next photo",
   "detail.closePhotos": "Close photos",
   "detail.photoSource": "Photo from {source}",
+  "detail.photoRegion": "Taken in {region}",
+  "detail.sightings": "Confirmed sightings",
+  "detail.sightingsMap": "Map of Italy, the regions with confirmed sightings highlighted: {regions}",
+  "detail.sightingsNote": "Highlighted: the regions where the photos were taken.",
+  "detail.noSightings": "No photo names an Italian region yet.",
   "detail.learnMore": "Learn more",
   "detail.wikipedia": "Search {name} on Wikipedia",
 
@@ -145,6 +174,7 @@ export const en = {
   "seo.homeDescription": "Identify the wild mushrooms of Italy by name, family, cap, gills, spore print and ecology. A free field guide that works offline, with a journal for your finds.",
   "seo.findsDescription": "Keep a private journal of your mushroom finds: species, place, date and notes, saved in your browser.",
   "seo.speciesDescription": "{name} ({family}), {edibility}: identification, classification and similar species in the FindFungi guide to Italian mushrooms.",
+  "seo.disclaimerDescription": "FindFungi information is unverified and for education only. Never use it to decide whether a mushroom is edible: always consult a qualified mycologist.",
   "seo.speciesDescriptionNoFamily": "{name}, {edibility}: identification, classification and similar species in the FindFungi guide to Italian mushrooms.",
 }
 

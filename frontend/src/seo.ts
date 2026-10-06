@@ -54,6 +54,7 @@ export function metaTags(meta: PageMeta, siteUrl: string): Tag[] {
   const url = absoluteUrl(siteUrl, meta.path)
   const description = clampText(meta.description)
   const defaultImage = meta.image === undefined
+  const image = meta.image ?? absoluteUrl(siteUrl, DEFAULT_IMAGE.path)
   return [
     { tag: "meta", key: "name", id: "description", attr: "content", value: description },
     { tag: "meta", key: "name", id: "robots", attr: "content", value: meta.noindex ? "noindex" : undefined },
@@ -63,12 +64,16 @@ export function metaTags(meta: PageMeta, siteUrl: string): Tag[] {
     { tag: "meta", key: "property", id: "og:title", attr: "content", value: meta.title },
     { tag: "meta", key: "property", id: "og:description", attr: "content", value: description },
     { tag: "meta", key: "property", id: "og:url", attr: "content", value: url },
-    { tag: "meta", key: "property", id: "og:image", attr: "content", value: meta.image ?? absoluteUrl(siteUrl, DEFAULT_IMAGE.path) },
+    { tag: "meta", key: "property", id: "og:image", attr: "content", value: image },
     { tag: "meta", key: "property", id: "og:image:width", attr: "content", value: defaultImage ? DEFAULT_IMAGE.width : undefined },
     { tag: "meta", key: "property", id: "og:image:height", attr: "content", value: defaultImage ? DEFAULT_IMAGE.height : undefined },
     { tag: "meta", key: "property", id: "og:image:alt", attr: "content", value: meta.title },
     { tag: "meta", key: "property", id: "og:locale", attr: "content", value: meta.locale ?? OG_LOCALES.en },
     { tag: "meta", key: "name", id: "twitter:card", attr: "content", value: "summary_large_image" },
+    { tag: "meta", key: "name", id: "twitter:title", attr: "content", value: meta.title },
+    { tag: "meta", key: "name", id: "twitter:description", attr: "content", value: description },
+    { tag: "meta", key: "name", id: "twitter:image", attr: "content", value: image },
+    { tag: "meta", key: "name", id: "twitter:image:alt", attr: "content", value: meta.title },
   ]
 }
 
@@ -77,7 +82,7 @@ type Translate = (key: MessageKey, params?: Record<string, string>) => string
 interface SpeciesFields {
   id: number
   taxonomy: { genus: string; species: string; family: string }
-  properties: { edible: boolean; poisonous?: boolean; images: string[] }
+  properties: { edible: boolean; poisonous?: boolean; images: { url: string }[] }
 }
 
 export const homeMeta = (t: Translate): PageMeta => ({
@@ -90,6 +95,12 @@ export const findsMeta = (t: Translate): PageMeta => ({
   title: withSiteName(t("finds.title")),
   description: t("seo.findsDescription"),
   path: "/finds",
+})
+
+export const disclaimerMeta = (t: Translate): PageMeta => ({
+  title: withSiteName(t("legal.title")),
+  description: t("seo.disclaimerDescription"),
+  path: "/disclaimer",
 })
 
 export const notFoundMeta = (
@@ -115,7 +126,7 @@ export function speciesMeta(m: SpeciesFields, t: Translate): PageMeta {
       ? t("seo.speciesDescription", { name, family, edibility })
       : t("seo.speciesDescriptionNoFamily", { name, edibility }),
     path: `/species/${m.id}`,
-    image: m.properties.images[0],
+    image: m.properties.images[0]?.url,
     type: "article",
   }
 }

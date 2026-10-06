@@ -1,29 +1,19 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
 import react from '@vitejs/plugin-react'
 import { defineConfig, loadEnv, type Plugin, type ResolvedConfig } from 'vite'
 import { en, type MessageKey } from './src/i18n/locales/en.ts'
-import { absoluteUrl, fill, findsMeta, homeMeta, metaHtml, notFoundMeta, SITE_NAME, speciesMeta, type PageMeta } from './src/seo.ts'
+import { absoluteUrl, disclaimerMeta, fill, findsMeta, homeMeta, metaHtml, notFoundMeta, SITE_NAME, speciesMeta, type PageMeta } from './src/seo.ts'
 
-const LOCAL_DATASET = fileURLToPath(new URL('../data/mushrooms.json', import.meta.url))
-
-/** In dev, serve the repo's data/mushrooms.json so a fresh export shows up without pushing it. */
-function localDataset(): Plugin {
-  return {
-    name: 'local-dataset',
-    apply: 'serve',
-    configureServer(server) {
-      server.middlewares.use('/data/mushrooms.json', async (_req, res, next) => {
-        try {
-          res.setHeader('Content-Type', 'application/json')
-          res.end(await readFile(LOCAL_DATASET))
-        } catch (e) {
-          next(e)
-        }
-      })
-    },
-  }
+/** The dataset the app loads, from the export-mushrooms edge function (see src/hooks/useMushrooms.tsx). */
+async function fetchDataset(env: Record<string, string>): Promise<unknown> {
+  const { VITE_SUPABASE_URL: url, VITE_SUPABASE_ANON_KEY: key } = env
+  if (!url || !key) throw new Error('VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY must be set (see .env)')
+  const res = await fetch(`${url}/functions/v1/export-mushrooms`, {
+    headers: { apikey: key, Authorization: `Bearer ${key}` },
+  })
+  if (!res.ok) throw new Error(`Could not download the dataset for the species pages (HTTP ${res.status})`)
+  return res.json()
 }
 
 const SEO_START = '<!--seo-->'
@@ -40,14 +30,15 @@ const t = (key: MessageKey, params?: Record<string, string>) => fill(en[key], pa
 function seoPages(): Plugin {
   let config: ResolvedConfig
   let siteUrl: string
+  let env: Record<string, string>
   const block = (meta: PageMeta) => `${SEO_START}\n    ${metaHtml(meta, siteUrl)}\n    ${SEO_END}`
 
   return {
     name: 'seo-pages',
     configResolved(resolved) {
       config = resolved
-      const origin = loadEnv(resolved.mode, resolved.envDir || resolved.root, 'VITE_').VITE_SITE_ORIGIN ?? ''
-      siteUrl = origin + resolved.base
+      env = loadEnv(resolved.mode, resolved.envDir || resolved.root, 'VITE_')
+      siteUrl = (env.VITE_SITE_ORIGIN ?? '') + resolved.base
     },
     transformIndexHtml(html) {
       const website = JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebSite', name: SITE_NAME, url: siteUrl })
@@ -66,10 +57,8 @@ function seoPages(): Plugin {
         await writeFile(path, content)
       }
 
-      const { mushrooms } = JSON.parse(await readFile(LOCAL_DATASET, 'utf8')) as {
-        mushrooms: Parameters<typeof speciesMeta>[0][]
-      }
-      const indexed = [homeMeta(t), findsMeta(t), ...mushrooms.map((m) => speciesMeta(m, t))]
+      const { mushrooms } = (await fetchDataset(env)) as { mushrooms: Parameters<typeof speciesMeta>[0][] }
+      const indexed = [homeMeta(t), findsMeta(t), disclaimerMeta(t), ...mushrooms.map((m) => speciesMeta(m, t))]
       for (const meta of indexed.slice(1)) await write(`${meta.path.slice(1)}.html`, page(meta))
       // Unknown paths still load the app (species added since this build show up there), but stay out of search.
       await write('404.html', page(notFoundMeta(t, '/404')))
@@ -88,5 +77,5 @@ function seoPages(): Plugin {
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), localDataset(), seoPages()],
+  plugins: [react(), seoPages()],
 })

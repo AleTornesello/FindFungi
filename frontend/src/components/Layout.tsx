@@ -4,6 +4,8 @@ import { BookOpen, Check, Coffee, Globe, Heart, Languages, Mail, NotebookPen, ty
 import { useI18n } from "../i18n/I18nProvider"
 import type { MessageKey } from "../i18n/locales/en"
 import { isLocale, LOCALES } from "../i18n/locales"
+import { SafetyNoticeDialog } from "./SafetyNoticeDialog"
+import { AUTHOR_EMAIL, AUTHOR_NAME } from "../data/author"
 
 const NAV: { to: string; label: MessageKey; icon: LucideIcon }[] = [
   { to: "/", label: "nav.species", icon: BookOpen },
@@ -54,7 +56,10 @@ export function Layout() {
       <Box as="footer" borderTopWidth="1px" borderColor="border" pt="6" pb={{ base: "28", md: "6" }}>
         <Container maxW="6xl" px={{ base: "4", md: "6" }}>
           <Text fontSize="sm" color="fg.muted">
-            {t("app.disclaimer")}
+            {t("app.disclaimer")}{" "}
+            <ChakraLink asChild color="fg" fontWeight="600" textDecoration="underline">
+              <Link to="/disclaimer">{t("legal.title")}</Link>
+            </ChakraLink>
           </Text>
           <SupportNote />
           <AuthorCredit />
@@ -62,6 +67,7 @@ export function Layout() {
       </Box>
 
       <BottomNav />
+      <SafetyNoticeDialog />
     </Flex>
   )
 }
@@ -81,9 +87,9 @@ function Logo() {
 }
 
 const AUTHOR = {
-  name: "Alessandro Tornesello",
+  name: AUTHOR_NAME,
   links: [
-    { label: "Email", href: "mailto:alessandro.tornesello99@gmail.com", icon: Mail },
+    { label: "Email", href: `mailto:${AUTHOR_EMAIL}`, icon: Mail },
     { label: "Website", href: "https://alessandrotornesello.dev", icon: Globe },
     { label: "GitHub", href: "https://github.com/AleTornesello", icon: GitHubIcon },
   ],

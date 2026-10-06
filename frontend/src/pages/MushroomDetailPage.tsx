@@ -1,9 +1,11 @@
 import { useEffect, useMemo, type ReactNode } from "react"
 import { Badge, Box, Button, Container, Flex, Grid, Heading, HStack, Link, SimpleGrid, Spinner, Stack, Text } from "@chakra-ui/react"
 import { Link as RouterLink, useLocation, useNavigate, useParams } from "react-router"
-import { ArrowLeft, ChevronRight, ExternalLink, Microscope, Skull, TriangleAlert, Utensils, type LucideIcon } from "lucide-react"
+import { ArrowLeft, ChevronRight, ExternalLink, Microscope, ShieldAlert, Skull, TriangleAlert, Utensils, type LucideIcon } from "lucide-react"
 import { commonName, scientificName, type Mushroom } from "../data/mushrooms"
+import { isThreatened } from "../data/conservation"
 import { hasTraitDrawing, TraitIcon } from "../components/TraitIcon"
+import { ItalyRegionsMap } from "../components/ItalyRegionsMap"
 import { MushroomCard } from "../components/MushroomCard"
 import { EdibilityBadge } from "../components/EdibilityBadge"
 import { MushroomPhoto } from "../components/MushroomPhoto"
@@ -55,9 +57,6 @@ const RELATED_LIMIT = 6
 
 const hasValue = (v: unknown): v is string => typeof v === "string" && v !== "" && v !== "not applicable"
 
-/** IUCN categories that mean the species is at risk, as opposed to "Least Concern" or "Secure". */
-const isThreatened = (status: string) => /vulnerable|endangered|threatened/i.test(status)
-
 export function MushroomDetailPage() {
   const { id } = useParams()
   const { mushrooms, status } = useMushrooms()
@@ -102,6 +101,7 @@ export function MushroomDetailPage() {
     <Container maxW="6xl" px={{ base: "4", md: "6" }} pt={{ base: "4", md: "6" }}>
       <BackLink />
       {mushroom.properties.poisonous && <PoisonWarning mushroom={mushroom} />}
+      {isThreatened(mushroom.properties.conservationStatus) && <ConservationWarning mushroom={mushroom} />}
       <Hero mushroom={mushroom} />
 
       <Grid templateColumns={{ base: "1fr", lg: "1fr 340px" }} gap={{ base: "6", lg: "8" }} mt={{ base: "8", md: "10" }} alignItems="start">
@@ -112,6 +112,7 @@ export function MushroomDetailPage() {
         </Stack>
         <Stack gap="6">
           <Classification mushroom={mushroom} />
+          <Sightings mushroom={mushroom} />
           <LearnMore mushroom={mushroom} />
         </Stack>
       </Grid>
@@ -159,7 +160,7 @@ function Hero({ mushroom }: { mushroom: Mushroom }) {
   return (
     <Grid templateColumns={{ base: "1fr", md: "minmax(0, 5fr) minmax(0, 6fr)" }} gap={{ base: "5", md: "8" }} mt="2" alignItems="center">
       <MushroomPhoto
-        src={properties.images[0]}
+        src={properties.images[0]?.url}
         alt={scientificName(mushroom)}
         aspectRatio="4 / 3"
         borderRadius="3xl"
@@ -244,38 +245,70 @@ function Hero({ mushroom }: { mushroom: Mushroom }) {
 }
 
 /**
- * Stays pinned under the header while the page scrolls, so the warning is on screen whatever part
- * of the page is being read, on every screen size.
+ * A pinned alert stays under the header while the page scrolls, so the warning is on screen whatever
+ * part of the page is being read, on every screen size.
  */
-function PoisonWarning({ mushroom }: { mushroom: Mushroom }) {
-  const { t } = useI18n()
+function WarningBanner({
+  icon: Icon,
+  palette,
+  title,
+  sticky,
+  children,
+}: {
+  icon: LucideIcon
+  palette: string
+  title: string
+  sticky: boolean
+  children: ReactNode
+}) {
   return (
     <Flex
-      position="sticky"
-      top="16"
-      zIndex="docked"
+      position={sticky ? "sticky" : undefined}
+      top={sticky ? "16" : undefined}
+      zIndex={sticky ? "docked" : undefined}
       mt="2"
       align="flex-start"
       gap="3"
       px="4"
       py="3"
       borderRadius="xl"
-      bg="amanita.solid"
-      color="amanita.contrast"
+      bg={`${palette}.solid`}
+      color={`${palette}.contrast`}
       boxShadow="0 6px 18px rgba(46,31,20,.25)"
       role="alert"
     >
       <Box flexShrink={0} mt="0.5">
-        <Skull size={22} aria-hidden />
+        <Icon size={22} aria-hidden />
       </Box>
       <Box minW="0">
         <Text fontWeight="800" fontSize="md" textTransform="uppercase" letterSpacing="0.04em">
-          {t("edibility.poisonous")}
+          {title}
         </Text>
-        <Text fontSize="sm">{t("detail.poisonousNote")}</Text>
-        <ToxicityEffect value={mushroom.properties.toxicityEffectIt} />
+        {children}
       </Box>
     </Flex>
+  )
+}
+
+function PoisonWarning({ mushroom }: { mushroom: Mushroom }) {
+  const { t } = useI18n()
+  return (
+    <WarningBanner icon={Skull} palette="amanita" title={t("edibility.poisonous")} sticky>
+      <Text fontSize="sm">{t("detail.poisonousNote")}</Text>
+      <ToxicityEffect value={mushroom.properties.toxicityEffectIt} />
+    </WarningBanner>
+  )
+}
+
+/** Only one banner is pinned at a time; next to the poison warning this one scrolls with the page. */
+function ConservationWarning({ mushroom }: { mushroom: Mushroom }) {
+  const { t } = useI18n()
+  const valueLabel = useValueLabel()
+  const { conservationStatus, poisonous } = mushroom.properties
+  return (
+    <WarningBanner icon={ShieldAlert} palette="chanterelle" title={valueLabel("conservationStatus", conservationStatus)} sticky={!poisonous}>
+      <Text fontSize="sm">{t("detail.threatenedNote")}</Text>
+    </WarningBanner>
   )
 }
 
@@ -481,6 +514,24 @@ function Classification({ mushroom }: { mushroom: Mushroom }) {
           {t("detail.higherRanksMissing")}
         </Text>
       )}
+    </Section>
+  )
+}
+
+/** The regions the photos were taken in, on a map of Italy. */
+function Sightings({ mushroom }: { mushroom: Mushroom }) {
+  const { t } = useI18n()
+  const regions = new Set(mushroom.properties.images.map((image) => image.region).filter(Boolean))
+  const list = [...regions].sort().join(", ")
+
+  return (
+    <Section title={t("detail.sightings")}>
+      <Box mt="4" maxW="72" mx="auto">
+        <ItalyRegionsMap highlighted={regions} label={t("detail.sightingsMap", { regions: list || "-" })} />
+      </Box>
+      <Text fontSize="sm" color="fg.muted" mt="4">
+        {regions.size > 0 ? t("detail.sightingsNote") : t("detail.noSightings")}
+      </Text>
     </Section>
   )
 }
