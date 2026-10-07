@@ -11,15 +11,18 @@ import {
   Input,
   Link as ChakraLink,
   Stack,
+  Switch,
   Text,
   Textarea,
 } from "@chakra-ui/react"
-import { MapPin, Trash2 } from "lucide-react"
+import { Globe, MapPin, Trash2 } from "lucide-react"
 import { Link } from "react-router"
 import { commonName, scientificName, speciesPath, type Mushroom } from "../data/mushrooms"
 import { MushroomIllustration } from "../components/MushroomIllustration"
 import { MushroomPhoto } from "../components/MushroomPhoto"
+import { ShareFindsDialog } from "../components/ShareFindsDialog"
 import { SpeciesCombobox } from "../components/SpeciesCombobox"
+import { currentPosition, loadSharingChoice, saveSharingChoice, shareFind } from "../data/sharedFinds"
 import { useFinds, type Find } from "../hooks/useFinds"
 import { useMushrooms } from "../hooks/useMushrooms"
 import { useI18n } from "../i18n/I18nProvider"
@@ -29,7 +32,7 @@ import { findsMeta } from "../seo"
 const today = () => new Date().toISOString().slice(0, 10)
 
 export function FindsPage() {
-  const { finds, addFind, removeFind } = useFinds()
+  const { finds, addFind, updateFind, removeFind } = useFinds()
   const { mushrooms } = useMushrooms()
   const { locale, t } = useI18n()
   const [species, setSpecies] = useState<Mushroom>()
@@ -37,6 +40,9 @@ export function FindsPage() {
   const [place, setPlace] = useState("")
   const [date, setDate] = useState(today)
   const [notes, setNotes] = useState("")
+  // A find waiting for the answer to "share anonymously?", asked the first time one is logged.
+  const [unasked, setUnasked] = useState<Omit<Find, "id">>()
+  const [sharing, setSharing] = useState(loadSharingChoice)
   usePageMeta(findsMeta(t))
 
   // Finds remember the Latin name too, so they still resolve if the dataset changes ids.
@@ -47,6 +53,45 @@ export function FindsPage() {
       (f.mushroomId !== undefined ? byId.get(f.mushroomId) : undefined) ?? byName.get(f.scientificName.toLowerCase())
   }, [mushrooms])
 
+  // The find is saved right away; the position and the upload follow, since the browser may be
+  // waiting on the user to answer its location prompt.
+  const record = (find: Omit<Find, "id">, share: boolean) => {
+    const id = addFind(find)
+    if (!share) return
+    void (async () => {
+      const position = await currentPosition()
+      if (position) updateFind(id, { position })
+      try {
+        await shareFind({ ...find, position })
+        updateFind(id, { shared: true })
+      } catch (error) {
+        console.error("Could not share the find", error)
+      }
+    })()
+  }
+
+  const changeSharing = (share: boolean) => {
+    saveSharingChoice(share)
+    setSharing(share)
+  }
+
+  // Turned on from the switch: ask for the location now rather than on the next save.
+  const toggleSharing = (share: boolean) => {
+    changeSharing(share)
+    if (share) void currentPosition()
+  }
+
+  const answerSharing = (share: boolean) => {
+    changeSharing(share)
+    if (unasked) record(unasked, share)
+    setUnasked(undefined)
+  }
+
+  const dismissSharing = () => {
+    if (unasked) record(unasked, false)
+    setUnasked(undefined)
+  }
+
   const submit = (e: FormEvent) => {
     e.preventDefault()
     if (!species) {
@@ -54,13 +99,15 @@ export function FindsPage() {
       return
     }
     if (!place.trim()) return
-    addFind({
+    const find = {
       mushroomId: species.id,
       scientificName: scientificName(species),
       place: place.trim(),
       date,
       notes: notes.trim(),
-    })
+    }
+    if (sharing === undefined) setUnasked(find)
+    else record(find, sharing)
     setPlace("")
     setNotes("")
     setDate(today())
@@ -74,6 +121,8 @@ export function FindsPage() {
       <Text color="fg.muted" mt="2">
         {t("finds.intro")}
       </Text>
+
+      <ShareFindsDialog open={unasked !== undefined} onAnswer={answerSharing} onDismiss={dismissSharing} />
 
       <Grid templateColumns={{ base: "1fr", lg: "380px 1fr" }} gap={{ base: "8", lg: "10" }} mt="6" alignItems="start">
         <Box as="form" onSubmit={submit} bg="bg.panel" borderWidth="1px" borderColor="border" borderRadius="3xl" p="5">
@@ -113,6 +162,24 @@ export function FindsPage() {
                 rows={3}
               />
             </Field.Root>
+            <Box>
+              <Switch.Root
+                checked={sharing === true}
+                onCheckedChange={(e) => toggleSharing(e.checked)}
+                colorPalette="moss"
+              >
+                <Switch.HiddenInput />
+                <Switch.Control>
+                  <Switch.Thumb />
+                </Switch.Control>
+                <Switch.Label>{t("finds.share.toggle")}</Switch.Label>
+              </Switch.Root>
+              {(sharing || finds.some((f) => f.shared)) && (
+                <Text fontSize="xs" color="fg.muted" mt="1">
+                  {t("finds.share.kept")}
+                </Text>
+              )}
+            </Box>
             <Button type="submit" size="lg" borderRadius="full" colorPalette="moss" fontWeight="700">
               {t("finds.save")}
             </Button>
@@ -182,6 +249,12 @@ export function FindsPage() {
                           year: "numeric",
                         })}
                       </Text>
+                      {f.shared && (
+                        <Flex align="center" gap="1" color="moss.fg" fontSize="xs">
+                          <Globe size={12} aria-hidden />
+                          <Text>{t("finds.shared")}</Text>
+                        </Flex>
+                      )}
                       {f.notes && (
                         <Text fontSize="sm" mt="1" lineClamp={2}>
                           {f.notes}

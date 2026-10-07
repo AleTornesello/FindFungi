@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
+import type { Position } from "../data/sharedFinds"
 
 export interface Find {
   id: string
@@ -9,6 +10,10 @@ export interface Find {
   place: string
   date: string
   notes: string
+  /** Where the user stood when logging the find, if they shared it and allowed geolocation. */
+  position?: Position
+  /** Set once the find has been stored anonymously in Supabase. */
+  shared?: boolean
 }
 
 const KEY = "findfungi:finds"
@@ -53,12 +58,18 @@ export function useFinds() {
   }, [finds])
 
   const addFind = useCallback((find: Omit<Find, "id">) => {
-    setFinds((prev) => [{ ...find, id: crypto.randomUUID() }, ...prev])
+    const id = crypto.randomUUID()
+    setFinds((prev) => [{ ...find, id }, ...prev])
+    return id
+  }, [])
+
+  const updateFind = useCallback((id: string, changes: Partial<Omit<Find, "id">>) => {
+    setFinds((prev) => prev.map((f) => (f.id === id ? { ...f, ...changes } : f)))
   }, [])
 
   const removeFind = useCallback((id: string) => {
     setFinds((prev) => prev.filter((f) => f.id !== id))
   }, [])
 
-  return { finds, addFind, removeFind }
+  return { finds, addFind, updateFind, removeFind }
 }
