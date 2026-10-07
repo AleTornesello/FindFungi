@@ -186,7 +186,7 @@ export function FindsPage() {
           </Stack>
         </Box>
 
-        <Box>
+        <Box minW="0">
           {finds.length === 0 ? (
             <Flex direction="column" align="center" textAlign="center" py="10" px="6" borderRadius="3xl" bg="bg.subtle">
               <MushroomIllustration capColor="#B58962" stemColor="#E9D9C8" w="24" />
