@@ -1,0 +1,36 @@
+[project]
+name = "data-cleaning"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "numpy>=2.5.3",
+    "pandas>=3.0.6",
+    "pydantic>=2.13.5",
+    "pillow>=11.0.0",
+    "matplotlib>=3.10.0",
+    "scikit-learn>=1.7.0",
+    "tqdm>=4.67.1",
+    "typer>=0.27.2",
+    "seaborn>=0.13.2",
+    "torch",
+    "timm>=1.0.30",
+    "torchvision>=0.29.1",
+    "mlflow>=3.17.0",
+    "opencv-contrib-python-headless>=5.0.0.93",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.4.0",
+    "ipywidgets>=8.1.9",
+]
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu132" }
+
+[[tool.uv.index]]
+name = "pytorch-cu132"
+url = "https://download.pytorch.org/whl/cu132"
+explicit = true
