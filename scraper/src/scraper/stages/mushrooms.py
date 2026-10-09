@@ -1,11 +1,13 @@
-"""Stage 4: fill the `mushrooms` table from the Wikipedia infoboxes.
+"""Stage 5: fill the `mushrooms` table from funghiitaliani.it and the Wikipedia infoboxes.
 
-Every `funghi_italiani` record with a Wikipedia page (see stage 3) becomes a row:
-taxonomy, edibility, toxicity and its effect come from funghi_italiani, the morphological properties,
-conservation status, cover image and common names from the Italian page, or from the English
-one when there is no Italian page. Records without any page are skipped. The edibility of the
-page overrides the funghi_italiani one when it is more dangerous
-(poisonous > not edible > edible).
+Every `funghi_italiani` record becomes a row. The taxonomy comes from the species card
+of its funghiitaliani.it topic (see stage 3), rank by rank, falling back to the grid
+record for the ranks the card does not give; edibility, toxicity and its effect come
+from the grid record. When the record has a Wikipedia page (see stage 4), the
+morphological properties, conservation status, cover image and common names come from
+the Italian page, or from the English one when there is no Italian page; records
+without any page keep them empty. The edibility of the page overrides the
+funghi_italiani one when it is more dangerous (poisonous > not edible > edible).
 
 Pages are fetched through the Firecrawl API, which returns only the infobox
 tables and the lead paragraphs; each page is scraped once even if several records
@@ -28,7 +30,8 @@ from scraper.db import connect, migrate, row_count, table_exists
 from scraper.firecrawl import Firecrawl, FirecrawlError, FirecrawlFatalError
 
 TABLE = "mushrooms"
-REQUIRED_TABLES = ("funghi_italiani", "wikipedia_pages", TABLE)
+TOPICS_TABLE = "funghi_italiani_topics"
+REQUIRED_TABLES = ("funghi_italiani", TOPICS_TABLE, "wikipedia_pages", TABLE)
 PAGE_URL = "https://{lang}.wikipedia.org/?curid={page_id}"
 INFOBOX_SELECTOR = "table.infobox"
 # Paragraphs before the first heading: Firecrawl returns the Parsoid HTML, where
@@ -65,7 +68,23 @@ EDIBILITY_KEYWORDS = (
     (EDIBLE, ("commestibil", "edible", "choice")),
 )
 
+TAXONOMY = ("kingdom", "division", "taxon_class", "taxon_order", "family")
+# Kingdom of the divisions, for the records whose card and grid record both lack it.
+DIVISION_KINGDOMS = {
+    "Ascomycota": "Fungi",
+    "Basidiomycota": "Fungi",
+    "Mucoromycota": "Fungi",
+    "Zygomycota": "Fungi",
+    "Amoebozoa": "Protozoa",
+    "Mycetozoa": "Protozoa",
+    "Myxomycota": "Protozoa",
+}
+
 PROPERTIES = ("cap", "hymenium", "lamella", "stipe", "gleba", "spore_print", "ecology")
+# The Wikipedia data of a record without a page.
+NO_PAGE_DATA = dict.fromkeys(
+    (*PROPERTIES, "conservation_status", "cover_image", "common_name_it", "common_name_en"), ""
+)
 
 # Row labels of the Italian "Caratteristiche morfologiche" box. Velo and Carne
 # map to stipe and gleba to keep the structure of data/8.json.
@@ -173,6 +192,7 @@ def run() -> None:
                         f"[red]Table '{table}' does not exist. Run stage 1 first.[/red]"
                     )
                     return
+            migrate(conn, TOPICS_TABLE)
             migrate(conn, TABLE)
             conn.commit()
 
@@ -205,7 +225,7 @@ def run() -> None:
 
 
 def load_records(conn: psycopg.Connection, only_missing: bool) -> list[dict]:
-    """funghi_italiani records with a Wikipedia page, as dicts keyed like INSERT_SQL."""
+    """funghi_italiani records, as dicts keyed like INSERT_SQL."""
     query = f"""
         SELECT
             f.id AS funghi_italiani_id,
@@ -213,29 +233,44 @@ def load_records(conn: psycopg.Connection, only_missing: bool) -> list[dict]:
             it.page_id AS wikipedia_it_page_id,
             en.page_id AS wikipedia_en_page_id,
             f.kingdom, f.division, f.taxon_class, f.taxon_order, f.family,
+            t.kingdom AS card_kingdom, t.division AS card_division,
+            t.taxon_class AS card_taxon_class, t.taxon_order AS card_taxon_order,
+            t.family AS card_family,
             f.genus, f.species, f.edibility, f.poisonous,
             f.toxicity AS toxicity_effect_it, f.microscopic
         FROM funghi_italiani f
+        LEFT JOIN {TOPICS_TABLE} t ON t.topic_id = f.topic_id
         LEFT JOIN wikipedia_pages it ON it.funghi_italiani_id = f.id AND it.lang = 'it'
         LEFT JOIN wikipedia_pages en ON en.funghi_italiani_id = f.id AND en.lang = 'en'
-        WHERE (it.page_id IS NOT NULL OR en.page_id IS NOT NULL)
     """
     if only_missing:
-        query += f" AND NOT EXISTS (SELECT 1 FROM {TABLE} m WHERE m.funghi_italiani_id = f.id)"
+        query += f" WHERE NOT EXISTS (SELECT 1 FROM {TABLE} m WHERE m.funghi_italiani_id = f.id)"
     query += " ORDER BY f.id"
 
     with conn.cursor(row_factory=dict_row) as cur:
         records = cur.execute(query).fetchall()
     for record in records:
+        merge_taxonomy(record)
         record["edible"] = record.pop("edibility") in EDIBLE_CODES
         record["microscopic"] = bool(record["microscopic"])
     return records
 
 
-def _source_page(record: dict) -> Page:
+def merge_taxonomy(record: dict) -> None:
+    """Set the taxonomy of `record` to the ranks of its topic card (the card_* keys,
+    removed), keeping the grid ones where the card gives none."""
+    for rank in TAXONOMY:
+        record[rank] = record.pop(f"card_{rank}") or record[rank]
+    if not record["kingdom"]:
+        record["kingdom"] = DIVISION_KINGDOMS.get(record["division"], "")
+
+
+def _source_page(record: dict) -> Page | None:
     if record["wikipedia_it_page_id"] is not None:
         return Page("it", record["wikipedia_it_page_id"])
-    return Page("en", record["wikipedia_en_page_id"])
+    if record["wikipedia_en_page_id"] is not None:
+        return Page("en", record["wikipedia_en_page_id"])
+    return None
 
 
 def _scrape_and_save(
@@ -243,12 +278,16 @@ def _scrape_and_save(
 ) -> None:
     # Several records (synonyms) can share a page: scrape each page only once.
     records_by_page: dict[Page, list[dict]] = {}
+    pending: list[dict] = []
     for record in records:
-        records_by_page.setdefault(_source_page(record), []).append(record)
+        page = _source_page(record)
+        if page is None:
+            pending.append(merge_edibility(record, None) | NO_PAGE_DATA)
+        else:
+            records_by_page.setdefault(page, []).append(record)
 
     saved = 0
     failed: list[str] = []
-    pending: list[dict] = []
 
     def flush() -> None:
         nonlocal saved
@@ -259,6 +298,7 @@ def _scrape_and_save(
             saved += len(pending)
             pending.clear()
 
+    flush()  # the records without a page
     pool = ThreadPoolExecutor(max_workers=concurrency)
     try:
         with Progress(

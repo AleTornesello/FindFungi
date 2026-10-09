@@ -6,7 +6,7 @@ The output is an object with two keys:
   `taxonomy` and a `properties` object, keys in camelCase. The source ids
   (funghi_italiani and Wikipedia) and the timestamps are not exported.
   `properties.images` lists the Wikipedia cover image first, then the photos of
-  the funghiitaliani.it topic (stage 6) in page order. `properties.commonNameIt`
+  the funghiitaliani.it topic (stage 3) in page order. `properties.commonNameIt`
   and `properties.commonNameEn` hold the common names from the Wikipedia page of
   that language, comma separated ('' when there are none).
 - `translations`: per language and property, the translation of every English
@@ -59,7 +59,7 @@ def run() -> None:
     try:
         with connect(config) as conn:
             if not table_exists(conn, TABLE) or not row_count(conn, TABLE):
-                console.print(f"[red]Table '{TABLE}' is missing or empty. Run stage 4 first.[/red]")
+                console.print(f"[red]Table '{TABLE}' is missing or empty. Run stage 5 first.[/red]")
                 return
             if not table_exists(conn, PHOTOS_TABLE):
                 console.print(

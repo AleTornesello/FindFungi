@@ -16,7 +16,7 @@ CREATE TABLE mushrooms (
     wikipedia_it_page_id      bigint,
     wikipedia_en_page_id      bigint,
 
-    -- taxonomy
+    -- taxonomy: the card of the funghiitaliani.it topic, else the grid
     kingdom                   text NOT NULL DEFAULT '',
     division                  text NOT NULL DEFAULT '',
     taxon_class               text NOT NULL DEFAULT '',
@@ -78,7 +78,7 @@ CREATE TABLE funghi_italiani (
 CREATE INDEX funghi_italiani_genus_species_idx ON funghi_italiani (genus, species);
 """
 
-# Wikipedia lookup results (stage 3): one row per funghi_italiani record and
+# Wikipedia lookup results (stage 4): one row per funghi_italiani record and
 # language. page_id is NULL when no page exists, so a row always means "searched".
 WIKIPEDIA_PAGES = """
 CREATE TABLE wikipedia_pages (
@@ -92,19 +92,25 @@ CREATE TABLE wikipedia_pages (
 );
 """
 
-# funghiitaliani.it forum topics (stage 6), i.e. the detail pages linked from the
+# funghiitaliani.it forum topics (stage 3), i.e. the detail pages linked from the
 # grid. Several funghi_italiani records (synonyms) can share a topic. url is NULL
-# when the topic does not exist, so a row always means "fetched".
+# when the topic does not exist, so a row always means "fetched". The taxonomy is
+# the "Tassonomia" section of the species card in the first post, '' when missing.
 FUNGHI_ITALIANI_TOPICS = """
 CREATE TABLE funghi_italiani_topics (
     topic_id            integer PRIMARY KEY,           -- funghi_italiani.topic_id
     url                 text,                          -- canonical URL of page 1
     pages               integer NOT NULL DEFAULT 0,
+    kingdom             text NOT NULL DEFAULT '',      -- Regno (rarely given)
+    division            text NOT NULL DEFAULT '',      -- Divisione
+    taxon_class         text NOT NULL DEFAULT '',      -- Classe
+    taxon_order         text NOT NULL DEFAULT '',      -- Ordine
+    family              text NOT NULL DEFAULT '',      -- Famiglia
     fetched_at          timestamptz NOT NULL DEFAULT now()
 );
 """
 
-# Photos posted in a funghiitaliani.it topic (stage 6), in page order. region is
+# Photos posted in a funghiitaliani.it topic (stage 3), in page order. region is
 # the Italian region named in the caption of the post, as in scraper.regions.REGION_ALIASES.
 FUNGHI_ITALIANI_PHOTOS = """
 CREATE TABLE funghi_italiani_photos (
@@ -125,6 +131,10 @@ MIGRATIONS: dict[str, list[str]] = {
         "ALTER TABLE mushrooms ADD COLUMN IF NOT EXISTS common_name_it text NOT NULL DEFAULT ''",
         "ALTER TABLE mushrooms ADD COLUMN IF NOT EXISTS common_name_en text NOT NULL DEFAULT ''",
     ],
+    "funghi_italiani_topics": [
+        f"ALTER TABLE funghi_italiani_topics ADD COLUMN IF NOT EXISTS {column} text NOT NULL DEFAULT ''"
+        for column in ("kingdom", "division", "taxon_class", "taxon_order", "family")
+    ],
     "funghi_italiani_photos": [
         "ALTER TABLE funghi_italiani_photos ADD COLUMN IF NOT EXISTS region text NOT NULL DEFAULT ''",
     ],
@@ -132,8 +142,8 @@ MIGRATIONS: dict[str, list[str]] = {
 
 TABLES: dict[str, str] = {
     "funghi_italiani": FUNGHI_ITALIANI,
-    "wikipedia_pages": WIKIPEDIA_PAGES,
-    "mushrooms": MUSHROOMS,
     "funghi_italiani_topics": FUNGHI_ITALIANI_TOPICS,
     "funghi_italiani_photos": FUNGHI_ITALIANI_PHOTOS,
+    "wikipedia_pages": WIKIPEDIA_PAGES,
+    "mushrooms": MUSHROOMS,
 }
