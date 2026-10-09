@@ -95,7 +95,8 @@ CREATE TABLE wikipedia_pages (
 # funghiitaliani.it forum topics (stage 3), i.e. the detail pages linked from the
 # grid. Several funghi_italiani records (synonyms) can share a topic. url is NULL
 # when the topic does not exist, so a row always means "fetched". The taxonomy is
-# the "Tassonomia" section of the species card in the first post, '' when missing.
+# the "Tassonomia" section of the species card in the first post, edibility_text the
+# raw text of its "Commestibilità e Tossicità" section; '' when missing.
 FUNGHI_ITALIANI_TOPICS = """
 CREATE TABLE funghi_italiani_topics (
     topic_id            integer PRIMARY KEY,           -- funghi_italiani.topic_id
@@ -106,6 +107,7 @@ CREATE TABLE funghi_italiani_topics (
     taxon_class         text NOT NULL DEFAULT '',      -- Classe
     taxon_order         text NOT NULL DEFAULT '',      -- Ordine
     family              text NOT NULL DEFAULT '',      -- Famiglia
+    edibility_text      text NOT NULL DEFAULT '',      -- Commestibilità e Tossicità
     fetched_at          timestamptz NOT NULL DEFAULT now()
 );
 """
@@ -133,7 +135,9 @@ MIGRATIONS: dict[str, list[str]] = {
     ],
     "funghi_italiani_topics": [
         f"ALTER TABLE funghi_italiani_topics ADD COLUMN IF NOT EXISTS {column} text NOT NULL DEFAULT ''"
-        for column in ("kingdom", "division", "taxon_class", "taxon_order", "family")
+        for column in (
+            "kingdom", "division", "taxon_class", "taxon_order", "family", "edibility_text"
+        )
     ],
     "funghi_italiani_photos": [
         "ALTER TABLE funghi_italiani_photos ADD COLUMN IF NOT EXISTS region text NOT NULL DEFAULT ''",

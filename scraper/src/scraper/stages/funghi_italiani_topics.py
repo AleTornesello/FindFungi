@@ -4,7 +4,8 @@ in `funghi_italiani_topics` and its photos in `funghi_italiani_photos`.
 
 The first post of a topic is the species card, which starts with a "Tassonomia"
 section: its division, class, order and family (and kingdom, when given) are saved
-with the topic. Every page of a topic is read and the images posted in it are kept
+with the topic, with the raw text of its edibility section ("Commestibilità e
+Tossicità"). Every page of a topic is read and the images posted in it are kept
 in page order: avatars, badges, emoticons and quoted posts are skipped, and a linked
 full size image is preferred to its thumbnail. Only the image URLs are stored, with
 the Italian region named in the caption of the post (see scraper.regions). Saves are
@@ -95,16 +96,29 @@ TAXON_FIXES = {
     "Agaricicomycetes": "Agaricomycetes",
 }
 
+# Header of the edibility section of the species card: "Commestibilità e Tossicità",
+# "Commestibilità o tossicità", "Commestibilità, tossicità", or just one of the two
+# words. Some cards put the text on the header line, after a colon.
+EDIBILITY_HEADER = re.compile(
+    r"^(?:commestibilit[aà](?:\s*(?:,|e|o|/)\s*tossicit[aà])?|tossicit[aà])"
+    r"\s*(?::\s*(.*))?$",
+    re.IGNORECASE,
+)
+# A blank line, between the paragraphs of a post.
+PARAGRAPH_BREAK = re.compile(r"\n[ ]*\n")
+WHITESPACE = re.compile(r"\s+")
+
 MISSING = "Download only topics not fetched yet"
 ALL = "Download all topics again"
 CANCEL = "Cancel"
 
 TOPIC_SQL = f"""
 INSERT INTO {TOPICS_TABLE} (
-    topic_id, url, pages, kingdom, division, taxon_class, taxon_order, family
+    topic_id, url, pages, kingdom, division, taxon_class, taxon_order, family,
+    edibility_text
 ) VALUES (
     %(topic_id)s, %(url)s, %(pages)s, %(kingdom)s, %(division)s, %(taxon_class)s,
-    %(taxon_order)s, %(family)s
+    %(taxon_order)s, %(family)s, %(edibility_text)s
 )
 ON CONFLICT (topic_id) DO UPDATE SET
     url = EXCLUDED.url,
@@ -114,6 +128,7 @@ ON CONFLICT (topic_id) DO UPDATE SET
     taxon_class = EXCLUDED.taxon_class,
     taxon_order = EXCLUDED.taxon_order,
     family = EXCLUDED.family,
+    edibility_text = EXCLUDED.edibility_text,
     fetched_at = now()
 """
 
@@ -286,14 +301,14 @@ def fetch_topic(firecrawl: Firecrawl, topic_id: int) -> tuple[dict, list[dict]]:
     """Download every page of a topic; return its row and its photo rows."""
     page = _scrape(firecrawl, TOPIC_URL.format(topic_id=topic_id))
     if page is None:
-        topic = {"topic_id": topic_id, "url": None, "pages": 0}
+        topic = {"topic_id": topic_id, "url": None, "pages": 0, "edibility_text": ""}
         return topic | dict.fromkeys(TAXONOMY_RANKS.values(), ""), []
 
     soup = BeautifulSoup(page.html, "html.parser")
     # The canonical topic URL ends with a slash, e.g. .../topic/24260-abortiporus-biennis/
     url = canonical_url(soup) or page.url
     pages = page_count(soup)
-    taxonomy = parse_taxonomy(soup)
+    card = parse_taxonomy(soup) | {"edibility_text": parse_edibility(soup)}
     photos = parse_photos(soup)
     for number in range(2, pages + 1):
         next_page = _scrape(firecrawl, f"{url}page/{number}/")
@@ -308,7 +323,7 @@ def fetch_topic(firecrawl: Firecrawl, topic_id: int) -> tuple[dict, list[dict]]:
             continue
         seen.add(photo["url"])
         rows.append(photo | {"topic_id": topic_id, "position": len(rows) + 1})
-    return {"topic_id": topic_id, "url": url, "pages": pages} | taxonomy, rows
+    return {"topic_id": topic_id, "url": url, "pages": pages} | card, rows
 
 
 def _scrape(firecrawl: Firecrawl, url: str) -> ScrapedPage | None:
@@ -372,6 +387,29 @@ def parse_taxonomy(soup: BeautifulSoup) -> dict[str, str]:
     return taxonomy
 
 
+def parse_edibility(soup: BeautifulSoup) -> str:
+    """The raw text of the edibility section of the species card (the first post),
+    its lines joined by newlines; '' when the card has none.
+
+    The section ends with its paragraph, so the author credits, captions and comments
+    that some cards have after it are left out.
+    """
+    content = soup.select_one(FIRST_POST_SELECTOR)
+    if content is None:
+        return ""
+    paragraphs = _paragraphs(copy.copy(content))
+    for i, lines in enumerate(paragraphs):
+        for j, line in enumerate(lines):
+            match = EDIBILITY_HEADER.match(line)
+            if match is None:
+                continue
+            section = ([match.group(1)] if match.group(1) else []) + lines[j + 1 :]
+            if not section and i + 1 < len(paragraphs):
+                section = paragraphs[i + 1]  # the header is a paragraph of its own
+            return "\n".join(section)
+    return ""
+
+
 def parse_photos(soup: BeautifulSoup) -> list[dict]:
     """Photos posted on a topic page, in order, as {post_id, url, thumbnail_url, region}.
 
@@ -408,6 +446,24 @@ def _lines(content: Tag) -> list[str]:
         block.append(NavigableString("\n"))
     lines = (" ".join(line.split()) for line in content.get_text().split("\n"))
     return [line for line in lines if line]
+
+
+def _paragraphs(content: Tag) -> list[list[str]]:
+    """The text of `content` as paragraphs of lines, like _lines: a paragraph ends at
+    a blank line (two line breaks) or with a <p>. Changes `content`."""
+    # The newlines of the HTML source are not line breaks.
+    for text in content.find_all(string=True):
+        text.replace_with(NavigableString(WHITESPACE.sub(" ", text)))
+    for br in content.find_all("br"):
+        br.replace_with(NavigableString("\n"))
+    for block in content.find_all(BLOCK_TAGS):
+        block.append(NavigableString("\n\n" if block.name == "p" else "\n"))
+    paragraphs = []
+    for chunk in PARAGRAPH_BREAK.split(content.get_text()):
+        lines = [" ".join(line.split()) for line in chunk.split("\n")]
+        if lines := [line for line in lines if line]:
+            paragraphs.append(lines)
+    return paragraphs
 
 
 def _photo(img: Tag) -> dict | None:

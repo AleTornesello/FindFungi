@@ -33,6 +33,11 @@ uv run scraper
      the authors; the other ranks (genus, section, …) are skipped. Misspelled names
      are fixed with `TAXON_FIXES` in `src/scraper/stages/funghi_italiani_topics.py`;
      add more there. A rank the card does not give is ''.
+   - the raw text of the edibility section of the card ("Commestibilità e
+     Tossicità", "Commestibilità o tossicità", …) into `funghi_italiani_topics.edibility_text`,
+     its lines separated by newlines. The section ends with its paragraph, so the
+     author credits and captions after it are left out; it is '' when the card has
+     none (the short "Foto e Descrizioni" cards). Not used by the later stages yet.
    - the photos posted in it into `funghi_italiani_photos`, in page order: the forum
      post id, the full size image URL and, when the post shows a smaller one, the
      thumbnail URL, and the `region` the photo was taken in. The region comes from
