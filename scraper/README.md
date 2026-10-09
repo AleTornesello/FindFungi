@@ -63,12 +63,14 @@ uv run scraper
    NULL `page_id` when there is no page. On later runs you can search only the
    mushrooms not searched yet, or all of them again.
 5. **Build mushrooms**: saves a row into `mushrooms` for every `funghi_italiani`
-   record. The taxonomy (`kingdom` to `family`) comes from the species card of its
-   topic (stage 3), rank by rank: the ranks the card does not give, or all of them
-   when the topic was not downloaded, come from the grid record, and a kingdom still
-   missing comes from the division (`DIVISION_KINGDOMS` in
-   `src/scraper/stages/mushrooms.py`). Genus and species are the grid record's, so
-   synonyms keep their own name. Edibility, `poisonous` and `toxicity_effect_it` (the
+   record. Each rank of the taxonomy (`kingdom` to `family`) comes from the first
+   source that gives it: the species card of its topic (stage 3), then the grid
+   record, then the "Scientific classification" box of its Wikipedia page (the
+   `Regno`/`Kingdom`, `Divisione`/`Division` or `Phylum`, `Classe`/`Class`,
+   `Ordine`/`Order` and `Famiglia`/`Family` rows, without the authors; "Incertae
+   sedis" counts as missing). A kingdom still missing comes from the division
+   (`DIVISION_KINGDOMS` in `src/scraper/stages/mushrooms.py`). Genus and species are
+   the grid record's, so synonyms keep their own name. Edibility, `poisonous` and `toxicity_effect_it` (the
    ingestion syndrome, in Italian) come from funghiitaliani.it. For the records with a
    Wikipedia page, it scrapes the infoboxes of the Italian page (or the English one
    when there is no Italian page) through the Firecrawl API for the morphology

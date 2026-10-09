@@ -1,12 +1,12 @@
 """Stage 5: fill the `mushrooms` table from funghiitaliani.it and the Wikipedia infoboxes.
 
-Every `funghi_italiani` record becomes a row. The taxonomy comes from the species card
-of its funghiitaliani.it topic (see stage 3), rank by rank, falling back to the grid
-record for the ranks the card does not give; edibility, toxicity and its effect come
-from the grid record. When the record has a Wikipedia page (see stage 4), the
-morphological properties, conservation status, cover image and common names come from
-the Italian page, or from the English one when there is no Italian page; records
-without any page keep them empty. The edibility of the page overrides the
+Every `funghi_italiani` record becomes a row. Each rank of the taxonomy comes from the
+first source that gives it: the species card of its funghiitaliani.it topic (see
+stage 3), the grid record, then the taxobox of its Wikipedia page; edibility, toxicity
+and its effect come from the grid record. When the record has a Wikipedia page (see
+stage 4), the morphological properties, conservation status, cover image and common
+names come from the Italian page, or from the English one when there is no Italian
+page; records without any page keep them empty. The edibility of the page overrides the
 funghi_italiani one when it is more dangerous (poisonous > not edible > edible).
 
 Pages are fetched through the Firecrawl API, which returns only the infobox
@@ -69,7 +69,30 @@ EDIBILITY_KEYWORDS = (
 )
 
 TAXONOMY = ("kingdom", "division", "taxon_class", "taxon_order", "family")
-# Kingdom of the divisions, for the records whose card and grid record both lack it.
+# Row labels of the "Scientific classification" box, by language; the colon of the
+# English ones ("Kingdom:") is dropped first.
+TAXOBOX_LABELS = {
+    "it": {
+        "Regno": "kingdom",
+        "Divisione": "division",
+        "Phylum": "division",
+        "Classe": "taxon_class",
+        "Ordine": "taxon_order",
+        "Famiglia": "family",
+    },
+    "en": {
+        "Kingdom": "kingdom",
+        "Division": "division",
+        "Phylum": "division",
+        "Class": "taxon_class",
+        "Order": "taxon_order",
+        "Family": "family",
+    },
+}
+# The name at the start of a taxobox value, without the author or notes after it.
+TAXON_NAME = re.compile(r"[A-Za-z]+")
+# Kingdom of the divisions, for the records whose card, grid record and Wikipedia
+# page all lack it.
 DIVISION_KINGDOMS = {
     "Ascomycota": "Fungi",
     "Basidiomycota": "Fungi",
@@ -250,19 +273,21 @@ def load_records(conn: psycopg.Connection, only_missing: bool) -> list[dict]:
     with conn.cursor(row_factory=dict_row) as cur:
         records = cur.execute(query).fetchall()
     for record in records:
-        merge_taxonomy(record)
         record["edible"] = record.pop("edibility") in EDIBLE_CODES
         record["microscopic"] = bool(record["microscopic"])
     return records
 
 
-def merge_taxonomy(record: dict) -> None:
-    """Set the taxonomy of `record` to the ranks of its topic card (the card_* keys,
-    removed), keeping the grid ones where the card gives none."""
+def merge_taxonomy(record: dict, wikipedia: dict[str, str]) -> dict:
+    """`record` with every rank taken from the first source that gives it: the topic
+    card (the card_* keys, dropped), the grid record, then the Wikipedia taxobox. A
+    kingdom none of them gives comes from the division."""
+    merged = {key: value for key, value in record.items() if not key.startswith("card_")}
     for rank in TAXONOMY:
-        record[rank] = record.pop(f"card_{rank}") or record[rank]
-    if not record["kingdom"]:
-        record["kingdom"] = DIVISION_KINGDOMS.get(record["division"], "")
+        merged[rank] = record[f"card_{rank}"] or record[rank] or wikipedia.get(rank, "")
+    if not merged["kingdom"]:
+        merged["kingdom"] = DIVISION_KINGDOMS.get(merged["division"], "")
+    return merged
 
 
 def _source_page(record: dict) -> Page | None:
@@ -282,7 +307,7 @@ def _scrape_and_save(
     for record in records:
         page = _source_page(record)
         if page is None:
-            pending.append(merge_edibility(record, None) | NO_PAGE_DATA)
+            pending.append(merge_edibility(merge_taxonomy(record, {}), None) | NO_PAGE_DATA)
         else:
             records_by_page.setdefault(page, []).append(record)
 
@@ -326,9 +351,11 @@ def _scrape_and_save(
                     continue
                 data = parse_infobox(html, page.lang)
                 wikipedia_edibility = data.pop("wikipedia_edibility")
+                wikipedia_taxonomy = data.pop("wikipedia_taxonomy")
                 for record in records_by_page[page]:
                     names = parse_common_names(html, page.lang, record["genus"], record["species"])
-                    pending.append(merge_edibility(record, wikipedia_edibility) | data | names)
+                    merged = merge_taxonomy(record, wikipedia_taxonomy)
+                    pending.append(merge_edibility(merged, wikipedia_edibility) | data | names)
                 if len(pending) >= COMMIT_EVERY:
                     flush()
     except FirecrawlFatalError as e:
@@ -364,6 +391,7 @@ def parse_infobox(html: str, lang: str) -> dict:
             data[key] = ", ".join(values)
 
     taxonomy = _find_table(tables, taxonomy_header)
+    data["wikipedia_taxonomy"] = _parse_taxobox(taxonomy, lang) if taxonomy is not None else {}
     data["conservation_status"] = _conservation_status(tables, status_header)
     # Prefer the taxobox picture; fall back to any other infobox image, but not to
     # the icons of the morphology box.
@@ -374,6 +402,24 @@ def parse_infobox(html: str, lang: str) -> dict:
         (image for table in candidates if (image := _cover_image(table))), ""
     )
     return data
+
+
+def _parse_taxobox(table: Tag, lang: str) -> dict[str, str]:
+    """The ranks of the "Scientific classification" box, keyed by column; the ranks
+    it does not give are missing."""
+    labels = TAXOBOX_LABELS[lang]
+    taxonomy: dict[str, str] = {}
+    for tr in table.find_all("tr"):
+        # A rank is a label and a value, e.g. "Divisione | Basidiomycota".
+        cells = tr.find_all(["th", "td"])
+        if len(cells) != 2:
+            continue
+        column = labels.get(_text(cells[0]).rstrip(":"))
+        name = TAXON_NAME.match(_text(cells[1]))
+        # "Incertae sedis": the rank is not known.
+        if column and name and name.group() != "Incertae":
+            taxonomy.setdefault(column, name.group())
+    return taxonomy
 
 
 def edibility_level(value: str) -> int | None:
