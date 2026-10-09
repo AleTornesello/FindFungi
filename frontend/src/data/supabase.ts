@@ -4,7 +4,14 @@ const url = import.meta.env.VITE_SUPABASE_URL
 const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 if (!url || !anonKey) throw new Error("VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY must be set (see .env)")
 
-/** The app has no accounts: the client only calls edge functions with the anon key. */
+/**
+ * Signing in is optional: without a session the client calls edge functions with the anon key.
+ * PKCE, because Google and the confirmation emails send users back to the app with a ?code=
+ * that the client exchanges for a session on load.
+ */
 export const supabase = createClient(url, anonKey, {
-  auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  auth: { flowType: "pkce", persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
 })
+
+/** Where Google and the confirmation emails send users back to; it must be in Supabase's redirect URLs. */
+export const AUTH_REDIRECT_URL = window.location.origin + import.meta.env.BASE_URL

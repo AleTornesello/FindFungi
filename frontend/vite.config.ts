@@ -3,7 +3,21 @@ import { dirname, resolve } from 'node:path'
 import react from '@vitejs/plugin-react'
 import { defineConfig, loadEnv, type Plugin, type ResolvedConfig } from 'vite'
 import { en, type MessageKey } from './src/i18n/locales/en.ts'
-import { absoluteUrl, disclaimerMeta, fill, findsMeta, homeMeta, metaHtml, notFoundMeta, SITE_NAME, speciesMeta, type PageMeta } from './src/seo.ts'
+import {
+  absoluteUrl,
+  disclaimerMeta,
+  fill,
+  findsMeta,
+  homeMeta,
+  loginMeta,
+  metaHtml,
+  notFoundMeta,
+  privacyMeta,
+  SITE_NAME,
+  speciesMeta,
+  termsMeta,
+  type PageMeta,
+} from './src/seo.ts'
 
 /** The dataset the app loads, from the export-mushrooms edge function (see src/hooks/useMushrooms.tsx). */
 async function fetchDataset(env: Record<string, string>): Promise<unknown> {
@@ -58,8 +72,8 @@ function seoPages(): Plugin {
       }
 
       const { mushrooms } = (await fetchDataset(env)) as { mushrooms: Parameters<typeof speciesMeta>[0][] }
-      const indexed = [homeMeta(t), findsMeta(t), disclaimerMeta(t), ...mushrooms.map((m) => speciesMeta(m, t))]
-      for (const meta of indexed.slice(1)) await write(`${meta.path.slice(1)}.html`, page(meta))
+      const indexed = [homeMeta(t), findsMeta(t), disclaimerMeta(t), termsMeta(t), privacyMeta(t), ...mushrooms.map((m) => speciesMeta(m, t))]
+      for (const meta of [...indexed.slice(1), loginMeta(t)]) await write(`${meta.path.slice(1)}.html`, page(meta))
       // Unknown paths still load the app (species added since this build show up there), but stay out of search.
       await write('404.html', page(notFoundMeta(t, '/404')))
 

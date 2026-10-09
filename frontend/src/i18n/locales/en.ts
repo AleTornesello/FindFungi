@@ -169,6 +169,38 @@ export const en = {
   "finds.share.kept": "Finds you have already shared stay shared, even if you turn this off. It only stops sharing new ones.",
   "finds.shared": "Shared anonymously",
 
+  "account.signIn": "Sign in",
+  "account.signOut": "Sign out",
+  "account.label": "Account",
+
+  "login.title": "Sign in",
+  "login.signUpTitle": "Create an account",
+  "login.subtitle": "Use your Google account or an email and password.",
+  "login.google": "Continue with Google",
+  "login.or": "or",
+  "login.email": "Email",
+  "login.password": "Password",
+  "login.passwordHint": "At least {min} characters.",
+  "login.submit": "Sign in",
+  "login.signUpSubmit": "Create account",
+  "login.noAccount": "No account yet?",
+  "login.toSignUp": "Create one",
+  "login.haveAccount": "Already have an account?",
+  "login.toSignIn": "Sign in",
+  "login.agree": "By continuing you agree to the {terms} and the {privacy}.",
+  "login.confirm.title": "Check your email",
+  "login.confirm.body": "We sent a confirmation link to {email}. Open it to finish creating your account.",
+  "login.confirm.back": "Back to sign in",
+  "login.error.invalidCredentials": "Wrong email or password.",
+  "login.error.emailNotConfirmed": "Confirm your email first: open the link we sent you.",
+  "login.error.userExists": "An account with this email already exists. Sign in instead.",
+  "login.error.weakPassword": "This password is too weak. Choose a longer one.",
+  "login.error.rateLimit": "Too many attempts. Wait a few minutes and try again.",
+  "login.error.generic": "Something went wrong. Try again.",
+
+  "terms.title": "Terms of Service",
+  "privacy.title": "Privacy Policy",
+
   "notFound.title": "This page isn't here",
   "notFound.body": "The link may be old or mistyped.",
   "notFound.cta": "Browse species",
@@ -179,6 +211,9 @@ export const en = {
   "seo.speciesDescription": "{name} ({family}), {edibility}: identification, classification and similar species in the FindFungi guide to Italian mushrooms.",
   "seo.disclaimerDescription": "FindFungi information is unverified and for education only. Never use it to decide whether a mushroom is edible: always consult a qualified mycologist.",
   "seo.speciesDescriptionNoFamily": "{name}, {edibility}: identification, classification and similar species in the FindFungi guide to Italian mushrooms.",
+  "seo.termsDescription": "The terms that govern your use of FindFungi.",
+  "seo.privacyDescription": "How FindFungi collects, uses and protects your personal data.",
+  "seo.loginDescription": "Sign in to FindFungi with Google or with your email and password.",
 }
 
 export type MessageKey = keyof typeof en
