@@ -69,14 +69,27 @@ export function parseReport(body: unknown): Report | "spam" | undefined {
   };
 }
 
-/** The sender's IP: the first address in x-forwarded-for, which the Supabase gateway sets. */
+/**
+ * The sender's IP. Cloudflare, in front of Supabase, sets cf-connecting-ip from the connection
+ * itself, while proxies append to an x-forwarded-for the client may have forged: its first
+ * address is only a fallback.
+ */
 export function clientIp(headers: Headers): string | null {
-  const first = headers.get("x-forwarded-for")?.split(",")[0].trim();
-  return first || null;
+  const ip = headers.get("cf-connecting-ip")?.trim() || headers.get("x-forwarded-for")?.split(",")[0].trim();
+  return ip || null;
 }
 
 /** Hex SHA-256 of the salt and the IP: the same sender always gets the same hash, but it can't be reversed without the salt. */
 export async function hashIp(salt: string, ip: string): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(salt + ip));
   return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+/** The `ip_hash` of senders whose IP can't be read: they share one bucket, so leaving it out doesn't lift the limit. */
+export const UNKNOWN_IP = "unknown";
+
+/** The `ip_hash` the sender of a request is counted under. */
+export async function senderIpHash(salt: string, headers: Headers): Promise<string> {
+  const ip = clientIp(headers);
+  return ip ? await hashIp(salt, ip) : UNKNOWN_IP;
 }

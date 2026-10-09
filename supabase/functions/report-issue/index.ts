@@ -12,7 +12,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.117.2";
 import postgres from "npm:postgres@3.4.7";
-import { clientIp, hashIp, parseReport, type Report } from "./report.ts";
+import { parseReport, senderIpHash, type Report } from "./report.ts";
 
 // The app calls the function from the browser, on another origin.
 const CORS_HEADERS = {
@@ -71,8 +71,7 @@ Deno.serve(async (req) => {
     return Response.json({ error: "Invalid session" }, { status: 401, headers: CORS_HEADERS });
   }
 
-  const ip = clientIp(req.headers);
-  const ipHash = ip ? await hashIp(IP_SALT, ip) : null;
+  const ipHash = await senderIpHash(IP_SALT, req.headers);
   // Signed-in users are counted by account, anyone else by IP.
   const sender = userId ? sql`user_id = ${userId}::uuid` : sql`ip_hash = ${ipHash}`;
   const limit = userId ? USER_LIMIT : ANONYMOUS_LIMIT;

@@ -1,5 +1,5 @@
 import { assertEquals, assertMatch, assertNotEquals } from "jsr:@std/assert@1";
-import { clientIp, hashIp, parseReport } from "./report.ts";
+import { clientIp, hashIp, parseReport, senderIpHash, UNKNOWN_IP } from "./report.ts";
 
 const valid = {
   mushroomId: 12,
@@ -81,6 +81,21 @@ Deno.test("the client IP is the first x-forwarded-for entry, trimmed", () => {
 Deno.test("no x-forwarded-for, or an empty one, means no IP", () => {
   assertEquals(clientIp(new Headers()), null);
   assertEquals(clientIp(new Headers({ "x-forwarded-for": " , 10.0.0.1" })), null);
+});
+
+Deno.test("cf-connecting-ip, set by Cloudflare, wins over a forged x-forwarded-for", () => {
+  const headers = new Headers({ "cf-connecting-ip": "203.0.113.7", "x-forwarded-for": "6.6.6.6, 203.0.113.7" });
+  assertEquals(clientIp(headers), "203.0.113.7");
+  assertEquals(clientIp(new Headers({ "cf-connecting-ip": " ", "x-forwarded-for": "203.0.113.7" })), "203.0.113.7");
+});
+
+Deno.test("senders without a usable IP share one bucket instead of escaping the limit", async () => {
+  assertEquals(await senderIpHash("salt", new Headers()), UNKNOWN_IP);
+  assertEquals(await senderIpHash("salt", new Headers({ "x-forwarded-for": " , 10.0.0.1" })), UNKNOWN_IP);
+  assertEquals(
+    await senderIpHash("salt", new Headers({ "x-forwarded-for": "203.0.113.7" })),
+    await hashIp("salt", "203.0.113.7"),
+  );
 });
 
 Deno.test("IP hashes are hex SHA-256, stable, and depend on the salt", async () => {

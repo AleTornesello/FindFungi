@@ -222,13 +222,21 @@ function ReportForm({ mushroom, onClose }: Omit<Props, "open">) {
             />
           </Field.Root>
 
-          {/* Hidden from people and screen readers: only bots fill it in, and their reports are dropped. */}
+          {/*
+            Hidden from people and screen readers: only bots fill it in, and their reports are dropped.
+            A name no autofill recognizes, and the opt-outs of the common password managers, so a
+            person's report is never dropped because their browser filled the field in.
+          */}
           <Box position="absolute" left="-10000px" top="0" w="1px" h="1px" overflow="hidden" aria-hidden>
             <input
               type="text"
-              name="website"
+              name="hp_check"
               tabIndex={-1}
               autoComplete="off"
+              data-1p-ignore=""
+              data-lpignore="true"
+              data-bwignore=""
+              data-form-type="other"
               value={website}
               onChange={(e) => setWebsite(e.target.value)}
             />

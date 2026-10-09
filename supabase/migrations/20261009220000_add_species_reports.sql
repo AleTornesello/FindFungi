@@ -31,7 +31,8 @@ CREATE TABLE species_reports (
     locale           text NOT NULL CHECK (locale IN ('it', 'en')),
     -- Null for anonymous reports; set to null too if the account is deleted.
     user_id          uuid REFERENCES auth.users (id) ON DELETE SET NULL,
-    -- Hex SHA-256 of a secret salt and the sender's IP, to rate-limit anonymous senders.
+    -- Hex SHA-256 of a secret salt and the sender's IP, to rate-limit anonymous senders;
+    -- 'unknown' for the senders whose IP can't be read, who share one limit.
     ip_hash          text,
     status           report_status NOT NULL DEFAULT 'open',
     review_note      text,
