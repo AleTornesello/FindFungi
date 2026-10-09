@@ -89,6 +89,8 @@ export function SpeciesCombobox({
       onValueChange={(e) => onChange(e.items[0])}
       onInputValueChange={(e) => setQuery(e.inputValue)}
       openOnClick
+      // Larger on phones, where the form is filled in with a thumb out in the woods.
+      size={{ base: "lg", md: "md" }}
       // Keyboard navigation can highlight a row that isn't rendered yet; scroll it into existence first.
       scrollToIndexFn={({ index }) => {
         flushSync(() => virtualizer.scrollToIndex(index, { align: "auto" }))

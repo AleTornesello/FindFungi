@@ -12,8 +12,16 @@ export interface Find {
   notes: string
   /** Where the user stood when logging the find, if they shared it and allowed geolocation. */
   position?: Position
-  /** Set once the find has been stored anonymously in Supabase. */
+  /** Set once the find has been stored in Supabase: anonymously, or with `userId`. */
   shared?: boolean
+  /** Set while the find waits to be stored in Supabase, for example while the phone is offline in the woods. */
+  pending?: boolean
+  /** The signed-in user who logged the find; it is stored with their id, and uploaded only while they are signed in. */
+  userId?: string
+  /** The find has a photo in this browser (see data/findPhotos). */
+  hasPhoto?: boolean
+  /** Where the photo was uploaded in the find-photos bucket, for signed-in users. */
+  photoPath?: string
 }
 
 const KEY = "findfungi:finds"

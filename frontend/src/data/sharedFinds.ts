@@ -1,4 +1,4 @@
-import { supabase } from "./supabase"
+import { anonKey, supabase } from "./supabase"
 
 export interface Position {
   latitude: number
@@ -12,6 +12,8 @@ export interface SharedFind {
   scientificName: string
   date: string
   position?: Position
+  /** The find's photo in the find-photos bucket; only signed-in users upload photos. */
+  photoPath?: string
 }
 
 const KEY = "findfungi:shareFinds"
@@ -52,10 +54,18 @@ export function currentPosition(): Promise<Position | undefined> {
 /** Supabase edge function that stores a shared find (supabase/functions/share-find). */
 const SHARE_FUNCTION = "share-find"
 
-/** Stores the find anonymously: no place, notes or anything that ties it to this browser. */
-export async function shareFind({ mushroomId, scientificName, date, position }: SharedFind) {
+/**
+ * Stores the find: never the place, notes or anything else that ties it to this browser. Supabase
+ * sends the session token when a user is signed in, and the edge function saves their user id with
+ * the find; `anonymous` sends the anon key instead, for finds logged while signed out.
+ */
+export async function shareFind(
+  { mushroomId, scientificName, date, position, photoPath }: SharedFind,
+  { anonymous }: { anonymous: boolean },
+) {
   const { error } = await supabase.functions.invoke(SHARE_FUNCTION, {
-    body: { mushroomId, scientificName, date, position },
+    body: { mushroomId, scientificName, date, position, photoPath },
+    headers: anonymous ? { Authorization: `Bearer ${anonKey}` } : undefined,
   })
   if (error) throw error
 }
