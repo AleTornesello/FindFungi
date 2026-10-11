@@ -12,7 +12,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.117.2";
 import postgres from "npm:postgres@3.4.7";
-import { parseReport, senderIpHash, type Report } from "./report.ts";
+import { isAnonKey, parseReport, senderIpHash, type Report } from "./report.ts";
 
 // The app calls the function from the browser, on another origin.
 const CORS_HEADERS = {
@@ -40,7 +40,7 @@ const USER_LIMIT = 30;
  */
 async function requestUser(req: Request): Promise<string | null | undefined> {
   const token = req.headers.get("Authorization")?.replace(/^Bearer /, "");
-  if (!token || token === ANON_KEY) return null;
+  if (!token || token === ANON_KEY || isAnonKey(token)) return null;
   const { data, error } = await supabase.auth.getClaims(token);
   if (error || !data) return undefined;
   return data.claims.role === "authenticated" ? data.claims.sub : null;
