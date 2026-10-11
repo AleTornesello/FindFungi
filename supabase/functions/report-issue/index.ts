@@ -12,7 +12,8 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.117.2";
 import postgres from "npm:postgres@3.4.7";
-import { isAnonKey, parseReport, senderIpHash, type Report } from "./report.ts";
+import { isAnonKey } from "../_shared/anon_key.ts";
+import { parseReport, senderIpHash, type Report } from "./report.ts";
 
 // The app calls the function from the browser, on another origin.
 const CORS_HEADERS = {
