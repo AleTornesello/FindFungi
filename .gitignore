@@ -1,1 +1,11 @@
 ﻿.playwright-mcp
+
+
+
+.mypy_cache/
+.venv/
+__pycache__/
+
+/data/
+!/data/mushrooms.json
+/.cache/

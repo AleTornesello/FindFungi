@@ -1,6 +1,6 @@
-"""Stage 5: translate the mushrooms characteristics to a common English vocabulary.
+"""Stage 6: translate the mushrooms characteristics to a common English vocabulary.
 
-Stage 4 fills these columns from the Italian page when there is one, so they mix
+Stage 5 fills these columns from the Italian page when there is one, so they mix
 Italian ("convesso") and English ("convex") values. Each column has a dictionary
 from every known value (lowercase) to its lowercase English form; English values
 map to themselves, so the stage can run again safely. Compound values such as

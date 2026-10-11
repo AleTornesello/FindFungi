@@ -1,11 +1,13 @@
 import { Box, Button, Link as ChakraLink, Container, Flex, HStack, Image, Menu, Portal, Text } from "@chakra-ui/react"
 import { Link, NavLink, Outlet } from "react-router"
-import { BookOpen, Check, Coffee, Globe, Heart, Languages, Mail, NotebookPen, type LucideIcon } from "lucide-react"
+import { BookOpen, Check, CircleUserRound, Coffee, Globe, Heart, Languages, LogIn, LogOut, Mail, NotebookPen, type LucideIcon } from "lucide-react"
 import { useI18n } from "../i18n/I18nProvider"
 import type { MessageKey } from "../i18n/locales/en"
 import { isLocale, LOCALES } from "../i18n/locales"
 import { SafetyNoticeDialog } from "./SafetyNoticeDialog"
 import { AUTHOR_EMAIL, AUTHOR_NAME } from "../data/author"
+import { supabase } from "../data/supabase"
+import { useAuth } from "../hooks/useAuth"
 
 const NAV: { to: string; label: MessageKey; icon: LucideIcon }[] = [
   { to: "/", label: "nav.species", icon: BookOpen },
@@ -43,6 +45,7 @@ export function Layout() {
                 ))}
               </HStack>
               <LanguageMenu />
+              <AccountButton />
             </HStack>
           </Flex>
         </Container>
@@ -63,6 +66,18 @@ export function Layout() {
           </Text>
           <SupportNote />
           <AuthorCredit />
+          <HStack as="ul" mt="3" gap="4" listStyleType="none" fontSize="sm" color="fg.muted">
+            <li>
+              <ChakraLink asChild color="fg.muted" _hover={{ color: "fg" }}>
+                <Link to="/terms">{t("terms.title")}</Link>
+              </ChakraLink>
+            </li>
+            <li>
+              <ChakraLink asChild color="fg.muted" _hover={{ color: "fg" }}>
+                <Link to="/privacy">{t("privacy.title")}</Link>
+              </ChakraLink>
+            </li>
+          </HStack>
         </Container>
       </Box>
 
@@ -197,6 +212,58 @@ function BottomNav() {
         ))}
       </Flex>
     </Box>
+  )
+}
+
+/** "Sign in" when signed out; otherwise a menu with the account's email and a way to sign out. */
+function AccountButton() {
+  const { t } = useI18n()
+  const { user, ready } = useAuth()
+  // Avoids flashing "Sign in" to a signed-in user while the session loads.
+  if (!ready) return null
+
+  if (!user)
+    return (
+      <Button asChild size="sm" borderRadius="full" bg="lichen.400" color="soil.900" _hover={{ bg: "lichen.300" }}>
+        <Link to="/login">
+          <LogIn aria-hidden />
+          {t("account.signIn")}
+        </Link>
+      </Button>
+    )
+
+  return (
+    <Menu.Root positioning={{ placement: "bottom-end" }}>
+      <Menu.Trigger asChild>
+        <Button
+          size="sm"
+          variant="ghost"
+          borderRadius="full"
+          color="soil.100"
+          _hover={{ bg: "soil.800" }}
+          _expanded={{ bg: "soil.800" }}
+          aria-label={t("account.label")}
+        >
+          <CircleUserRound aria-hidden />
+        </Button>
+      </Menu.Trigger>
+      <Portal>
+        <Menu.Positioner>
+          <Menu.Content minW="48">
+            <Menu.ItemGroup>
+              <Menu.ItemGroupLabel fontWeight="400" color="fg.muted" truncate maxW="64">
+                {user.email}
+              </Menu.ItemGroupLabel>
+            </Menu.ItemGroup>
+            <Menu.Separator />
+            <Menu.Item value="sign-out" onSelect={() => void supabase.auth.signOut()}>
+              <LogOut aria-hidden />
+              {t("account.signOut")}
+            </Menu.Item>
+          </Menu.Content>
+        </Menu.Positioner>
+      </Portal>
+    </Menu.Root>
   )
 }
 

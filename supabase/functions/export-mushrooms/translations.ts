@@ -35,7 +35,7 @@ export const LANGUAGES: Record<string, Language> = {
       and: (a, b) => `${a} e ${b}`,
       to: (a, b) => `da ${a} a ${b}`,
     },
-    // Mostly the terms of it.wikipedia's Template:Fungo (see stage 5).
+    // Mostly the terms of it.wikipedia's Template:Fungo (see stage 6).
     terms: {
       cap: {
         "acute conical": "conico-acuto",

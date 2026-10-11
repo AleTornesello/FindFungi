@@ -1,4 +1,4 @@
-"""Stage 3: for every record in `funghi_italiani`, look up a "<genus> <species>"
+"""Stage 4: for every record in `funghi_italiani`, look up a "<genus> <species>"
 page on the Italian and English Wikipedia and store the result in
 `wikipedia_pages`.
 

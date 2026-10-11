@@ -1,7 +1,7 @@
-import { useEffect, useMemo, type ReactNode } from "react"
+import { useEffect, useMemo, useState, type ReactNode } from "react"
 import { Badge, Box, Button, Container, Flex, Grid, Heading, HStack, Link, SimpleGrid, Spinner, Stack, Text } from "@chakra-ui/react"
 import { Link as RouterLink, useLocation, useNavigate, useParams } from "react-router"
-import { ArrowLeft, ChevronRight, ExternalLink, Microscope, ShieldAlert, Skull, TriangleAlert, Utensils, type LucideIcon } from "lucide-react"
+import { ArrowLeft, ChevronRight, ExternalLink, Flag, Microscope, ShieldAlert, Skull, TriangleAlert, Utensils, type LucideIcon } from "lucide-react"
 import { commonName, scientificName, type Mushroom } from "../data/mushrooms"
 import { isThreatened } from "../data/conservation"
 import { hasTraitDrawing, TraitIcon } from "../components/TraitIcon"
@@ -10,6 +10,7 @@ import { MushroomCard } from "../components/MushroomCard"
 import { EdibilityBadge } from "../components/EdibilityBadge"
 import { MushroomPhoto } from "../components/MushroomPhoto"
 import { PhotoGallery } from "../components/PhotoGallery"
+import { ReportIssueDialog } from "../components/ReportIssueDialog"
 import { SporePrintSwatch } from "../components/SporePrintSwatch"
 import { useMushrooms, useValueLabel } from "../hooks/useMushrooms"
 import { useI18n } from "../i18n/I18nProvider"
@@ -114,6 +115,7 @@ export function MushroomDetailPage() {
           <Classification mushroom={mushroom} />
           <Sightings mushroom={mushroom} />
           <LearnMore mushroom={mushroom} />
+          <ReportIssue mushroom={mushroom} />
         </Stack>
       </Grid>
 
@@ -548,6 +550,21 @@ function LearnMore({ mushroom }: { mushroom: Mushroom }) {
         <ExternalLink size={14} aria-hidden />
       </Link>
     </Section>
+  )
+}
+
+/** Opens the form to report missing or wrong information on this page. */
+function ReportIssue({ mushroom }: { mushroom: Mushroom }) {
+  const { t } = useI18n()
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <Button variant="outline" borderRadius="full" size="sm" alignSelf="flex-start" onClick={() => setOpen(true)}>
+        <Flag size={16} aria-hidden />
+        {t("report.open")}
+      </Button>
+      <ReportIssueDialog mushroom={mushroom} open={open} onClose={() => setOpen(false)} />
+    </>
   )
 }
 

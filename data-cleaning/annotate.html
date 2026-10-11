@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Image annotator</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #19221e;
+      background: #f3f5f2;
+      --micro-color: #0072b2;
+      --macro-color: #a84300;
+      --not-mushroom-color: #59636e;
+      --pred-micro-color: #009e73;
+      --pred-macro-color: #9b4f7d;
+      --pred-unknown-color: #59636e;
+      font-synthesis: none;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .topbar {
+      position: sticky; top: 0; z-index: 2;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 14px 22px; background: #fff; border-bottom: 1px solid #dfe5df;
+    }
+    h1 { margin: 0; font-size: 18px; letter-spacing: -.02em; }
+    .top-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .button {
+      border: 1px solid #cbd4cd; border-radius: 8px; background: white;
+      padding: 8px 12px; color: #26332b; font-weight: 600;
+    }
+    .button:hover { background: #f2f6f2; }
+    .button.primary { color: #fff; background: #236749; border-color: #236749; }
+    .button.primary:hover { background: #19583d; }
+    .button:disabled { opacity: .45; cursor: default; }
+    .toolbar {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+      padding: 12px 22px; background: #fbfcfa; border-bottom: 1px solid #dfe5df;
+    }
+    .toolbar input[type="search"] {
+      width: min(320px, 100%); padding: 9px 11px; border: 1px solid #cbd4cd; border-radius: 8px;
+      background: white;
+    }
+    .toolbar select { padding: 9px 11px; border: 1px solid #cbd4cd; border-radius: 8px; background: white; }
+    .top-actions input[type="file"] { display: none; }
+    .summary { margin-left: auto; color: #536158; font-size: 13px; }
+    .selection-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .overlay-toggle { display: inline-flex; align-items: center; gap: 7px; color: #536158; font-size: 13px; white-space: nowrap; }
+    .overlay-toggle input { accent-color: #236749; }
+    .hide-class-overlays .thumb-frame::after { background: transparent !important; }
+    main { padding: 18px 22px 28px; }
+    .grid-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; color: #657168; font-size: 13px; }
+    #image-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 12px; }
+    .image-card { min-width: 0; overflow: hidden; border: 1px solid #dce3dc; border-radius: 10px; background: white; cursor: pointer; }
+    .image-card:hover { border-color: #9cb8a5; box-shadow: 0 2px 8px #15291d12; }
+    .image-card.selected { border: 2px solid #236749; background: #f0f7f2; }
+    .thumb-frame { position: relative; display: block; aspect-ratio: 4 / 3; overflow: hidden; background: #e8ece8; }
+    .thumb-frame img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .image-card.annotated-micro { --manual-overlay: rgb(0 114 178 / 30%); }
+    .image-card.annotated-macroscopic { --manual-overlay: rgb(168 67 0 / 30%); }
+    .image-card.annotated-not-mushroom { --manual-overlay: rgb(89 99 110 / 34%); }
+    .image-card.predicted-micro { --prediction-overlay: rgb(0 158 115 / 32%); }
+    .image-card.predicted-macroscopic { --prediction-overlay: rgb(155 79 125 / 32%); }
+    .image-card.predicted-unknown { --prediction-overlay: rgb(89 99 110 / 34%); }
+    .image-card.predicted-not-mushroom { --prediction-overlay: rgb(193 145 0 / 36%); }
+    .thumb-frame::after { position: absolute; inset: 0; content: ""; pointer-events: none; }
+    .image-card[class*="predicted-"] .thumb-frame::after {
+      background: linear-gradient(to bottom, var(--prediction-overlay) 0 50%, var(--manual-overlay, var(--prediction-overlay)) 50% 100%);
+    }
+    .image-card[class*="annotated-"]:not([class*="predicted-"]) .thumb-frame::after { background: var(--manual-overlay); }
+    .image-card input { position: absolute; z-index: 1; top: 9px; left: 9px; width: 20px; height: 20px; accent-color: #236749; cursor: pointer; }
+    .fullscreen-button { position: absolute; z-index: 2; top: 7px; right: 7px; display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 1px solid #ffffffa8; border-radius: 7px; color: white; background: #142019b8; cursor: zoom-in; }
+    .fullscreen-button:hover { background: #142019ed; }
+    .fullscreen-button svg { width: 16px; height: 16px; }
+    .class-badge { position: absolute; z-index: 1; right: 8px; bottom: 8px; padding: 5px 7px; border-radius: 5px; color: white; font-size: 10px; font-weight: 800; letter-spacing: .02em; }
+    .image-card.annotated-micro .class-badge { background: var(--micro-color); }
+    .image-card.annotated-macroscopic .class-badge { background: var(--macro-color); }
+    .image-card.annotated-not-mushroom .class-badge { background: var(--not-mushroom-color); }
+    .prediction-badge { position: absolute; z-index: 1; top: 44px; right: 8px; max-width: calc(100% - 16px); overflow: hidden; padding: 5px 7px; border-radius: 5px; color: white; font-size: 9px; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+    .image-card.predicted-micro .prediction-badge { background: #006b4e; }
+    .image-card.predicted-macroscopic .prediction-badge { background: #753758; }
+    .image-card.predicted-unknown .prediction-badge { background: #424b54; }
+    .image-card.predicted-not-mushroom .prediction-badge { background: #765800; }
+    .card-caption { display: block; padding: 9px 10px 10px; }
+    .card-name { display: block; overflow: hidden; color: #26332b; font-size: 12px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+    .card-id { display: block; margin-top: 4px; color: #738078; font-size: 11px; }
+    .empty { grid-column: 1 / -1; padding: 54px 18px; color: #637067; text-align: center; line-height: 1.55; }
+    .empty strong { display: block; margin-bottom: 7px; color: #26332b; font-size: 17px; }
+    .class-action { display: inline-flex; align-items: center; gap: 8px; }
+    .class-action.micro-action { color: #00517f; border-color: #9cc9e2; background: #f2f9fd; }
+    .class-action.macro-action { color: #8b3800; border-color: #e5b99c; background: #fff7f1; }
+    .class-action.not-mushroom-action { color: #424b54; border-color: #c6cdd3; background: #f3f5f7; }
+    .color-swatch { width: 12px; height: 12px; flex: 0 0 12px; border-radius: 3px; }
+    .micro-action .color-swatch { background: var(--micro-color); }
+    .macro-action .color-swatch { background: var(--macro-color); }
+    .not-mushroom-action .color-swatch { background: var(--not-mushroom-color); }
+    #preview-dialog { width: 100vw; max-width: none; height: 100vh; height: 100dvh; max-height: none; margin: 0; padding: 14px; border: 0; color: white; background: #111; }
+    #preview-dialog::backdrop { background: rgb(0 0 0 / 94%); }
+    .preview-shell { display: grid; grid-template-rows: auto minmax(0, 1fr); width: 100%; height: 100%; }
+    .preview-topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 12px; }
+    #preview-caption { overflow: hidden; color: #e8eee9; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+    #preview-image { display: block; width: 100%; height: 100%; min-height: 0; object-fit: contain; }
+    #close-preview { min-width: 42px; min-height: 38px; color: white; background: #343a36; border-color: #657168; }
+    .pagination { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 20px; }
+    #page-status { min-width: 100px; color: #59665d; text-align: center; font-size: 13px; }
+    .notice { padding: 9px 22px; color: #526057; background: #eef4ef; border-bottom: 1px solid #dfe5df; font-size: 13px; }
+    .notice.error { color: #8a302a; background: #fff0ee; }
+    @media (max-width: 760px) {
+      .topbar { align-items: flex-start; flex-direction: column; }
+      main { padding: 14px; }
+      #image-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 9px; }
+      .summary { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <h1>Image annotator</h1>
+    <div class="top-actions">
+      <button class="button primary" id="choose-folder">Choose images folder</button>
+      <button class="button" id="import-button">Import CSV</button>
+      <button class="button" id="import-predictions-button">Import predictions</button>
+      <button class="button" id="export-button" disabled>Save CSV</button>
+      <input id="folder-input" type="file" accept="image/*" webkitdirectory directory multiple hidden>
+      <input id="import-input" type="file" accept="text/csv,.csv,text/plain" hidden>
+      <input id="predictions-input" type="file" accept="text/csv,.csv,text/plain" hidden>
+    </div>
+  </header>
+  <div class="notice" id="notice">Choose <code>../data/images</code> to load the images. Labeled images are hidden by default. Select thumbnails and apply a label to the batch; Shift-click selects a range.</div>
+  <section class="toolbar" aria-label="Image filters">
+    <input id="search" type="search" placeholder="Search ID or filename" disabled>
+    <select id="label-filter" disabled aria-label="Filter by manual label">
+      <option value="unlabeled" selected>Label: Unlabeled</option>
+      <option value="all">Label: Any</option>
+      <option value="micro">Label: Microscopic</option>
+      <option value="macroscopic">Label: Macroscopic</option>
+      <option value="not-mushroom">Label: Not a mushroom</option>
+    </select>
+    <select id="prediction-filter" disabled aria-label="Filter by prediction">
+      <option value="all" selected>Prediction: Any</option>
+      <option value="none">Prediction: None</option>
+      <option value="micro">Prediction: Microscopic</option>
+      <option value="macroscopic">Prediction: Macroscopic</option>
+      <option value="unknown">Prediction: Unknown</option>
+      <option value="not-mushroom">Prediction: Not a mushroom</option>
+    </select>
+    <select id="image-order" aria-label="Image order" disabled>
+      <option value="shuffle">Shuffled (seed 42)</option>
+      <option value="confidence-desc">Confidence: high to low</option>
+      <option value="confidence-asc">Confidence: low to high</option>
+    </select>
+    <label class="overlay-toggle"><input id="overlay-toggle" type="checkbox" checked>Show class color overlays</label>
+    <div class="selection-tools">
+      <button class="button" id="select-page-button" disabled>Select page</button>
+      <button class="button" id="clear-selection-button" disabled>Clear selection</button>
+      <button class="button class-action micro-action" id="apply-micro-button" disabled><span class="color-swatch" aria-hidden="true"></span>Microscopic</button>
+      <button class="button class-action macro-action" id="apply-macroscopic-button" disabled><span class="color-swatch" aria-hidden="true"></span>Macroscopic</button>
+      <button class="button class-action not-mushroom-action" id="apply-not-mushroom-button" disabled><span class="color-swatch" aria-hidden="true"></span>Not a mushroom</button>
+    </div>
+    <span class="summary" id="summary">No images loaded</span>
+  </section>
+  <main>
+    <div class="grid-heading"><span>Choose images to annotate</span><span id="list-count">0 images</span></div>
+    <div id="image-grid" aria-live="polite"></div>
+    <div class="pagination">
+      <button class="button" id="previous-page" disabled>← Previous</button>
+      <span id="page-status">Page 0 of 0</span>
+      <button class="button" id="next-page" disabled>Next →</button>
+    </div>
+  </main>
+  <dialog id="preview-dialog" aria-label="Image preview">
+    <div class="preview-shell">
+      <div class="preview-topbar">
+        <span id="preview-caption"></span>
+        <button class="button" id="close-preview" aria-label="Close full screen preview">Close</button>
+      </div>
+      <img id="preview-image" alt="Full screen image preview">
+    </div>
+  </dialog>
+  <script>
+    (() => {
+      const STORAGE_KEY = 'find-fungi-image-labels-v2';
+      const LEGACY_STORAGE_KEY = 'find-fungi-image-labels-v1';
+      const folderInput = document.querySelector('#folder-input');
+      const importInput = document.querySelector('#import-input');
+      const predictionsInput = document.querySelector('#predictions-input');
+      const imageGrid = document.querySelector('#image-grid');
+      const previewDialog = document.querySelector('#preview-dialog');
+      const previewImage = document.querySelector('#preview-image');
+      const previewCaption = document.querySelector('#preview-caption');
+      const closePreviewButton = document.querySelector('#close-preview');
+      const search = document.querySelector('#search');
+      const labelFilter = document.querySelector('#label-filter');
+      const predictionFilter = document.querySelector('#prediction-filter');
+      const imageOrder = document.querySelector('#image-order');
+      const overlayToggle = document.querySelector('#overlay-toggle');
+      const notice = document.querySelector('#notice');
+      const summary = document.querySelector('#summary');
+      const listCount = document.querySelector('#list-count');
+      const exportButton = document.querySelector('#export-button');
+      const applyMicroButton = document.querySelector('#apply-micro-button');
+      const applyMacroscopicButton = document.querySelector('#apply-macroscopic-button');
+      const applyNotMushroomButton = document.querySelector('#apply-not-mushroom-button');
+      const selectPageButton = document.querySelector('#select-page-button');
+      const clearSelectionButton = document.querySelector('#clear-selection-button');
+      const previousPageButton = document.querySelector('#previous-page');
+      const nextPageButton = document.querySelector('#next-page');
+      const pageStatus = document.querySelector('#page-status');
+      const PAGE_SIZE = 100;
+      const SHUFFLE_SEED = 42;
+      let images = [];
+      let pageIndex = 0;
+      let visibleIndices = [];
+      let selectedPaths = new Set();
+      let selectionAnchorIndex = null;
+      let pageObjectUrls = [];
+      let previewObjectUrl = null;
+      let labels = readStoredLabels();
+      let predictions = new Map();
+
+      overlayToggle.checked = true;
+
+      function readStoredLabels() {
+        try {
+          const value = JSON.parse(localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY) || '{}');
+          if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
+          return Object.fromEntries(Object.entries(value).flatMap(([path, label]) => {
+            if (label === 'micro' || label === 'microscopic') return [[path, 'micro']];
+            if (label === 'macroscopic' || label === 'not-microscopic') return [[path, 'macroscopic']];
+            if (label === 'not-mushroom' || label === 'not a mushroom') return [[path, 'not-mushroom']];
+            return [];
+          }));
+        } catch { return {}; }
+      }
+
+      function persistLabels() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(labels)); }
+        catch { setNotice('Browser storage is full or unavailable. Export labels to keep a copy.', true); }
+      }
+
+      function setNotice(message, isError = false) {
+        notice.textContent = message;
+        notice.classList.toggle('error', isError);
+      }
+
+      function relativeName(file) {
+        const parts = (file.webkitRelativePath || file.name).split('/').filter(Boolean);
+        // The browser includes the selected root directory in webkitRelativePath.
+        if (parts.length > 1) parts.shift();
+        return parts.join('/') || file.name;
+      }
+
+      function shuffleWithSeed(items, seed) {
+        let state = seed >>> 0;
+        const random = () => {
+          let value = state += 0x6D2B79F5;
+          value = Math.imul(value ^ (value >>> 15), value | 1);
+          value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+          return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+        };
+        for (let index = items.length - 1; index > 0; index--) {
+          const swapIndex = Math.floor(random() * (index + 1));
+          [items[index], items[swapIndex]] = [items[swapIndex], items[index]];
+        }
+        return items;
+      }
+
+      function revokePageUrls() {
+        pageObjectUrls.forEach(URL.revokeObjectURL);
+        pageObjectUrls = [];
+      }
+
+      function openPreview(image) {
+        if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
+        previewObjectUrl = URL.createObjectURL(image.file);
+        previewImage.src = previewObjectUrl;
+        previewCaption.textContent = `${image.id} / ${image.path.split('/').slice(1).join('/') || image.path}`;
+        previewDialog.showModal();
+      }
+
+      function releasePreview() {
+        previewImage.removeAttribute('src');
+        previewCaption.textContent = '';
+        if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
+        previewObjectUrl = null;
+      }
+
+      function loadFiles(fileList) {
+        revokePageUrls();
+        const supported = [...fileList].filter(file => file.type.startsWith('image/') || /\.(jpe?g|png|gif|webp|bmp|tiff?|avif|heic)$/i.test(file.name));
+        images = supported.map(file => {
+          const path = relativeName(file);
+          return { file, path, id: path.split('/')[0] || '(root)' };
+        }).sort((a, b) => a.path.localeCompare(b.path, undefined, { numeric: true, sensitivity: 'base' }));
+        shuffleWithSeed(images, SHUFFLE_SEED);
+        search.disabled = labelFilter.disabled = predictionFilter.disabled = exportButton.disabled = images.length === 0;
+        imageOrder.disabled = images.length === 0 || predictions.size === 0;
+        selectPageButton.disabled = images.length === 0;
+        selectedPaths.clear();
+        selectionAnchorIndex = null;
+        pageIndex = 0;
+        setNotice(images.length ? `Found ${images.length} images. Shuffled with fixed seed ${SHUFFLE_SEED}; showing ${PAGE_SIZE} thumbnails at a time.` : 'No image files found. Choose the images folder that contains your ID folders.', images.length === 0);
+        updateView();
+      }
+
+      function getVisibleIndices() {
+        const query = search.value.trim().toLocaleLowerCase();
+        const selectedLabelFilter = labelFilter.value;
+        const selectedPredictionFilter = predictionFilter.value;
+        const matches = [];
+        images.forEach((image, index) => {
+          const label = labels[image.path];
+          const prediction = predictions.get(image.path);
+          const matchesQuery = !query || `${image.id} ${image.path}`.toLocaleLowerCase().includes(query);
+          const matchesLabel = selectedLabelFilter === 'all'
+            || (selectedLabelFilter === 'unlabeled' && !label)
+            || label === selectedLabelFilter;
+          const matchesPrediction = selectedPredictionFilter === 'all'
+            || (selectedPredictionFilter === 'none' && !prediction)
+            || prediction?.label === selectedPredictionFilter;
+          if (matchesQuery && matchesLabel && matchesPrediction) matches.push(index);
+        });
+        if (imageOrder.value !== 'shuffle') {
+          const direction = imageOrder.value === 'confidence-asc' ? 1 : -1;
+          matches.sort((left, right) => {
+            const leftConfidence = predictions.get(images[left].path)?.confidence;
+            const rightConfidence = predictions.get(images[right].path)?.confidence;
+            if (leftConfidence == null && rightConfidence == null) return left - right;
+            if (leftConfidence == null) return 1;
+            if (rightConfidence == null) return -1;
+            return (leftConfidence - rightConfidence) * direction || left - right;
+          });
+        }
+        return matches;
+      }
+
+      function updateView() {
+        revokePageUrls();
+        visibleIndices = getVisibleIndices();
+        const pageCount = Math.ceil(visibleIndices.length / PAGE_SIZE);
+        pageIndex = Math.min(pageIndex, Math.max(0, pageCount - 1));
+        const pageStart = pageIndex * PAGE_SIZE;
+        const pageIndices = visibleIndices.slice(pageStart, pageStart + PAGE_SIZE);
+        imageGrid.replaceChildren();
+        listCount.textContent = `${visibleIndices.length.toLocaleString()} images`;
+
+        if (!images.length) {
+          const empty = document.createElement('div');
+          empty.className = 'empty';
+          empty.innerHTML = '<strong>Choose the images folder to begin</strong>Select <code>../data/images</code>, which contains one folder per ID.';
+          imageGrid.append(empty);
+        } else if (!pageIndices.length) {
+          const empty = document.createElement('div');
+          empty.className = 'empty';
+          empty.innerHTML = '<strong>No images match this view</strong>Try another filter or search term.';
+          imageGrid.append(empty);
+        }
+
+        for (const index of pageIndices) {
+          const image = images[index];
+          const card = document.createElement('div');
+          const label = labels[image.path];
+          const prediction = predictions.get(image.path);
+          const labelClass = label === 'micro' ? ' annotated-micro' : label === 'macroscopic' ? ' annotated-macroscopic' : label === 'not-mushroom' ? ' annotated-not-mushroom' : '';
+          const predictionClass = prediction ? ` predicted-${prediction.label}` : '';
+          card.className = `image-card${selectedPaths.has(image.path) ? ' selected' : ''}${labelClass}${predictionClass}`;
+          card.dataset.path = image.path;
+          const frame = document.createElement('span');
+          frame.className = 'thumb-frame';
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.checked = selectedPaths.has(image.path);
+          checkbox.setAttribute('aria-label', `Select image ${image.path}`);
+          card.addEventListener('click', event => {
+            if (event.target.closest('.fullscreen-button')) return;
+            if (!event.shiftKey) return;
+            event.preventDefault();
+            const anchorPosition = visibleIndices.indexOf(selectionAnchorIndex);
+            const targetPosition = visibleIndices.indexOf(index);
+            if (anchorPosition < 0 || targetPosition < 0) {
+              selectionAnchorIndex = index;
+              selectedPaths.add(image.path);
+            } else {
+              const first = Math.min(anchorPosition, targetPosition);
+              const last = Math.max(anchorPosition, targetPosition);
+              for (let position = first; position <= last; position++) {
+                selectedPaths.add(images[visibleIndices[position]].path);
+              }
+            }
+            imageGrid.querySelectorAll('.image-card').forEach(renderedCard => {
+              const checked = selectedPaths.has(renderedCard.dataset.path);
+              renderedCard.classList.toggle('selected', checked);
+              renderedCard.querySelector('input[type="checkbox"]').checked = checked;
+            });
+            updateSelectionTools();
+          }, true);
+          card.addEventListener('click', event => {
+            if (event.shiftKey || event.target.closest('.fullscreen-button') || event.target === checkbox) return;
+            checkbox.checked = !checkbox.checked;
+            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+          });
+          checkbox.addEventListener('change', () => {
+            if (checkbox.checked) selectedPaths.add(image.path);
+            else selectedPaths.delete(image.path);
+            selectionAnchorIndex = index;
+            card.classList.toggle('selected', checkbox.checked);
+            updateSelectionTools();
+          });
+          const thumb = document.createElement('img');
+          thumb.alt = '';
+          thumb.loading = 'lazy';
+          thumb.decoding = 'async';
+          thumb.src = URL.createObjectURL(image.file);
+          pageObjectUrls.push(thumb.src);
+          const fullscreenButton = document.createElement('button');
+          fullscreenButton.type = 'button';
+          fullscreenButton.className = 'fullscreen-button';
+          fullscreenButton.title = 'Open full screen';
+          fullscreenButton.setAttribute('aria-label', `Open ${image.path} full screen`);
+          fullscreenButton.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/></svg>';
+          fullscreenButton.addEventListener('click', event => {
+            event.preventDefault();
+            event.stopPropagation();
+            openPreview(image);
+          });
+          frame.append(checkbox, thumb, fullscreenButton);
+          if (prediction) {
+            const badge = document.createElement('span');
+            badge.className = 'prediction-badge';
+            const predictedName = prediction.label === 'micro' ? 'Microscopic'
+              : prediction.label === 'macroscopic' ? 'Macroscopic'
+              : prediction.label === 'unknown' ? 'Unknown' : 'Not a mushroom';
+            const confidence = prediction.confidence == null ? '' : ` · ${(prediction.confidence * 100).toFixed(1)}%`;
+            badge.textContent = `Predicted: ${predictedName}${confidence}`;
+            badge.title = badge.textContent;
+            frame.append(badge);
+          }
+          if (label) {
+            const badge = document.createElement('span');
+            badge.className = 'class-badge';
+            badge.textContent = label === 'micro' ? 'Microscopic' : label === 'macroscopic' ? 'Macroscopic' : 'Not a mushroom';
+            frame.append(badge);
+          }
+          const caption = document.createElement('span');
+          caption.className = 'card-caption';
+          const name = document.createElement('span');
+          name.className = 'card-name';
+          name.textContent = image.path.split('/').slice(1).join('/') || image.path;
+          name.title = image.path;
+          const id = document.createElement('span');
+          id.className = 'card-id';
+          id.textContent = `ID ${image.id}`;
+          caption.append(name, id);
+          card.append(frame, caption);
+          imageGrid.append(card);
+        }
+
+        previousPageButton.disabled = pageIndex <= 0;
+        nextPageButton.disabled = pageIndex >= pageCount - 1;
+        pageStatus.textContent = `Page ${pageCount ? pageIndex + 1 : 0} of ${pageCount}`;
+
+        const counts = images.reduce((total, image) => {
+          if (labels[image.path] === 'micro') total.micro++;
+          else if (labels[image.path] === 'macroscopic') total.macro++;
+          else if (labels[image.path] === 'not-mushroom') total.notMushroom++;
+          return total;
+        }, { micro: 0, macro: 0, notMushroom: 0 });
+        summary.textContent = images.length
+          ? `${images.length.toLocaleString()} total · ${predictions.size.toLocaleString()} predictions · ${counts.micro} microscopic · ${counts.macro} macroscopic · ${counts.notMushroom} not a mushroom · ${images.length - counts.micro - counts.macro - counts.notMushroom} unlabeled`
+          : 'No images loaded';
+        updateSelectionTools();
+      }
+
+      function updateSelectionTools() {
+        const count = selectedPaths.size;
+        applyMicroButton.disabled = applyMacroscopicButton.disabled = applyNotMushroomButton.disabled = count === 0;
+        clearSelectionButton.disabled = count === 0;
+        applyMicroButton.textContent = '';
+        const microSwatch = document.createElement('span');
+        microSwatch.className = 'color-swatch';
+        microSwatch.setAttribute('aria-hidden', 'true');
+        applyMicroButton.append(microSwatch, `Microscopic${count ? ` (${count})` : ''}`);
+        applyMacroscopicButton.textContent = '';
+        const macroSwatch = document.createElement('span');
+        macroSwatch.className = 'color-swatch';
+        macroSwatch.setAttribute('aria-hidden', 'true');
+        applyMacroscopicButton.append(macroSwatch, `Macroscopic${count ? ` (${count})` : ''}`);
+        applyNotMushroomButton.textContent = '';
+        const notMushroomSwatch = document.createElement('span');
+        notMushroomSwatch.className = 'color-swatch';
+        notMushroomSwatch.setAttribute('aria-hidden', 'true');
+        applyNotMushroomButton.append(notMushroomSwatch, `Not a mushroom${count ? ` (${count})` : ''}`);
+        const pagePaths = visibleIndices.slice(pageIndex * PAGE_SIZE, (pageIndex + 1) * PAGE_SIZE).map(index => images[index].path);
+        selectPageButton.disabled = pagePaths.length === 0 || pagePaths.every(path => selectedPaths.has(path));
+        selectPageButton.textContent = pagePaths.length && pagePaths.every(path => selectedPaths.has(path)) ? 'Page selected' : 'Select page';
+      }
+
+      function setLabel(value) {
+        if (!selectedPaths.size) return;
+        for (const path of selectedPaths) labels[path] = value;
+        const count = selectedPaths.size;
+        selectedPaths.clear();
+        persistLabels();
+        updateView();
+        const className = value === 'micro' ? 'Microscopic' : value === 'macroscopic' ? 'Macroscopic' : 'Not a mushroom';
+        setNotice(`Applied ${className} to ${count} images. Labeled images are hidden by the current filter.`);
+      }
+
+      function csvCell(value) {
+        const text = String(value ?? '');
+        return /[",\r\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+      }
+
+      function labelsCsv() {
+        const rows = [['id', 'image', 'label']];
+        for (const image of images) {
+          rows.push([image.id, image.path.split('/').slice(1).join('/') || image.path, labels[image.path] || '']);
+        }
+        return '\uFEFF' + rows.map(row => row.map(csvCell).join(',')).join('\r\n') + '\r\n';
+      }
+
+      async function exportLabels() {
+        const csv = labelsCsv();
+        if (window.showSaveFilePicker) {
+          try {
+            const handle = await window.showSaveFilePicker({
+              suggestedName: 'image-labels.csv',
+              types: [{ description: 'CSV file', accept: { 'text/csv': ['.csv'] } }]
+            });
+            const writable = await handle.createWritable();
+            await writable.write(csv);
+            await writable.close();
+            setNotice(`Saved ${images.length} image rows to ${handle.name}.`);
+            return;
+          } catch (error) {
+            if (error.name === 'AbortError') return;
+            setNotice(`Could not save directly (${error.message}); downloading the CSV instead.`);
+          }
+        }
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'image-labels.csv';
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+        setNotice('Downloaded image-labels.csv. Move it into ../data to keep it with the project.');
+      }
+
+      function parseCsv(text) {
+        const rows = [];
+        let row = [], value = '', quoted = false;
+        for (let i = 0; i < text.length; i++) {
+          const char = text[i];
+          if (quoted) {
+            if (char === '"' && text[i + 1] === '"') { value += '"'; i++; }
+            else if (char === '"') quoted = false;
+            else value += char;
+          } else if (char === '"' && value === '') quoted = true;
+          else if (char === ',') { row.push(value); value = ''; }
+          else if (char === '\n') { row.push(value.replace(/\r$/, '')); rows.push(row); row = []; value = ''; }
+          else value += char;
+        }
+        if (value.length || row.length) { row.push(value.replace(/\r$/, '')); rows.push(row); }
+        return rows.filter(cells => cells.some(cell => cell.trim() !== ''));
+      }
+
+      function normalizePath(id, image) {
+        const imagePath = String(image || '').replaceAll('\\', '/').replace(/^\/+/, '');
+        if (!imagePath) return '';
+        if (imagePath.includes('/')) return imagePath;
+        return `${String(id || '').trim()}/${imagePath}`;
+      }
+
+      function normalizePredictionPath(imagePath, id, image) {
+        let path = String(imagePath || '').trim().replaceAll('\\', '/').replace(/^\/+/, '');
+        if (!path) path = normalizePath(id, image);
+        if (path.startsWith('./images/')) path = path.slice('./images/'.length);
+        else if (path.startsWith('images/')) path = path.slice('images/'.length);
+        return path;
+      }
+
+      function numericValue(value) {
+        if (value == null || String(value).trim() === '') return null;
+        const number = Number(value);
+        return Number.isFinite(number) ? number : null;
+      }
+
+      document.querySelector('#choose-folder').addEventListener('click', () => folderInput.click());
+      overlayToggle.addEventListener('change', () => {
+        document.body.classList.toggle('hide-class-overlays', !overlayToggle.checked);
+      });
+      closePreviewButton.addEventListener('click', () => previewDialog.close());
+      previewDialog.addEventListener('close', releasePreview);
+      previewDialog.addEventListener('click', event => {
+        if (event.target === previewDialog) previewDialog.close();
+      });
+      folderInput.addEventListener('change', event => {
+        if (event.target.files.length) loadFiles(event.target.files);
+      });
+      document.querySelector('#import-button').addEventListener('click', () => importInput.click());
+      document.querySelector('#import-predictions-button').addEventListener('click', () => predictionsInput.click());
+      predictionsInput.addEventListener('change', async event => {
+        const file = event.target.files[0];
+        if (!file) return;
+        try {
+          const rows = parseCsv((await file.text()).replace(/^\uFEFF/, ''));
+          if (!rows.length) throw new Error('The predictions CSV is empty.');
+          const headers = rows[0].map(header => header.trim().toLowerCase());
+          const column = name => headers.indexOf(name);
+          const imagePathColumn = column('image_path');
+          const idColumn = headers.includes('mushroom_id') ? column('mushroom_id') : column('id');
+          const imageColumn = column('image');
+          const labelColumn = column('predicted_label');
+          const confidenceColumn = column('confidence');
+          const microProbabilityColumn = column('probability_micro');
+          const macroProbabilityColumn = column('probability_macroscopic');
+          if (labelColumn < 0 || (imagePathColumn < 0 && (idColumn < 0 || imageColumn < 0))) {
+            throw new Error('Expected image_path and predicted_label columns (or mushroom_id, image, and predicted_label).');
+          }
+
+          const importedPredictions = new Map();
+          for (const cells of rows.slice(1)) {
+            const path = normalizePredictionPath(
+              imagePathColumn >= 0 ? cells[imagePathColumn] : '',
+              idColumn >= 0 ? cells[idColumn] : '',
+              imageColumn >= 0 ? cells[imageColumn] : ''
+            );
+            const rawLabel = String(cells[labelColumn] || '').trim().toLowerCase();
+            const label = ['micro', 'microscopic'].includes(rawLabel) ? 'micro'
+              : ['macro', 'macroscopic'].includes(rawLabel) ? 'macroscopic'
+              : rawLabel === 'unknown' ? 'unknown'
+              : ['not-mushroom', 'not mushroom', 'not mushrooms', 'not a mushroom', 'not a mushroom at all', 'not-a-mushroom', 'not_a_mushroom', 'not_mushroom', 'not_mushrooms', 'non-mushroom', 'non-mushrooms', 'non_mushroom'].includes(rawLabel) ? 'not-mushroom' : '';
+            if (!path || !label) continue;
+            let confidence = numericValue(confidenceColumn >= 0 ? cells[confidenceColumn] : '');
+            if (confidence == null) {
+              const probabilityColumn = label === 'micro' ? microProbabilityColumn
+                : label === 'macroscopic' ? macroProbabilityColumn
+                : headers.findIndex(header => ['probability_not_mushroom', 'probability_not-mushroom', 'probability_non_mushroom'].includes(header));
+              confidence = numericValue(probabilityColumn >= 0 ? cells[probabilityColumn] : '');
+            }
+            importedPredictions.set(path, { label, confidence });
+          }
+          predictions = importedPredictions;
+          imageOrder.disabled = images.length === 0 || predictions.size === 0;
+          pageIndex = 0;
+          updateView();
+          setNotice(`Imported ${predictions.size.toLocaleString()} predictions. They remain separate from your labels and are not written to the annotation CSV.`);
+        } catch (error) {
+          setNotice(`Could not import predictions: ${error.message}`, true);
+        }
+        predictionsInput.value = '';
+      });
+      importInput.addEventListener('change', async event => {
+        const file = event.target.files[0];
+        if (!file) return;
+        try {
+          const rows = parseCsv((await file.text()).replace(/^\uFEFF/, ''));
+          if (!rows.length) throw new Error('The CSV is empty.');
+          const headers = rows[0].map(header => header.trim().toLowerCase());
+          const idColumn = headers.indexOf('id');
+          const imageColumn = headers.findIndex(header => ['image', 'filename', 'path', 'file'].includes(header));
+          const labelColumn = headers.findIndex(header => ['label', 'microscopic', 'annotation'].includes(header));
+          if (labelColumn < 0 || imageColumn < 0) throw new Error('Expected CSV columns for image (or path) and label.');
+          let imported = 0;
+          for (const cells of rows.slice(1)) {
+            const path = normalizePath(idColumn >= 0 ? cells[idColumn] : '', cells[imageColumn]);
+            const rawLabel = String(cells[labelColumn] || '').trim().toLowerCase();
+            const label = ['micro', 'microscopic', 'yes', 'true', '1'].includes(rawLabel) ? 'micro'
+              : ['macroscopic', 'not-microscopic', 'not microscopic', 'not_micro', 'no', 'false', '0'].includes(rawLabel) ? 'macroscopic'
+              : ['not-mushroom', 'not a mushroom', 'not mushroom', 'not_mushroom'].includes(rawLabel) ? 'not-mushroom' : '';
+            if (path && label) { labels[path] = label; imported++; }
+          }
+          persistLabels();
+          updateView();
+          setNotice(`Imported ${imported} labels from CSV. Use the filter to show labeled images.`);
+        } catch (error) { setNotice(`Could not import labels: ${error.message}`, true); }
+        importInput.value = '';
+      });
+      exportButton.addEventListener('click', exportLabels);
+      applyMicroButton.addEventListener('click', () => setLabel('micro'));
+      applyMacroscopicButton.addEventListener('click', () => setLabel('macroscopic'));
+      applyNotMushroomButton.addEventListener('click', () => setLabel('not-mushroom'));
+      document.querySelector('#select-page-button').addEventListener('click', () => {
+        const pagePaths = visibleIndices.slice(pageIndex * PAGE_SIZE, (pageIndex + 1) * PAGE_SIZE).map(index => images[index].path);
+        pagePaths.forEach(path => selectedPaths.add(path));
+        updateView();
+      });
+      document.querySelector('#clear-selection-button').addEventListener('click', () => {
+        selectedPaths.clear();
+        selectionAnchorIndex = null;
+        updateView();
+      });
+      previousPageButton.addEventListener('click', () => {
+        if (pageIndex > 0) { pageIndex--; updateView(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+      });
+      nextPageButton.addEventListener('click', () => {
+        if ((pageIndex + 1) * PAGE_SIZE < visibleIndices.length) { pageIndex++; updateView(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+      });
+      search.addEventListener('input', () => { pageIndex = 0; updateView(); });
+      labelFilter.addEventListener('change', () => { pageIndex = 0; updateView(); });
+      predictionFilter.addEventListener('change', () => { pageIndex = 0; updateView(); });
+      imageOrder.addEventListener('change', () => { pageIndex = 0; updateView(); });
+      document.addEventListener('keydown', event => {
+        if (event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement) return;
+        if (event.key.toLowerCase() === 'm') setLabel('micro');
+        else if (event.key.toLowerCase() === 'n') setLabel('macroscopic');
+      });
+      window.addEventListener('beforeunload', () => {
+        revokePageUrls();
+        if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
+      });
+    })();
+  </script>
+</body>
+</html>

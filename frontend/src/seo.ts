@@ -103,6 +103,26 @@ export const disclaimerMeta = (t: Translate): PageMeta => ({
   path: "/disclaimer",
 })
 
+export const termsMeta = (t: Translate): PageMeta => ({
+  title: withSiteName(t("terms.title")),
+  description: t("seo.termsDescription"),
+  path: "/terms",
+})
+
+export const privacyMeta = (t: Translate): PageMeta => ({
+  title: withSiteName(t("privacy.title")),
+  description: t("seo.privacyDescription"),
+  path: "/privacy",
+})
+
+/** Nothing on the login page is worth a search result. */
+export const loginMeta = (t: Translate): PageMeta => ({
+  title: withSiteName(t("login.title")),
+  description: t("seo.loginDescription"),
+  path: "/login",
+  noindex: true,
+})
+
 export const notFoundMeta = (
   t: Translate,
   path: string,

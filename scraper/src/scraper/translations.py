@@ -1,6 +1,6 @@
 """Translations of the mushrooms characteristics, exported with the data by stage 7.
 
-The database keeps the English vocabulary produced by stage 5; the app filters on
+The database keeps the English vocabulary produced by stage 6; the app filters on
 those values and shows them translated when a dictionary for its language exists.
 For each language, `terms` maps every English term of a field (the JSON key) to
 its translation, and compound values are translated part by part:
@@ -25,7 +25,7 @@ FIELDS = ("cap", "hymenium", "lamella", "stipe", "gleba", "sporePrint", "ecology
 LANGUAGES: dict[str, dict] = {
     "it": {
         "separators": {"or": "{} o {}", "and": "{} e {}", "to": "da {} a {}"},
-        # Mostly the terms of it.wikipedia's Template:Fungo (see stage 5).
+        # Mostly the terms of it.wikipedia's Template:Fungo (see stage 6).
         "terms": {
             "cap": {
                 "acute conical": "conico-acuto",
